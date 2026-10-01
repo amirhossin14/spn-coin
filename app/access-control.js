@@ -199,6 +199,39 @@ function hashPassword(password, salt = null) {
     return `${s}:${h}`;
 }
 
+// Password policy (NIST-aligned, balanced):
+// >=12 chars, <=128, at least 3 of 4 character classes,
+// no 3+ identical characters in a row, not a common/weak password,
+// not equal to the username. Spaces are allowed (passphrases).
+const COMMON_PASSWORDS = new Set([
+    'password','passw0rd','password1','password123','123456','1234567','12345678',
+    '123456789','1234567890','qwerty','qwertyui','qwerty123','111111','000000',
+    'abc123','abcd1234','letmein','welcome','welcome1','admin','admin123','root',
+    'toor','iloveyou','monkey','dragon','sunshine','princess','football','baseball',
+    'master','superman','batman','trustno1','whatever','passpass','changeme',
+    'login','starwars','hello123','test123','secret','samsung','google'
+]);
+function validatePasswordPolicy(password, username = '') {
+    const pw = String(password == null ? '' : password);
+    if (pw.length < 12)  return { ok: false, error: 'Password must be at least 12 characters' };
+    if (pw.length > 128) return { ok: false, error: 'Password must be at most 128 characters' };
+    if (username && pw.toLowerCase() === String(username).toLowerCase())
+        return { ok: false, error: 'Password must not be the same as the username' };
+    let classes = 0;
+    if (/[a-z]/.test(pw)) classes++;
+    if (/[A-Z]/.test(pw)) classes++;
+    if (/[0-9]/.test(pw)) classes++;
+    if (/[^a-zA-Z0-9]/.test(pw)) classes++;
+    if (classes < 3)
+        return { ok: false, error: 'Password must include at least 3 of: lowercase, uppercase, number, symbol' };
+    if (/(.)\1\1/.test(pw))
+        return { ok: false, error: 'Password must not contain the same character 3+ times in a row' };
+    const base = pw.toLowerCase().replace(/[0-9!@#$%^&*._-]+$/,'');
+    if (COMMON_PASSWORDS.has(pw.toLowerCase()) || COMMON_PASSWORDS.has(base))
+        return { ok: false, error: 'Password is too common - choose something less guessable' };
+    return { ok: true };
+}
+
 // Hash a recovery code. Codes have plenty of entropy, so a keyed SHA-256 is
 // enough and keeps verification fast. Deterministic so we can look codes up.
 function hashRecovery(code) {
@@ -710,12 +743,10 @@ class AccessControl {
             return { ok: false, error: 'Username may only contain letters, digits, underscore and hyphen' };
 
         // Password: 8–128 chars, and must not be trivially weak.
-        if (password.length < 8)
-            return { ok: false, error: 'Password must be at least 8 characters' };
-        if (password.length > 128)
-            return { ok: false, error: 'Password must be at most 128 characters' };
-        if (password.toLowerCase() === username.toLowerCase())
-            return { ok: false, error: 'Password must not be the same as the username' };
+        {
+            const pc = validatePasswordPolicy(password, username);
+            if (!pc.ok) return { ok: false, error: pc.error };
+        }
 
         // Role: default to the least-privileged role when omitted; reject invalid.
         if (role === undefined || role === null || role === '') {
@@ -770,6 +801,8 @@ class AccessControl {
         }
 
         if (updates.password) {
+            const pc = validatePasswordPolicy(updates.password, updates.username || user.username);
+            if (!pc.ok) return { ok: false, error: pc.error };
             user.passwordHash = hashPassword(updates.password);
             writeLog({ action: 'password:changed', username: editorUsername, target: user.username });
         }

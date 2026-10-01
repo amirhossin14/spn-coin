@@ -1163,8 +1163,8 @@ authRouter.post('/change-password', jwtMiddleware(), async (req, res) => {
     const { oldPassword, newPassword } = req.body;
     if (!oldPassword || !newPassword)
         return res.status(400).json({ error: 'Both oldPassword and newPassword are required' });
-    if (newPassword.length < 8)
-        return res.status(400).json({ error: 'New password must be at least 8 characters' });
+    if (newPassword.length < 12)
+        return res.status(400).json({ error: 'New password must be at least 12 characters' });
     const u = ac.getUserById(req.user.id);
     if (!u) return res.status(404).json({ error: 'User not found' });
     const test = ac.login({ username: u.username, password: oldPassword, ip: req.ip });
