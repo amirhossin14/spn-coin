@@ -93,7 +93,7 @@
       <label for="restoreInput">Recovery phrase (12 or 24 words)</label>
       <input id="restoreInput" placeholder="word1 word2 word3 …" autocomplete="off" />
       <label for="restorePass" style="margin-top:12px">Set a password (required — to unlock faster next time) *</label>
-      <input id="restorePass" type="password" placeholder="Min 8 chars, letter + number + symbol" autocomplete="new-password" oninput="showPwHint('restorePass','restorePwHint')" />
+      <input id="restorePass" type="password" placeholder="Min 12 chars, 3 of 4 types" autocomplete="new-password" oninput="showPwHint('restorePass','restorePwHint')" />
       <div id="restorePwHint" style="font-size:11.5px;color:var(--mut);margin-top:5px;line-height:1.7"></div>
       <button class="btn-ghost" id="btnRestore" style="width:100%;margin-top:12px">Restore wallet</button>
     </div>
@@ -110,7 +110,7 @@
       <div class="seed-grid" id="seedGrid"></div>
       <button class="btn-ghost" id="btnCopySeed" style="width:100%;margin-bottom:10px">📋 Copy phrase</button>
       <label for="newWalletPass" style="margin-top:6px">🔑 Set a password (required — to unlock this wallet faster next time) *</label>
-      <input id="newWalletPass" type="password" placeholder="Min 8 chars, letter + number + symbol" autocomplete="new-password" oninput="showPwHint('newWalletPass','newPwHint')" />
+      <input id="newWalletPass" type="password" placeholder="Min 12 chars, 3 of 4 types" autocomplete="new-password" oninput="showPwHint('newWalletPass','newPwHint')" />
       <div id="newPwHint" style="font-size:11.5px;color:var(--mut);margin-top:5px;line-height:1.7"></div>
       <div class="warn-box" style="margin-top:12px">
         📝 <b data-i18n>Save BOTH in a safe place:</b><br>
@@ -211,29 +211,49 @@ function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show');
 function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 // Live checklist shown as the user types a password.
-function showPwHint(inputId, hintId) {
-  const pw = document.getElementById(inputId).value || '';
-  const el = document.getElementById(hintId);
-  if (!pw) { el.innerHTML = ''; return; }
-  const rules = [
-    { ok: pw.length >= 8,            txt: 'At least 8 characters' },
-    { ok: /[a-zA-Z]/.test(pw),       txt: 'A letter (a–z)' },
-    { ok: /[0-9]/.test(pw),          txt: 'A number (0–9)' },
-    { ok: /[^a-zA-Z0-9]/.test(pw),   txt: 'A symbol (@ # ! $ …)' },
-  ];
-  el.innerHTML = rules.map(r =>
-    '<span style="color:' + (r.ok ? 'var(--grn)' : 'var(--mut)') + '">' +
-    (r.ok ? '✓' : '○') + ' ' + r.txt + '</span>'
-  ).join('&nbsp;&nbsp;');
+function showPwHint(inputId, hintId){
+  var pw=(document.getElementById(inputId)||{}).value||'';
+  var el=document.getElementById(hintId); if(!el) return;
+  if(!pw){ el.innerHTML=''; return; }
+  var low=/[a-z]/.test(pw),up=/[A-Z]/.test(pw),num=/[0-9]/.test(pw),sym=/[^a-zA-Z0-9]/.test(pw);
+  var pool=(low?26:0)+(up?26:0)+(num?10:0)+(sym?33:0)||1;
+  var bits=pw.length*Math.log2(pool);
+  if(/(.)\1\1/.test(pw)) bits-=12;
+  if(/^[0-9]+$/.test(pw)) bits-=8;
+  if(bits<0) bits=0;
+  var t = bits<28?{p:18,l:'Very weak',c:'#f2555a',g:'linear-gradient(90deg,#f2555a,#ff8a6b)'}
+        : bits<40?{p:38,l:'Weak',c:'#f59e0b',g:'linear-gradient(90deg,#f59e0b,#fbbf24)'}
+        : bits<60?{p:60,l:'Fair',c:'#f5b301',g:'linear-gradient(90deg,#f5b301,#ffd24a)'}
+        : bits<80?{p:85,l:'Strong',c:'#26d07c',g:'linear-gradient(90deg,#26d07c,#22d3ee)'}
+        :          {p:100,l:'Very strong',c:'#22d3ee',g:'linear-gradient(90deg,#26d07c,#22d3ee,#6d6bf5)'};
+  var secs=Math.pow(2,bits)/1e10;
+  var crack=(function(s){ if(s<1)return'instant';
+    var u=[['second',60],['minute',60],['hour',24],['day',365],['year',100],['century',1000]],v=s,n='second';
+    for(var i=0;i<u.length;i++){n=u[i][0]; if(v<u[i][1])break; v/=u[i][1];}
+    if(n==='century'&&v>=10)return'centuries'; v=Math.round(v); return v+' '+n+(v!==1?'s':'');})(secs);
+  function row(ok,txt){ return '<span style="color:'+(ok?'#26d07c':'var(--mut,#8a97b8)')+'">'+(ok?'\u2713':'\u25cb')+' '+txt+'</span>'; }
+  el.innerHTML =
+    '<div style="display:flex;align-items:center;gap:8px;margin:2px 0 6px">'
+    + '<div style="flex:1;height:7px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden">'
+    +   '<i style="display:block;height:100%;width:'+t.p+'%;border-radius:999px;background:'+t.g+';transition:width .25s"></i></div>'
+    + '<b style="font-size:11.5px;min-width:70px;text-align:right;color:'+t.c+'">'+t.l+'</b></div>'
+    + '<div style="color:var(--mut,#8a97b8);font-size:11px;margin-bottom:6px">Estimated time to crack: <b style="color:var(--txt,#eaf0fb)">'+crack+'</b></div>'
+    + '<div style="display:flex;flex-wrap:wrap;gap:4px 12px">'
+    + row(pw.length>=12,'At least 12 characters')
+    + row(low,'A lowercase letter (a\u2013z)')
+    + row(up,'An uppercase letter (A\u2013Z)')
+    + row(num,'A number (0\u20139)')
+    + row(sym,'A symbol (@ # ! $ \u2026)')
+    + '</div>';
 }
 
 // Validate wallet password strength. Returns an error string, or '' if valid.
 // Rules: >= 8 chars, at least one letter, one number, one special character.
 function checkPasswordStrength(pw) {
-  if (!pw || pw.length < 8)        return 'Password must be at least 8 characters.';
-  if (!/[a-zA-Z]/.test(pw))        return 'Password must contain a letter (a–z).';
-  if (!/[0-9]/.test(pw))           return 'Password must contain a number (0–9).';
-  if (!/[^a-zA-Z0-9]/.test(pw))    return 'Password must contain a special character (e.g. @ # ! $).';
+  if (!pw || pw.length < 12)  return 'Password must be at least 12 characters.';
+  var classes = (/[a-z]/.test(pw)?1:0) + (/[A-Z]/.test(pw)?1:0) + (/[0-9]/.test(pw)?1:0) + (/[^a-zA-Z0-9]/.test(pw)?1:0);
+  if (classes < 3)            return 'Use at least 3 of: lowercase, uppercase, number, symbol.';
+  if (/(.)\1\1/.test(pw))     return 'Do not repeat the same character 3+ times in a row.';
   return '';
 }
 function show(v){ ['setupView','seedView','walletView'].forEach(x=>$(x).classList.toggle('hidden', x!==v)); }

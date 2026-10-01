@@ -1373,21 +1373,40 @@ async function dis2FA() {
   } catch (e) { toast('Error: ' + e.message, 'e'); }
 }
 // Live password-requirements checklist shown as the user types.
-function showPwHint(inputId, hintId) {
-  var pw = (document.getElementById(inputId) || {}).value || '';
-  var el = document.getElementById(hintId);
-  if (!el) return;
-  if (!pw) { el.innerHTML = ''; return; }
-  var rules = [
-    { ok: pw.length >= 8,          txt: 'At least 8 characters' },
-    { ok: /[a-zA-Z]/.test(pw),     txt: 'A letter (a–z)' },
-    { ok: /[0-9]/.test(pw),        txt: 'A number (0–9)' },
-    { ok: /[^a-zA-Z0-9]/.test(pw), txt: 'A symbol (@ # ! $ …)' },
-  ];
-  el.innerHTML = rules.map(function (r) {
-    return '<span style="color:' + (r.ok ? 'var(--grn,#26d07c)' : 'var(--txt3,#8a94a6)') + '">' +
-      (r.ok ? '✓' : '○') + ' ' + r.txt + '</span>';
-  }).join('&nbsp;&nbsp;');
+function showPwHint(inputId, hintId){
+  var pw=(document.getElementById(inputId)||{}).value||'';
+  var el=document.getElementById(hintId); if(!el) return;
+  if(!pw){ el.innerHTML=''; return; }
+  var low=/[a-z]/.test(pw),up=/[A-Z]/.test(pw),num=/[0-9]/.test(pw),sym=/[^a-zA-Z0-9]/.test(pw);
+  var pool=(low?26:0)+(up?26:0)+(num?10:0)+(sym?33:0)||1;
+  var bits=pw.length*Math.log2(pool);
+  if(/(.)\1\1/.test(pw)) bits-=12;
+  if(/^[0-9]+$/.test(pw)) bits-=8;
+  if(bits<0) bits=0;
+  var t = bits<28?{p:18,l:'Very weak',c:'#f2555a',g:'linear-gradient(90deg,#f2555a,#ff8a6b)'}
+        : bits<40?{p:38,l:'Weak',c:'#f59e0b',g:'linear-gradient(90deg,#f59e0b,#fbbf24)'}
+        : bits<60?{p:60,l:'Fair',c:'#f5b301',g:'linear-gradient(90deg,#f5b301,#ffd24a)'}
+        : bits<80?{p:85,l:'Strong',c:'#26d07c',g:'linear-gradient(90deg,#26d07c,#22d3ee)'}
+        :          {p:100,l:'Very strong',c:'#22d3ee',g:'linear-gradient(90deg,#26d07c,#22d3ee,#6d6bf5)'};
+  var secs=Math.pow(2,bits)/1e10;
+  var crack=(function(s){ if(s<1)return'instant';
+    var u=[['second',60],['minute',60],['hour',24],['day',365],['year',100],['century',1000]],v=s,n='second';
+    for(var i=0;i<u.length;i++){n=u[i][0]; if(v<u[i][1])break; v/=u[i][1];}
+    if(n==='century'&&v>=10)return'centuries'; v=Math.round(v); return v+' '+n+(v!==1?'s':'');})(secs);
+  function row(ok,txt){ return '<span style="color:'+(ok?'#26d07c':'var(--mut,#8a97b8)')+'">'+(ok?'\u2713':'\u25cb')+' '+txt+'</span>'; }
+  el.innerHTML =
+    '<div style="display:flex;align-items:center;gap:8px;margin:2px 0 6px">'
+    + '<div style="flex:1;height:7px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden">'
+    +   '<i style="display:block;height:100%;width:'+t.p+'%;border-radius:999px;background:'+t.g+';transition:width .25s"></i></div>'
+    + '<b style="font-size:11.5px;min-width:70px;text-align:right;color:'+t.c+'">'+t.l+'</b></div>'
+    + '<div style="color:var(--mut,#8a97b8);font-size:11px;margin-bottom:6px">Estimated time to crack: <b style="color:var(--txt,#eaf0fb)">'+crack+'</b></div>'
+    + '<div style="display:flex;flex-wrap:wrap;gap:4px 12px">'
+    + row(pw.length>=12,'At least 12 characters')
+    + row(low,'A lowercase letter (a\u2013z)')
+    + row(up,'An uppercase letter (A\u2013Z)')
+    + row(num,'A number (0\u20139)')
+    + row(sym,'A symbol (@ # ! $ \u2026)')
+    + '</div>';
 }
 
 async function chgPwd() {
