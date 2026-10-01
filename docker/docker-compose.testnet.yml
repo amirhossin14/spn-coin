@@ -1,0 +1,160 @@
+version: '3.9'
+
+# ════════════════════════════════════════════════════════════
+#  🧪 Docker Compose — SPN Coin Testnet (3 نود)
+#  اجرا: docker-compose -f docker/docker-compose.testnet.yml up
+# ════════════════════════════════════════════════════════════
+
+x-node: &node-base
+  build:
+    context: ..
+    dockerfile: docker/Dockerfile
+  environment:
+    NODE_ENV:        testnet
+    CHAIN_ID:        "3"
+    BLOCK_TIME:      "5000"
+    DIFF_WINDOW:     "10"
+    MIN_DIFFICULTY:  "1"
+    INITIAL_REWARD:  "5000000000"
+    HALVING_INTERVAL: "100"
+    DB_HOST:         postgres-test
+    DB_NAME:         spncoin_test
+    DB_USER:         spncoin
+    DB_PASSWORD:     testpass
+    JWT_SECRET:      testnet-jwt-secret-not-for-production
+    JWT_REFRESH_SECRET: testnet-refresh-secret-not-for-production
+    RATE_AUTH:       "100"
+    DDOS_REQ_PER_SEC: "200"
+  depends_on:
+    postgres-test:
+      condition: service_healthy
+
+services:
+
+  # ── PostgreSQL برای testnet ─────────────────────────────────
+  postgres-test:
+    image: postgres:16-alpine
+    container_name: spncoin-test-db
+    environment:
+      POSTGRES_DB:       spncoin_test
+      POSTGRES_USER:     spncoin
+      POSTGRES_PASSWORD: testpass
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U spncoin -d spncoin_test"]
+      interval: 5s
+      retries: 5
+
+  # ── نود ۱ ────────────────────────────────────────────────────
+  node1:
+    <<: *node-base
+    container_name: spncoin-test-node1
+    hostname: node1
+    environment:
+      NODE_ENV:        testnet
+      CHAIN_ID:        "3"
+      BLOCK_TIME:      "5000"
+      DIFF_WINDOW:     "10"
+      MIN_DIFFICULTY:  "1"
+      INITIAL_REWARD:  "5000000000"
+      HALVING_INTERVAL: "100"
+      DB_HOST:         postgres-test
+      DB_NAME:         spncoin_test
+      DB_USER:         spncoin
+      DB_PASSWORD:     testpass
+      JWT_SECRET:      testnet-jwt-secret
+      JWT_REFRESH_SECRET: testnet-refresh-secret
+      RATE_AUTH:       "100"
+      DDOS_REQ_PER_SEC: "200"
+      PORT:            "3100"
+      STRATUM_PORT:    "3133"
+      P2P_PORT:        "6101"
+      NODE_ID:         node1
+      PEERS:           "node2:6102,node3:6103"
+    ports:
+      - "3100:3100"   # HTTP/Dashboard
+      - "3133:3133"   # Stratum
+    volumes:
+      - testnet-node1:/app/data/node1
+
+  # ── نود ۲ ────────────────────────────────────────────────────
+  node2:
+    <<: *node-base
+    container_name: spncoin-test-node2
+    hostname: node2
+    environment:
+      NODE_ENV:        testnet
+      CHAIN_ID:        "3"
+      BLOCK_TIME:      "5000"
+      DIFF_WINDOW:     "10"
+      MIN_DIFFICULTY:  "1"
+      INITIAL_REWARD:  "5000000000"
+      HALVING_INTERVAL: "100"
+      DB_HOST:         postgres-test
+      DB_NAME:         spncoin_test
+      DB_USER:         spncoin
+      DB_PASSWORD:     testpass
+      JWT_SECRET:      testnet-jwt-secret
+      JWT_REFRESH_SECRET: testnet-refresh-secret
+      RATE_AUTH:       "100"
+      DDOS_REQ_PER_SEC: "200"
+      PORT:            "3200"
+      STRATUM_PORT:    "3233"
+      P2P_PORT:        "6102"
+      NODE_ID:         node2
+      PEERS:           "node1:6101,node3:6103"
+    ports:
+      - "3200:3200"
+      - "3233:3233"
+    volumes:
+      - testnet-node2:/app/data/node2
+
+  # ── نود ۳ ────────────────────────────────────────────────────
+  node3:
+    <<: *node-base
+    container_name: spncoin-test-node3
+    hostname: node3
+    environment:
+      NODE_ENV:        testnet
+      CHAIN_ID:        "3"
+      BLOCK_TIME:      "5000"
+      DIFF_WINDOW:     "10"
+      MIN_DIFFICULTY:  "1"
+      INITIAL_REWARD:  "5000000000"
+      HALVING_INTERVAL: "100"
+      DB_HOST:         postgres-test
+      DB_NAME:         spncoin_test
+      DB_USER:         spncoin
+      DB_PASSWORD:     testpass
+      JWT_SECRET:      testnet-jwt-secret
+      JWT_REFRESH_SECRET: testnet-refresh-secret
+      RATE_AUTH:       "100"
+      DDOS_REQ_PER_SEC: "200"
+      PORT:            "3300"
+      STRATUM_PORT:    "3333"
+      P2P_PORT:        "6103"
+      NODE_ID:         node3
+      PEERS:           "node1:6101,node2:6102"
+    ports:
+      - "3300:3300"
+      - "3333:3333"
+    volumes:
+      - testnet-node3:/app/data/node3
+
+  # ── Prometheus (اختیاری برای testnet) ───────────────────────
+  prometheus-test:
+    image: prom/prometheus:latest
+    container_name: spncoin-test-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=1d'
+    volumes:
+      - ../monitoring/prometheus-testnet.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9091:9090"
+
+volumes:
+  testnet-node1:
+  testnet-node2:
+  testnet-node3:

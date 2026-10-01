@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SPN Coin Testnet Faucet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f18; --bg2:#141726; --card:#12141f; --bd:rgba(255,255,255,.07);
+  --txt:#dce1f2; --sub:#6e7898; --mut:#404766;
+  --gold:#f0a500; --grn:#00e676; --cyn:#00cccc; --red:#ff5470;
+}
+body{background:var(--bg);color:var(--txt);font-family:'Sora',sans-serif;min-height:100vh;
+  display:flex;flex-direction:column;line-height:1.5}
+.wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;width:100%}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;max-width:480px;width:100%;
+  overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.top{padding:26px 28px 20px;text-align:center;background:linear-gradient(180deg,rgba(240,165,0,.06),transparent)}
+.top .drop{font-size:44px;margin-bottom:8px}
+.top h1{font-size:21px;font-weight:700}
+.top p{color:var(--sub);font-size:13px;margin-top:6px}
+.warn{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);color:#fcd34d;
+  font-size:11.5px;padding:8px 12px;border-radius:8px;margin:0 28px 18px;text-align:center}
+.body{padding:0 28px 24px}
+label{display:block;font-size:12px;color:var(--sub);margin-bottom:7px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+input{width:100%;background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:13px 15px;
+  color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;margin-bottom:14px}
+input:focus{border-color:rgba(240,165,0,.5)}
+button{width:100%;background:var(--gold);color:#000;border:none;border-radius:10px;padding:14px;
+  font-weight:700;font-size:14px;cursor:pointer;font-family:'Sora',sans-serif;transition:.15s}
+button:hover:not(:disabled){background:#ffb820}
+button:disabled{opacity:.5;cursor:not-allowed}
+#out{margin-top:16px;padding:13px 15px;border-radius:10px;font-size:13px;display:none;word-break:break-all}
+#out.ok{background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);color:var(--grn);display:block}
+#out.err{background:rgba(255,84,112,.1);border:1px solid rgba(255,84,112,.3);color:var(--red);display:block}
+#out a{color:var(--cyn)}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--bd);
+  border-top:1px solid var(--bd)}
+.stat{background:var(--card);padding:14px;text-align:center}
+.stat .v{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:600;color:var(--gold)}
+.stat .l{font-size:10.5px;color:var(--sub);margin-top:3px;text-transform:uppercase;letter-spacing:.4px}
+.foot{text-align:center;padding:14px;font-size:11px;color:var(--mut);border-top:1px solid var(--bd)}
+.foot a{color:var(--sub);text-decoration:none}.foot a:hover{color:var(--gold)}
+</style>
+</head>
+<body>
+  <main class="wrap">
+  <div class="card">
+    <div class="top">
+      <div class="drop">💧</div>
+      <h1>SPN Testnet Faucet</h1>
+      <p>Get free testnet SPN to experiment with the network</p>
+    </div>
+    <div class="warn">⚠️ Testnet coins only — they have <b>no monetary value</b></div>
+    <div class="body">
+      <label>Your SPN Testnet Address</label>
+      <input id="addr" placeholder="SPNt… or SPN1…" autocomplete="off" spellcheck="false" />
+      <button id="btn" onclick="claim()">Request test SPN</button>
+      <div id="out"></div>
+    </div>
+    <div class="stats" id="stats">
+      <div class="stat"><div class="v" id="sAmt">—</div><div class="l">Per Claim</div></div>
+      <div class="stat"><div class="v" id="sCool">—</div><div class="l">Cooldown</div></div>
+      <div class="stat"><div class="v" id="sServed">—</div><div class="l">Served</div></div>
+    </div>
+    <div class="foot">
+      <a href="/dashboard.html">Dashboard</a> · <a href="/explorer.html">Explorer</a> · <a href="/analytics.html">Analytics</a>
+    </div>
+  </div>
+  </main>
+
+<script>
+const $=id=>document.getElementById(id);
+function show(cls,msg){const o=$('out');o.className=cls;o.innerHTML=msg;}
+
+async function loadStats(){
+  try{
+    const s=await fetch('/stats').then(r=>r.json());
+    $('sAmt').textContent=s.amount+' SPN';
+    $('sCool').textContent=s.cooldownHours+'h';
+    $('sServed').textContent=(s.totalServed||0).toLocaleString();
+  }catch{}
+}
+
+async function claim(){
+  const address=$('addr').value.trim();
+  if(!address){ show('err','Please enter an address.'); return; }
+  if(!/^SPN[1t][A-Za-z0-9]{25,50}$/.test(address)){
+    show('err','That does not look like a valid SPN address (SPN1… or SPNt…).'); return;
+  }
+  const btn=$('btn'); btn.disabled=true;
+  show('ok','⏳ Sending…');
+  try{
+    const r=await fetch('/faucet',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({address})});
+    const d=await r.json();
+    if(r.ok){
+      const txlink=d.txid?`<br>TxID: <a href="/tx.html?h=${d.txid}" target="_blank">${d.txid.slice(0,20)}…</a>`:'';
+      show('ok',`✅ Sent ${d.amount} SPN to your address!${txlink}`);
+      loadStats();
+    } else if(r.status===429){
+      show('err',`⏳ Cooldown active. Try again in ~${d.retryAfterHours}h.`);
+    } else {
+      show('err','❌ '+(d.error||'Request failed'));
+    }
+  }catch(e){ show('err','❌ '+e.message); }
+  finally{ btn.disabled=false; }
+}
+
+$('addr').addEventListener('keydown',e=>{if(e.key==='Enter')claim();});
+loadStats();
+setInterval(loadStats,20000);
+</script>
+<script src="/i18n.js?v=34"></script>
+<script src="/footer.js?v=34"></script>
+</body>
+</html>

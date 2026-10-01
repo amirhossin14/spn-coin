@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<!-- © 2026 SPN Coin Project — PROPRIETARY AND CONFIDENTIAL -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="64x64" href="/sepanta-coin.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/sepanta-coin-32.png?v=5">
+  <link rel="shortcut icon" href="/sepanta-coin.ico?v=5">
+  <link rel="apple-touch-icon" sizes="180x180" href="/sepanta-coin-180.png?v=5">
+  <meta name="theme-color" content="#070a0e">
+  <meta name="description" content="Claim your SPN Coin airdrop via Merkle proof distribution.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sepanta (SPN) — Airdrop</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/token-sign.js?v=99"></script>
+<script src="csrf-fetch.js?v=25"></script>
+  <script src="i18n.js?v=34" defer></script>
+  <script src="nav.js?v=40" defer></script><script src="/ai-bubble.js?v=5" defer></script>
+<script src="/anti-phishing.js?v=1" defer></script>
+  <script src="footer.js?v=35" defer></script>
+  <script src="ui-prefs.js?v=25" defer></script>
+<style>
+:root{--bg:#080b13;--panel:#0c1120;--bd:rgba(148,163,208,.14);--grn:#26d07c;--cyan:#25d0ee;
+  --gold:#f5b301;--red:#f2555a;--txt:#eaf0fb;--muted:#8a97b8;--txt3:#5a6788;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:'Sora',system-ui,sans-serif;
+  background-image:radial-gradient(900px 400px at 80% -8%,rgba(0,255,136,.05),transparent 60%);}
+.wrap{max-width:720px;margin:0 auto;padding:24px 22px 60px}
+h1{font-size:22px;font-weight:800;margin-bottom:4px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:20px}
+.card{background:var(--panel);border:1px solid var(--bd);border-radius:14px;padding:20px;margin-bottom:16px}
+label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;margin:12px 0 5px}
+input,textarea{width:100%;background:#070a0e;border:1px solid var(--bd);border-radius:9px;color:var(--txt);
+  padding:11px 13px;font-size:13px;font-family:'JetBrains Mono',monospace;outline:none}
+input:focus,textarea:focus{border-color:rgba(0,255,136,.4)}
+textarea{min-height:130px;resize:vertical}
+.hint{font-size:11px;color:var(--txt3);margin-top:5px}
+button{background:var(--grn);color:#04110a;border:0;border-radius:10px;padding:13px 22px;font-weight:700;
+  font-size:14px;cursor:pointer;margin-top:18px;width:100%;transition:.15s}
+button:hover{background:#33ffa0}button:disabled{opacity:.5;cursor:wait}
+.warn{background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);border-radius:10px;
+  padding:11px 14px;font-size:12px;color:var(--muted);margin-top:8px}
+.result{margin-top:16px;padding:14px;border-radius:10px;font-size:13px;display:none;word-break:break-all}
+.result.show{display:block}
+.result.ok{background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.25)}
+.result.err{background:rgba(255,68,102,.08);border:1px solid rgba(255,68,102,.25);color:#ff8095}
+.summary{display:flex;gap:16px;margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+.summary b{color:var(--grn)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Token Airdrop</h1>
+  <div class="sub">Distribute a token to many addresses at once. Signed in your browser — your key never leaves this page.</div>
+
+  <div class="card">
+    <label for="tokenId">Token ID</label>
+    <input id="tokenId" placeholder="the token you are airdropping" />
+
+    <label for="from">Your address (holder / issuer)</label>
+    <input id="from" placeholder="SPN… (must hold enough of the token)" />
+
+    <label for="recips">Recipients — one per line: <span style="text-transform:none">address,amount</span></label>
+    <textarea id="recips" placeholder="SPN1BAbc...,100&#10;SPN1BXyz...,250&#10;SPN1BQwe...,50"></textarea>
+    <div class="hint">Each line: an address, a comma, and the amount. Blank lines are ignored.</div>
+    <div class="summary" id="summary"></div>
+
+    <label for="pk">Your private key <span style="text-transform:none">(64-hex, signs locally)</span></label>
+    <input id="pk" type="password" placeholder="private key hex" autocomplete="off" />
+    <div class="warn">🔒 The key is used only in your browser to sign the airdrop. It is never sent to the server.</div>
+
+    <button id="send">Sign &amp; send airdrop</button>
+    <div class="result" id="result"></div>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+function tok(){ return sessionStorage.getItem('adm_tok')||localStorage.getItem('mc_token')||localStorage.getItem('token')||''; }
+
+function parseRecipients(text){
+  const rows=[]; let errors=0;
+  for(const raw of text.split('\n')){
+    const line=raw.trim(); if(!line) continue;
+    const [addr,amt]=line.split(',').map(x=>(x||'').trim());
+    if(!addr||!amt||isNaN(Number(amt))||Number(amt)<=0){ errors++; continue; }
+    rows.push({to:addr,amount:amt});
+  }
+  return {rows,errors};
+}
+
+function updateSummary(){
+  const {rows,errors}=parseRecipients($('#recips').value);
+  const total=rows.reduce((s,r)=>s+BigInt(r.amount),0n);
+  $('#summary').innerHTML = rows.length
+    ? `recipients: <b>${rows.length}</b> · total: <b>${total.toString()}</b>${errors?` · <span style="color:#ff8095">${errors} bad line(s) skipped</span>`:''}`
+    : (errors?`<span style="color:#ff8095">${errors} bad line(s)</span>`:'');
+}
+$('#recips').addEventListener('input', updateSummary);
+
+$('#send').addEventListener('click', async ()=>{
+  const tokenId=$('#tokenId').value.trim();
+  const from=$('#from').value.trim();
+  const privHex=$('#pk').value.trim();
+  const {rows,errors}=parseRecipients($('#recips').value);
+  const res=$('#result'); res.className='result';
+
+  if(!tokenId||!from){ res.classList.add('show','err'); res.textContent='Enter the token ID and your address.'; return; }
+  if(!/^[0-9a-fA-F]{64}$/.test(privHex)){ res.classList.add('show','err'); res.textContent='Private key must be 64 hex characters.'; return; }
+  if(!rows.length){ res.classList.add('show','err'); res.textContent='Add at least one valid recipient line (address,amount).'; return; }
+  if(rows.length>500){ res.classList.add('show','err'); res.textContent='Too many recipients for one batch (max 500). Split into several airdrops.'; return; }
+
+  $('#send').disabled=true; $('#send').textContent='Signing locally…';
+  try{
+    // fetch chain id + coins to fund the carrier tx fee
+    const prep=await (await fetch('/api/tokens/prepare',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({address:from,payIssuanceFee:false})})).json();
+    if(!prep.ok) throw new Error(prep.error||'prepare failed');
+
+    // sign the airdrop op in-browser
+    const op=await SPNSign.buildAirdropBatch({tokenId,recipients:rows,from}, privHex, prep.chainId);
+
+    // build + sign a small carrier tx that transports the op
+    let sum=0n; const chosen=[]; const need=BigInt(prep.feeOut)+100000n;
+    for(const u of prep.utxos){ chosen.push(u); sum+=BigInt(u.amount); if(sum>=need) break; }
+    if(sum<need) throw new Error('insufficient SPN to fund the tx fee');
+    const feeOut=BigInt(prep.feeOut);
+    const est=BigInt(Math.ceil((11+chosen.length*68+2*31)*prep.feeRate));
+    const change=sum-feeOut-est;
+    const outputs=[{address:prep.treasury,amount:feeOut.toString()}];
+    if(change>546n) outputs.push({address:from,amount:change.toString()});
+    const inputs=chosen.map(u=>({txid:u.txid,vout:u.vout,sequence:0xffffffff}));
+    const tx=await SPNSign.buildSignedTx({inputs,outputs,data:{tokenOps:[op]},chainId:prep.chainId}, privHex);
+
+    $('#send').textContent='Submitting…';
+    const r=await fetch('/api/tokens/submit-signed',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tx})});
+    const d=await r.json();
+    if(r.ok && d.ok){
+      const total=rows.reduce((s,x)=>s+BigInt(x.amount),0n);
+      res.classList.add('show','ok');
+      res.innerHTML=`<b>✓ Airdrop submitted.</b><br>recipients: ${rows.length} · total: ${total.toString()}<br>txid: ${d.txid}<br><span style="color:var(--muted)">${d.note||''}</span>`;
+      $('#pk').value='';
+    }else{ res.classList.add('show','err'); res.textContent='Failed: '+(d.error||'unknown error'); }
+  }catch(e){ res.classList.add('show','err'); res.textContent='Error: '+e.message; }
+  $('#send').disabled=false; $('#send').textContent='Sign & send airdrop';
+});
+</script>
+</body>
+</html>

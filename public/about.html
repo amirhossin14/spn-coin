@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<!-- © 2026 SPN Coin Project — About page (redesigned) -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="64x64" href="/sepanta-coin.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/sepanta-coin-32.png?v=5">
+  <link rel="shortcut icon" href="/sepanta-coin.ico?v=5">
+  <link rel="apple-touch-icon" sizes="180x180" href="/sepanta-coin-180.png?v=5">
+  <meta name="theme-color" content="#070a0e">
+  <meta name="description" content="Learn about SPN Coin — an educational Bitcoin-inspired blockchain with real PoW, UTXO, and P2P networking.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — Sepanta (SPN)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080b13;--bg2:#0c1120;--card:#0f1626;--bd:rgba(255,255,255,.08);
+  --txt:#eaf0fb;--sub:#8a97b8;--gold:#f5b301;--grn:#26d07c;--cyn:#25d0ee;--vio:#b06bf7;--r:14px;
+  --glow-a:rgba(245,179,1,.22);--glow-b:rgba(34,211,238,.20);--glow-c:rgba(167,139,250,.18);
+  --grid:rgba(255,255,255,.035);
+}
+:root[data-theme="light"]{
+  --bg:#f4f6fb;--bg2:#eaeef6;--card:#ffffff;--bd:rgba(10,20,40,.10);
+  --txt:#141b2e;--sub:#586084;
+  --glow-a:rgba(240,165,0,.16);--glow-b:rgba(34,211,238,.14);--glow-c:rgba(167,139,250,.14);
+  --grid:rgba(10,20,40,.05);
+}
+body{background:var(--bg);color:var(--txt);font-family:'Sora',sans-serif;min-height:100vh;line-height:1.7;overflow-x:hidden}
+/* ── ambient AI background: gradient orbs + subtle grid ── */
+.bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bgfx .orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.9;animation:float 18s ease-in-out infinite}
+.bgfx .o1{width:420px;height:420px;background:radial-gradient(circle,var(--glow-a),transparent 70%);top:-120px;left:-100px}
+.bgfx .o2{width:380px;height:380px;background:radial-gradient(circle,var(--glow-b),transparent 70%);top:20%;right:-120px;animation-delay:-6s}
+.bgfx .o3{width:340px;height:340px;background:radial-gradient(circle,var(--glow-c),transparent 70%);bottom:-100px;left:30%;animation-delay:-11s}
+.bgfx .grid{position:absolute;inset:0;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,#000 30%,transparent 80%)}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(20px,-24px) scale(1.06)}}
+@media(prefers-reduced-motion:reduce){.bgfx .orb{animation:none}}
+.wrap{max-width:920px;margin:0 auto;padding:36px 20px 60px;position:relative;z-index:1}
+
+/* ── hero ── */
+.hero{text-align:center;padding:26px 0 20px;position:relative}
+.ai-badge{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.4px;
+  color:var(--cyn);background:linear-gradient(90deg,rgba(34,211,238,.12),rgba(167,139,250,.12));
+  border:1px solid rgba(34,211,238,.28);padding:7px 16px;border-radius:999px;margin-bottom:20px;
+  font-family:'JetBrains Mono',monospace}
+.ai-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--cyn);box-shadow:0 0 10px var(--cyn);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.hero .logo{width:88px;height:88px;border-radius:24px;background:linear-gradient(135deg,var(--gold),#ffcf5c);
+  display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:900;color:#1a1400;
+  margin:0 auto 22px;box-shadow:0 12px 44px rgba(240,165,0,.36);position:relative}
+.hero .logo::after{content:'';position:absolute;inset:-3px;border-radius:26px;
+  background:conic-gradient(from 0deg,var(--gold),var(--cyn),var(--vio),var(--gold));z-index:-1;opacity:.5;filter:blur(9px);animation:spin 8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+h1{font-size:clamp(30px,6vw,44px);font-weight:800;margin-bottom:14px;letter-spacing:-.5px}
+h1 .g{background:linear-gradient(120deg,var(--gold),var(--cyn) 60%,var(--vio));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.lead{color:var(--sub);font-size:clamp(15px,3vw,17px);max-width:600px;margin:0 auto}
+
+/* ── live stat tiles ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:34px 0 8px}
+@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:18px 12px;text-align:center;
+  position:relative;overflow:hidden;transition:.2s}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--cyn))}
+.stat:hover{transform:translateY(-3px);border-color:rgba(34,211,238,.35)}
+.stat .n{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;color:var(--gold)}
+.stat .l{font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.6px;margin-top:5px}
+
+/* ── warn banner ── */
+.warn{display:flex;gap:12px;align-items:flex-start;background:linear-gradient(90deg,rgba(251,191,36,.10),rgba(251,191,36,.03));
+  border:1px solid rgba(251,191,36,.28);border-radius:var(--r);padding:16px 20px;color:#e0a92e;font-size:14px;margin:28px 0 22px;line-height:1.6}
+
+/* ── cards ── */
+.card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:26px 26px;margin-bottom:20px;
+  position:relative;transition:.2s}
+.card:hover{border-color:rgba(255,255,255,.14)}
+.card h2{font-size:20px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:11px}
+.card h2 .em{width:38px;height:38px;border-radius:11px;background:var(--bg2);display:inline-flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.card p{color:var(--sub);font-size:14.5px;margin-bottom:12px}
+.card p:last-child{margin-bottom:0}
+.card ul{list-style:none;margin-top:10px}
+.card li{color:var(--sub);font-size:14px;padding:8px 0 8px 28px;position:relative}
+.card li::before{content:'▸';position:absolute;left:6px;color:var(--cyn);font-weight:700}
+
+/* ── tech grid ── */
+.tech{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin-top:16px}
+.tech div{background:var(--bg2);border:1px solid var(--bd);border-radius:11px;padding:13px 15px;font-size:12.5px;color:var(--sub);transition:.18s}
+.tech div:hover{border-color:rgba(34,211,238,.45);transform:translateY(-2px);color:var(--txt)}
+.tech b{color:var(--cyn);font-family:'JetBrains Mono',monospace;display:block;margin-bottom:3px;font-size:13px}
+
+/* ── RTL ── */
+[dir="rtl"]{direction:rtl}
+[dir="rtl"] .card li{padding:8px 28px 8px 0;text-align:right}
+[dir="rtl"] .card li::before{left:auto;right:6px;content:'◂'}
+[dir="rtl"] .warn{text-align:right}
+[dir="rtl"] .tech div{text-align:right}
+</style>
+<script src="csrf-fetch.js?v=25"></script>
+  <script src="i18n.js?v=34" defer></script>
+  <script src="nav.js?v=40" defer></script><script src="/ai-bubble.js?v=5" defer></script>
+<script src="/anti-phishing.js?v=1" defer></script>
+<script src="ui-prefs.js?v=25" defer></script>
+  <script src="footer.js?v=35" defer></script>
+</head>
+<body>
+<div class="bgfx"><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span><span class="grid"></span></div>
+<div class="wrap" id="content"></div>
+
+<script>
+const LANG = (window.SPNLang && SPNLang.get()) || (localStorage.getItem('spn_lang')||'en');
+const C = {
+  en: {
+    badge:'AI-ASSISTED · OPEN BLOCKCHAIN',
+    title:['About ','SPN Coin'],
+    lead:'An educational, Bitcoin-inspired blockchain built to teach how cryptocurrencies really work — with real proof-of-work, a UTXO ledger, and a live peer-to-peer network.',
+    warn:'SPN Coin is an educational project. It has no monetary value and is not a real cryptocurrency for investment.',
+    s1t:'What is SPN Coin?', s1e:'🎯',
+    s1:['SPN Coin is a fully-functional blockchain written in Node.js, created to demonstrate the core ideas behind Bitcoin and modern cryptocurrencies.','It implements real proof-of-work mining, a UTXO model, secp256k1 signatures, a peer-to-peer network, a mempool, and a token layer — all the moving parts of a real chain, in readable code.'],
+    s2t:'What can you do with it?', s2e:'🔧',
+    s2list:['Mine blocks with real SHA-256d proof-of-work','Create and send your own coins and tokens','Explore blocks, transactions and addresses','Burn, freeze, and manage token metadata','Run a testnet faucet and monitor network health'],
+    s3t:'Technology stack', s3e:'⚙️',
+    s3:'Built with a clean, dependency-light stack:',
+    s4t:'Why it exists', s4e:'📚',
+    s4:['Understanding blockchain by reading about it is hard. Understanding it by running it, breaking it, and building on top of it is much easier.','SPN Coin exists so students, developers, and curious people can learn cryptocurrency technology hands-on — safely, with no money at risk.'],
+    stt:{height:'Blocks',txs:'Transactions',tokens:'Tokens',supply:'Max Supply'},
+  },
+  fa: {
+    badge:'مبتنی بر هوش مصنوعی · بلاکچین باز',
+    title:['درباره‌ی ','SPN Coin'],
+    lead:'یک بلاکچین آموزشی الهام‌گرفته از بیت‌کوین که برای آموزش نحوه‌ی واقعی کار ارزهای دیجیتال ساخته شده — با اثبات‌کار واقعی، دفترکل UTXO و شبکه‌ی زنده‌ی همتا‌به‌همتا.',
+    warn:'SPN Coin یک پروژه‌ی آموزشی است. هیچ ارزش مالی ندارد و یک ارز دیجیتال واقعی برای سرمایه‌گذاری نیست.',
+    s1t:'SPN Coin چیست؟', s1e:'🎯',
+    s1:['SPN Coin یک بلاکچین کامل و کارآمد است که با Node.js نوشته شده و برای نمایش ایده‌های اصلی پشت بیت‌کوین و ارزهای دیجیتال مدرن ساخته شده است.','این پروژه استخراج اثبات‌کار واقعی، مدل UTXO، امضای secp256k1، شبکه‌ی همتا‌به‌همتا، mempool و لایه‌ی توکن را پیاده کرده — همه‌ی اجزای یک زنجیره‌ی واقعی، در کدی خوانا.'],
+    s2t:'با آن چه می‌توانی بکنی؟', s2e:'🔧',
+    s2list:['استخراج بلوک با اثبات‌کار واقعی SHA-256d','ساخت و ارسال کوین و توکن خودت','کاوش بلوک‌ها، تراکنش‌ها و آدرس‌ها','سوزاندن، انجماد و مدیریت متادیتای توکن','اجرای شیر تست‌نت و پایش سلامت شبکه'],
+    s3t:'پشته‌ی فناوری', s3e:'⚙️',
+    s3:'ساخته‌شده با یک پشته‌ی تمیز و سبک:',
+    s4t:'چرا وجود دارد', s4e:'📚',
+    s4:['فهمیدن بلاکچین با خواندن درباره‌اش سخت است. فهمیدنش با اجرا کردن، شکستن و ساختن روی آن، خیلی راحت‌تر است.','SPN Coin وجود دارد تا دانشجویان، توسعه‌دهندگان و افراد کنجکاو بتوانند فناوری ارز دیجیتال را عملی یاد بگیرند — امن و بدون ریسک مالی.'],
+    stt:{height:'بلوک‌ها',txs:'تراکنش‌ها',tokens:'توکن‌ها',supply:'حداکثر عرضه'},
+  }
+};
+const d = C[LANG]||C.en;
+const rtl = LANG==='fa' ? ' dir="rtl"' : '';
+const TECH = [
+  ['Node.js ≥20', LANG==='fa'?'محیط اجرا':'runtime'],
+  ['SHA-256d', LANG==='fa'?'اثبات‌کار':'proof-of-work'],
+  ['secp256k1', LANG==='fa'?'امضاها':'signatures'],
+  ['UTXO', LANG==='fa'?'مدل دفترکل':'ledger model'],
+  ['Express', LANG==='fa'?'API روی HTTP':'HTTP API'],
+  ['WebSocket', LANG==='fa'?'P2P + استخراج':'P2P + mining'],
+  ['BIP39', LANG==='fa'?'کیف پول عبارت‌بازیابی':'mnemonic wallets'],
+  ['Base58Check', LANG==='fa'?'کدگذاری آدرس':'address encoding'],
+  ['Merkle tree', LANG==='fa'?'یکپارچگی بلوک':'block integrity'],
+  ['PostgreSQL', LANG==='fa'?'ذخیره‌ی وضعیت':'state persistence'],
+  ['JWT', LANG==='fa'?'احراز هویت':'authentication'],
+  ['TLS', LANG==='fa'?'انتقال رمزنگاری‌شده':'encrypted transport'],
+];
+
+document.getElementById('content').innerHTML = `
+  <div${rtl}>
+    <div class="hero">
+      <div class="ai-badge"><span class="dot"></span>${d.badge}</div>
+      <div class="logo">S</div>
+      <h1>${d.title[0]}<span class="g">${d.title[1]}</span></h1>
+      <div class="lead">${d.lead}</div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n" id="s-height">—</div><div class="l">${d.stt.height}</div></div>
+      <div class="stat"><div class="n" id="s-txs">—</div><div class="l">${d.stt.txs}</div></div>
+      <div class="stat"><div class="n" id="s-tokens">—</div><div class="l">${d.stt.tokens}</div></div>
+      <div class="stat"><div class="n">21M</div><div class="l">${d.stt.supply}</div></div>
+    </div>
+    <div class="warn"><span style="font-size:18px;line-height:1">⚠️</span><span>${d.warn}</span></div>
+    <div class="card"><h2><span class="em">${d.s1e}</span>${d.s1t}</h2>${d.s1.map(p=>`<p>${p}</p>`).join('')}</div>
+    <div class="card"><h2><span class="em">${d.s2e}</span>${d.s2t}</h2><ul>${d.s2list.map(i=>`<li>${i}</li>`).join('')}</ul></div>
+    <div class="card"><h2><span class="em">${d.s3e}</span>${d.s3t}</h2><p>${d.s3}</p>
+      <div class="tech">${TECH.map(t=>`<div><b>${t[0]}</b>${t[1]}</div>`).join('')}</div>
+    </div>
+    <div class="card"><h2><span class="em">${d.s4e}</span>${d.s4t}</h2>${d.s4.map(p=>`<p>${p}</p>`).join('')}</div>
+  </div>`;
+
+(async function(){
+  try{
+    const s = await fetch('/api/stats').then(r=>r.json());
+    if(s){
+      const h=document.getElementById('s-height'); if(h&&s.height!=null)h.textContent=Number(s.height).toLocaleString();
+      const t=document.getElementById('s-txs'); if(t&&s.totalTransactions!=null)t.textContent=Number(s.totalTransactions).toLocaleString();
+    }
+    const tk = await fetch('/api/tokens').then(r=>r.json());
+    const te=document.getElementById('s-tokens'); if(te&&tk&&tk.tokens)te.textContent=tk.tokens.length;
+  }catch(e){}
+})();
+document.addEventListener('spn-lang-change', ()=>location.reload());
+</script>
+</body>
+</html>

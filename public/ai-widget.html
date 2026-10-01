@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<!--
+  © 2026 SPN Coin Project — PROPRIETARY AND CONFIDENTIAL
+  All Rights Reserved. See LICENSE for full terms.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="64x64" href="/sepanta-coin.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/sepanta-coin-32.png?v=5">
+  <link rel="shortcut icon" href="/sepanta-coin.ico?v=5">
+  <link rel="apple-touch-icon" sizes="180x180" href="/sepanta-coin-180.png?v=5">
+  <meta name="theme-color" content="#070a0e">
+  <meta name="description" content="SPN Coin AI assistant powered by Claude — ask questions about the blockchain.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sepanta (SPN) AI Assistant — Powered by Claude</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080b13;--c1:#0c1120;--c2:#0f1626;--c3:#141d31;
+  --bd:rgba(109,107,245,.14);--bd2:rgba(109,107,245,.24);--bd3:rgba(109,107,245,.45);
+  --blue:#6d6bf5;--blue2:#5b59d6;--blue3:rgba(59,130,246,.08);--blue4:rgba(59,130,246,.16);
+  --gold:#f5b301;--txt:#eaf0fb;--txt2:#8a97b8;--txt3:#5a6788;
+}
+html{scroll-behavior:smooth}
+body{font-family:"Sora",sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;font-size:14px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(59,130,246,.07) 0%,transparent 55%),
+             radial-gradient(ellipse 40% 30% at 10% 100%,rgba(29,78,216,.05) 0%,transparent 55%)}
+
+/* TOPBAR */
+.topbar{background:rgba(5,9,16,.92);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:50;backdrop-filter:blur(14px)}
+.tb-in{max-width:1100px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:54px;gap:12px}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;flex-shrink:0}
+.logo-ic{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#5b59d6,#6d6bf5);display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 0 14px rgba(59,130,246,.3)}
+.logo-txt{font-size:15px;font-weight:900;color:var(--blue)}
+.tnav{display:flex;gap:2px}
+.tnav a{padding:6px 11px;border-radius:6px;font-size:13px;font-weight:500;color:var(--txt2);text-decoration:none;transition:all .15s}
+.tnav a:hover{background:var(--blue3);color:var(--txt)}
+.tnav a.on{color:var(--blue);font-weight:700;background:var(--blue3)}
+
+/* PAGE */
+.page{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:28px 20px 80px}
+
+/* HERO */
+.hero{text-align:center;padding:36px 20px 28px;animation:fu .4s ease both}
+@keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:800;letter-spacing:.6px;padding:4px 12px;border-radius:20px;background:var(--blue3);border:1px solid var(--bd2);color:var(--blue);margin-bottom:14px}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--blue);animation:pp 2s infinite}
+@keyframes pp{0%,100%{opacity:1}50%{opacity:.3}}
+.htitle{font-size:34px;font-weight:900;color:var(--txt);letter-spacing:-1px;line-height:1.1;margin-bottom:10px}
+.htitle span{background:linear-gradient(135deg,#6d6bf5,#9a98ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hsub{font-size:14px;color:var(--txt2);max-width:480px;margin:0 auto 20px;line-height:1.7}
+.feats{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
+.feat{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--txt2);background:var(--c1);border:1px solid var(--bd);border-radius:20px;padding:5px 11px}
+
+/* CHAT */
+.chat{background:linear-gradient(160deg,var(--c1) 0%,var(--c2) 100%);border:1px solid var(--bd2);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;height:560px;box-shadow:0 24px 80px rgba(0,0,0,.5),0 0 0 1px rgba(59,130,246,.05);animation:fu .4s .1s ease both}
+.chat-hd{padding:13px 17px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:linear-gradient(90deg,rgba(59,130,246,.06),transparent)}
+.ch-l{display:flex;align-items:center;gap:10px}
+.ch-av{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#5b59d6,#6d6bf5);display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 10px rgba(59,130,246,.3)}
+.ch-n{font-size:13px;font-weight:800;color:var(--txt)}
+.ch-m{font-size:9px;color:var(--txt3);font-family:"JetBrains Mono",monospace}
+.ch-st{display:flex;align-items:center;gap:4px;font-size:10px;color:#26d07c;font-weight:600}
+.ch-st::before{content:"";width:5px;height:5px;border-radius:50%;background:#26d07c;animation:pp 2s infinite}
+.msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:11px;scroll-behavior:smooth}
+.msgs::-webkit-scrollbar{width:3px}
+.msgs::-webkit-scrollbar-thumb{background:rgba(59,130,246,.2);border-radius:3px}
+.msg{display:flex;gap:8px;align-items:flex-start;animation:mi .25s ease}
+@keyframes mi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.msg.user{flex-direction:row-reverse}
+.bbl{max-width:80%;padding:10px 13px;border-radius:12px;font-size:12.5px;line-height:1.65}
+.msg.bot  .bbl{background:rgba(59,130,246,.09);border:1px solid rgba(59,130,246,.17);color:#cbd5e1;border-radius:4px 12px 12px 12px}
+.msg.user .bbl{background:linear-gradient(135deg,rgba(59,130,246,.22),rgba(37,99,235,.18));border:1px solid rgba(59,130,246,.3);color:var(--txt);border-radius:12px 4px 12px 12px}
+.av{width:27px;height:27px;border-radius:8px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.av.bot{background:linear-gradient(135deg,#5b59d6,#6d6bf5);box-shadow:0 3px 8px rgba(59,130,246,.25)}
+.av.user{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+.dots{display:flex;gap:4px;align-items:center}
+.dots span{width:6px;height:6px;border-radius:50%;background:var(--blue);animation:bnc .9s ease infinite}
+.dots span:nth-child(2){animation-delay:.15s}
+.dots span:nth-child(3){animation-delay:.3s}
+@keyframes bnc{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-7px)}}
+.chips{padding:7px 14px 0;display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0}
+.chip{font-size:11px;color:var(--txt2);background:var(--blue3);border:1px solid var(--bd);border-radius:20px;padding:4px 11px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.chip:hover{background:var(--blue4);color:var(--txt);border-color:var(--bd2)}
+.inp-wrap{padding:10px 13px 13px;border-top:1px solid var(--bd);display:flex;gap:8px;align-items:flex-end;flex-shrink:0;background:rgba(10,15,30,.5)}
+.inp{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--bd2);border-radius:10px;padding:10px 13px;color:var(--txt);font-family:inherit;font-size:13px;resize:none;outline:none;max-height:110px;min-height:40px;transition:border-color .2s;line-height:1.5}
+.inp:focus{border-color:var(--bd3)}
+.inp::placeholder{color:var(--txt3)}
+.sbtn{width:40px;height:40px;border-radius:9px;background:linear-gradient(135deg,#5b59d6,#6d6bf5);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;box-shadow:0 4px 12px rgba(59,130,246,.3)}
+.sbtn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(109,107,245,.45)}
+.sbtn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.cfooter{padding:4px 13px 2px;font-size:9px;color:var(--txt3);text-align:center;flex-shrink:0}
+.cfooter a{color:var(--txt3);text-decoration:none;transition:color .15s}
+.cfooter a:hover{color:var(--blue)}
+
+/* TIP CARDS */
+.tips{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;animation:fu .4s .18s ease both}
+.tip{background:var(--c1);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;cursor:pointer;transition:all .2s}
+.tip:hover{border-color:var(--bd2);background:var(--c2);transform:translateY(-2px)}
+.tip-ic{font-size:19px;margin-bottom:6px}
+.tip-t{font-size:12.5px;font-weight:700;color:var(--txt);margin-bottom:2px}
+.tip-s{font-size:11.5px;color:var(--txt2)}
+
+/* LICENSE bar */
+.licbar{position:fixed;bottom:6px;left:12px;z-index:8999;font-size:9.5px;color:rgba(255,255,255,.18);font-family:"JetBrains Mono",monospace;display:flex;align-items:center;gap:5px}
+.licbar a{color:rgba(240,165,0,.35);text-decoration:none;transition:color .2s}
+.licbar a:hover{color:rgba(240,165,0,.8)}
+
+@media(max-width:580px){
+  .tnav a span{display:none}
+  .tips{grid-template-columns:1fr}
+  .htitle{font-size:26px}
+}
+</style>
+  <script src="csrf-fetch.js?v=25"></script>
+  <script src="i18n.js?v=34" defer></script>
+  <script src="nav.js?v=40" defer></script>
+  <script src="footer.js?v=35" defer></script>
+  <script src="ui-prefs.js?v=25" defer></script>
+</head>
+<body>
+
+
+
+<div class="page">
+  <div class="hero">
+    <div class="badge">Powered by Anthropic Claude — Free Tier</div>
+    <h1 class="htitle">SPN Coin <span>AI Assistant</span></h1>
+    <p class="hsub">Live blockchain data injected automatically into every conversation. Ask anything — from transaction analysis to security guidance.</p>
+    <div class="feats">
+      <span class="feat">⛓️ Live chain data</span>
+      <span class="feat">💎 Address lookups</span>
+      <span class="feat">⛏️ Mining help</span>
+      <span class="feat">🔐 Security advice</span>
+      <span class="feat">🚀 claude-haiku model</span>
+    </div>
+  </div>
+
+  <div class="chat">
+    <div class="chat-hd">
+      <div class="ch-l">
+        <div class="ch-av">🤖</div>
+        <div><div class="ch-n">SPN Coin AI</div><div class="ch-m">claude-haiku-4-5 · Anthropic · Free Tier</div></div>
+      </div>
+      <div class="ch-st">Online</div>
+    </div>
+
+    <div class="msgs" id="msgs">
+      <div class="msg bot">
+        <div class="av bot">🤖</div>
+        <div class="bbl">
+          Hi! I'm SPN Coin AI — powered by Claude. I have <strong>live access</strong> to your blockchain and can help with:<br><br>
+          🔍 <strong>Transaction analysis</strong> — explain any TX by hash<br>
+          💰 <strong>Wallet queries</strong> — balance, UTXOs, SPN address format<br>
+          ⛏️ <strong>Mining help</strong> — difficulty, rewards, next halving<br>
+          📊 <strong>Network stats</strong> — live height, peers, mempool size<br>
+          🔐 <strong>Security guidance</strong> — 2FA, key management, threats<br><br>
+          What would you like to know?
+        </div>
+      </div>
+    </div>
+
+    <div class="chips" id="chips">
+      <span class="chip" onclick="ask(this.textContent)">Current block height &amp; difficulty?</span>
+      <span class="chip" onclick="ask(this.textContent)">Explain SPN1 address format</span>
+      <span class="chip" onclick="ask(this.textContent)">How many pending transactions?</span>
+      <span class="chip" onclick="ask(this.textContent)">When is the next halving?</span>
+      <span class="chip" onclick="ask(this.textContent)">How does 2FA protect my account?</span>
+      <span class="chip" onclick="ask(this.textContent)">What is Stratum mining?</span>
+    </div>
+
+    <div class="inp-wrap">
+      <textarea class="inp" id="inp" placeholder="Ask anything about SPN Coin..." rows="1" maxlength="2000"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"
+        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"></textarea>
+      <button class="sbtn" id="sbtn" onclick="send()" title="Send message">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M2 8l12-6-6 12V9L2 8z" fill="white"/></svg>
+      </button>
+    </div>
+    <div class="cfooter">
+      Powered by <a href="https://anthropic.com" target="_blank">Anthropic Claude</a>
+      &nbsp;·&nbsp; Live blockchain context &nbsp;·&nbsp;
+      <a href="/LICENSE" target="_blank">© 2026 SPN Coin Project</a>
+    </div>
+  </div>
+
+  <div class="tips">
+    <div class="tip" onclick="ask('Tell me about the latest block in detail')">
+      <div class="tip-ic">⛓️</div>
+      <div class="tip-t">Latest Block</div>
+      <div class="tip-s">Full breakdown — transactions, reward, difficulty, miner</div>
+    </div>
+    <div class="tip" onclick="ask('What is the current mining difficulty and estimated time to next halving?')">
+      <div class="tip-ic">⛏️</div>
+      <div class="tip-t">Mining Status</div>
+      <div class="tip-s">Difficulty, hashrate estimate, and halving countdown</div>
+    </div>
+    <div class="tip" onclick="ask('How should I secure my SPN Coin wallet and private keys?')">
+      <div class="tip-ic">🔐</div>
+      <div class="tip-t">Security Guide</div>
+      <div class="tip-s">Wallet security, 2FA setup, and key management tips</div>
+    </div>
+    <div class="tip" onclick="ask('How does the SPN1 address format work? Explain Base58Check and HASH160')">
+      <div class="tip-ic">💎</div>
+      <div class="tip-t">Address Format</div>
+      <div class="tip-s">SPN1.../SPNt... addresses explained — how they are derived</div>
+    </div>
+  </div>
+</div>
+
+<div class="licbar">
+  <a href="/LICENSE" target="_blank">© 2026 SPN Coin Project</a>
+  <span style="opacity:.4">·</span>
+  <span style="opacity:.4">PROPRIETARY</span>
+</div>
+
+<script>
+const API = window.SPN_COIN_API || (location.hostname==="localhost"||location.hostname==="127.0.0.1" ? "http://localhost:3000" : location.origin);
+let history=[], tok="";
+
+// Discover auth token from all possible storage keys
+function getTok() {
+  return sessionStorage.getItem("adm_tok") || sessionStorage.getItem("w_tok") ||
+         localStorage.getItem("mc_token")  || localStorage.getItem("myc_token") || "";
+}
+tok = getTok();
+setTimeout(() => { tok = getTok(); }, 400);
+
+function ask(text) {
+  document.getElementById("inp").value = text;
+  document.getElementById("chips").style.display = "none";
+  send();
+}
+
+async function send() {
+  const inp = document.getElementById("inp");
+  const msg = inp.value.trim();
+  if (!msg) return;
+  addMsg("user", msg);
+  inp.value = ""; inp.style.height = "auto";
+  document.getElementById("chips").style.display = "none";
+  const tid = addTyping();
+  document.getElementById("sbtn").disabled = true;
+  tok = getTok(); // refresh token in case user just logged in
+  try {
+    const r = await fetch(API + "/api/ai/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + tok },
+      body: JSON.stringify({ message: msg, history }),
+    });
+    removeTyping(tid);
+    if (r.status === 401) {
+      addMsg("bot", "🔒 <strong>Login required.</strong> Please sign in via <a href=\"/dashboard\" style=\"color:#6d6bf5\">Dashboard</a> first, then return here.");
+      return;
+    }
+    if (r.status === 429) { addMsg("bot", "⏳ Rate limit reached. Please wait a minute before sending more messages."); return; }
+    if (!r.ok) { const e = await r.json().catch(()=>({})); addMsg("bot", "⚠️ " + (e.error||"AI service unavailable.")); return; }
+    const d = await r.json();
+    addMsg("bot", d.reply);
+    history.push({ role:"user", content:msg }, { role:"assistant", content:d.reply });
+    if (history.length > 20) history = history.slice(-20);
+  } catch(e) {
+    removeTyping(tid);
+    addMsg("bot", "⚠️ Connection error: " + e.message + ". Is the SPN Coin node running at " + API + "?");
+  } finally {
+    document.getElementById("sbtn").disabled = false;
+  }
+}
+
+function addMsg(role, html) {
+  const w = document.getElementById("msgs");
+  const d = document.createElement("div");
+  d.className = "msg " + role;
+  const av = document.createElement("div");
+  av.className = "av " + role;
+  av.textContent = role === "bot" ? "🤖" : "👤";
+  const b = document.createElement("div");
+  b.className = "bbl";
+  b.innerHTML = fmt(html);
+  d.appendChild(av); d.appendChild(b);
+  w.appendChild(d); w.scrollTop = w.scrollHeight;
+}
+
+let tc = 0;
+function addTyping() {
+  const id = "t" + (++tc), w = document.getElementById("msgs");
+  const d = document.createElement("div");
+  d.className = "msg bot"; d.id = id;
+  d.innerHTML = "<div class=\"av bot\">🤖</div><div class=\"bbl\"><div class=\"dots\"><span></span><span></span><span></span></div></div>";
+  w.appendChild(d); w.scrollTop = w.scrollHeight;
+  return id;
+}
+function removeTyping(id) { document.getElementById(id)?.remove(); }
+
+function fmt(t) {
+  // Don't double-encode if already HTML
+  if (t.includes("<strong>") || t.includes("<a ")) return t.replace(/\n/g,"<br>");
+  return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>")
+    .replace(/`([^`]+)`/g,"<code style=\"font-family:JetBrains Mono,monospace;font-size:11px;background:rgba(109,107,245,.14);padding:1px 5px;border-radius:3px\">$1</code>")
+    .replace(/\n/g,"<br>");
+}
+</script>
+</body>
+</html>

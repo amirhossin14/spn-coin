@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<!-- © 2026 SPN Coin Project — PROPRIETARY AND CONFIDENTIAL -->
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Run a Node · SPN Coin Explorer</title>
+<meta name="description" content="How to mine SPN Coin and run a full node — help grow and decentralize the network.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#080b13;--panel:#0c1120;--card:#0f1626;--card2:#141d31;
+    --line:#1b2740;--line2:#26324f;--txt:#eaf0fb;--mut:#8a97b8;--mut2:#5a6788;
+    --gold:#f5b301;--gold-dim:rgba(245,179,1,.12);--indigo:#6d6bf5;--indigo2:#9a98ff;
+    --grn:#26d07c;--grn-dim:rgba(34,197,94,.13);--red:#f2555a;--red-dim:rgba(239,68,68,.13);
+    --cyan:#25d0ee;--pur:#b06bf7;--radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--txt);font-family:'Sora',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  code,.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+  ::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:var(--line2);border-radius:6px}
+  #spn-topbar{display:none !important}
+  .layout{display:flex;min-height:100vh}
+  .sidebar{width:250px;flex:0 0 250px;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .brand{display:flex;align-items:center;gap:12px;padding:22px 20px 20px}
+  .brand .logo{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--gold),#c47f00);display:grid;place-items:center;font-weight:900;color:#1a1200;font-size:19px;box-shadow:0 4px 14px rgba(240,165,0,.3)}
+  .brand .bt b{display:block;font-size:16px;font-weight:800}
+  .brand .bt span{display:block;font-size:11.5px;color:var(--mut);font-weight:500;margin-top:1px}
+  .nav{padding:6px 12px;flex:1}
+  .nav .grp{font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--mut2);padding:14px 12px 7px;font-weight:600}
+  .nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:var(--mut);font-size:14px;font-weight:500;margin-bottom:2px;transition:.15s;position:relative}
+  .nav a svg{width:19px;height:19px;flex:0 0 19px;stroke:currentColor;fill:none;stroke-width:1.9}
+  .nav a:hover{background:var(--card2);color:var(--txt)}
+  .nav a.on{background:var(--gold-dim);color:var(--gold)}
+  .nav a.on::before{content:"";position:absolute;left:-12px;top:8px;bottom:8px;width:3px;border-radius:3px;background:var(--gold)}
+  .sb-foot{border-top:1px solid var(--line);padding:16px 20px;font-size:12px}
+  .sb-foot .row{display:flex;justify-content:space-between;align-items:center;margin:6px 0;color:var(--mut)}
+  .sb-foot .row b{color:var(--txt);font-weight:600}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--grn);box-shadow:0 0 0 3px var(--grn-dim);margin-right:7px;vertical-align:middle}
+  .dot.off{background:var(--red);box-shadow:0 0 0 3px var(--red-dim)}
+  .main{flex:1;min-width:0;display:flex;flex-direction:column}
+  .topbar{display:flex;align-items:center;gap:18px;padding:20px 30px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(10,14,23,.86);backdrop-filter:blur(12px);z-index:20}
+  .topbar h1{font-size:20px;font-weight:800;white-space:nowrap}
+  .badges{display:flex;gap:9px;margin-left:auto}
+  .badge{padding:7px 13px;border-radius:9px;font-size:12px;font-weight:600;border:1px solid var(--line);background:var(--card)}
+  .badge.net{color:var(--grn);border-color:rgba(34,197,94,.3);background:var(--grn-dim)}
+  .badge.ver{color:var(--mut)}
+  .mtoggle{display:none;background:var(--card);border:1px solid var(--line);border-radius:10px;width:40px;height:40px;place-items:center;cursor:pointer}
+  .mtoggle svg{width:20px;height:20px;stroke:var(--txt);fill:none;stroke-width:2}
+  .scrim{display:none}
+  .content{padding:26px 30px 50px;max-width:1000px;width:100%}
+  .notice{background:var(--gold-dim);border:1px solid rgba(240,165,0,.3);border-radius:14px;padding:15px 20px;margin-bottom:24px;font-size:13.5px;line-height:1.7;color:#f5d78a}
+  .notice b{color:var(--gold)}
+  .lead{font-size:15px;color:var(--mut);line-height:1.8;margin-bottom:18px}
+  .lead b{color:var(--txt)}
+  .params{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+  .param{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .param .k{font-size:11.5px;color:var(--mut2);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+  .param .v{font-size:16px;font-weight:800;margin-top:5px}
+  .param .v small{font-size:12px;color:var(--mut);font-weight:600}
+  h2.sec{font-size:19px;font-weight:800;margin:30px 0 6px;display:flex;align-items:center;gap:12px}
+  h2.sec .ic{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;flex:0 0 38px}
+  h2.sec .ic svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2}
+  .ic.m{background:var(--gold-dim);color:var(--gold)}
+  .ic.n{background:rgba(99,102,241,.16);color:var(--indigo2)}
+  .sub{color:var(--mut);font-size:13.5px;line-height:1.75;margin:10px 0}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0}
+  .step h3{font-size:14.5px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:9px}
+  .step h3 .n{background:var(--indigo);color:#fff;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;flex:0 0 22px}
+  .step p{font-size:13px;color:var(--mut);line-height:1.7;margin:5px 0}
+  pre{background:#070b12;border:1px solid var(--line);color:#eaf0fb;border-radius:9px;padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.6;overflow-x:auto;margin:9px 0}
+  pre .c{color:#5a6788}
+  .tip{background:var(--grn-dim);border-left:3px solid var(--grn);padding:11px 15px;border-radius:8px;font-size:12.8px;color:#a7e8bf;margin:10px 0}
+  .warn{background:var(--red-dim);border-left:3px solid var(--red);padding:11px 15px;border-radius:8px;font-size:12.8px;color:#f3b0b0;margin:10px 0}
+  .foot{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);font-size:11.5px;color:var(--mut2);line-height:1.7}
+  @media(max-width:1100px){.params{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:900px){
+    .sidebar{position:fixed;left:0;top:0;z-index:60;transform:translateX(-100%);transition:.25s}
+    .sidebar.open{transform:none}.mtoggle{display:grid}
+    .scrim.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:55}
+    .content{padding:20px 16px 44px}.topbar{padding:16px}
+  }
+  @media(max-width:560px){.params{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="logo">S</div><div class="bt"><b>SPN Coin</b><span>Explorer</span></div></div>
+    <nav class="nav">
+      <div class="grp">Overview</div>
+      <a href="/dashboard"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
+      <a href="/block"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7 12 12l8.7-5M12 22V12"/></svg>Blocks</a>
+      <a href="/tx"><svg viewBox="0 0 24 24"><path d="M7 10 3 6l4-4"/><path d="M3 6h13a4 4 0 0 1 4 4v0"/><path d="m17 14 4 4-4 4"/><path d="M21 18H8a4 4 0 0 1-4-4v0"/></svg>Transactions</a>
+      <a href="/explorer"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>Addresses</a>
+      <div class="grp">Network</div>
+      <a href="/network"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5 6 16.5M12 7.5l6 9M7.5 19h9"/></svg>Network</a>
+      <a href="/miner"><svg viewBox="0 0 24 24"><path d="m14 4 6 6M9 21l-6-6M4 15l11-11 5 5L9 20z"/></svg>Mining</a>
+      <a class="on" href="/run-node"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="8" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/><path d="M7 8h.01M7 17h.01"/></svg>Run a Node</a>
+      <a href="/analytics"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>Analytics</a>
+      <a href="/roadmap"><svg viewBox="0 0 24 24"><path d="M9 6 3 4v14l6 2 6-2 6 2V6l-6-2-6 2z"/><path d="M9 6v14M15 4v14"/></svg>Roadmap</a>
+      <div class="grp">Account</div>
+      <a href="/mywallet"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 14h2"/></svg>Wallet</a>
+    </nav>
+    <div class="sb-foot">
+      <div class="row"><span><span class="dot" id="sbDot"></span>Node</span><b id="sbStatus">Online</b></div>
+      <div class="row"><span>Height</span><b id="sbHeight">—</b></div>
+      <div class="row"><span>Peers</span><b id="sbPeers">—</b></div>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="mtoggle" id="mtoggle"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></div>
+      <h1>Run a Node &amp; Mine</h1>
+      <div class="badges"><span class="badge net">● Mainnet</span><span class="badge ver" id="bVer">v—</span></div>
+    </div>
+
+    <div class="content">
+      <div class="notice"><b>Help decentralize SPN.</b> The more independent nodes and miners join, the stronger and more decentralized the network becomes. This page shows how to mine SPN Coin and how to run your own full node. SPN is an educational network under testing — mined coins currently carry no monetary value.</div>
+
+      <p class="lead">SPN Coin is a <b>SHA-256d proof-of-work</b> blockchain — the same family as Bitcoin. That means you can mine it with CPU (for learning) or standard SHA-256 hardware, and anyone can run a full node to help secure and decentralize the chain.</p>
+
+      <div class="params">
+        <div class="param"><div class="k">Algorithm</div><div class="v">SHA-256d</div></div>
+        <div class="param"><div class="k">Block time</div><div class="v">10 <small>min</small></div></div>
+        <div class="param"><div class="k">Block reward</div><div class="v">50 <small>SPN</small></div></div>
+        <div class="param"><div class="k">Max supply</div><div class="v">21,000,000</div></div>
+      </div>
+
+      <!-- ===== MINE ===== -->
+      <h2 class="sec"><span class="ic m"><svg viewBox="0 0 24 24"><path d="m14 4 6 6M9 21l-6-6M4 15l11-11 5 5L9 20z"/></svg></span>Part 1 — Mine SPN Coin</h2>
+      <p class="sub">Mining is how new blocks are produced and how the network stays secure. You point a miner at the SPN mining pool and get rewarded in SPN for every block your work helps find.</p>
+
+      <div class="step">
+        <h3><span class="n">1</span>Get an SPN address</h3>
+        <p>You need an address to receive mining rewards. Create one in the <a href="/mywallet" style="color:var(--indigo2)">Wallet</a> page — it looks like <span class="mono">SPN1…</span>. Your private key stays in your browser and is never sent to the server.</p>
+      </div>
+
+      <div class="step">
+        <h3><span class="n">2</span>Connect a miner to the pool</h3>
+        <p>SPN runs a Stratum mining pool over WebSocket. Point any SHA-256d Stratum miner at the pool endpoint below, using your SPN address as the username:</p>
+        <pre><span class="c"># Pool endpoint (Stratum over WebSocket)</span>
+wss://spnchain.com/stratum
+
+<span class="c"># Username: your SPN address   ·   Password: x (anything)</span>
+username: SPN1yourAddressHere
+password: x</pre>
+        <div class="tip">New to mining? The dashboard's <a href="/miner" style="color:#a7e8bf;text-decoration:underline">Mining</a> page has a built-in browser/CPU miner you can start with a single click — perfect for testing on this educational network.</div>
+      </div>
+
+      <div class="step">
+        <h3><span class="n">3</span>Watch your rewards</h3>
+        <p>Open the <a href="/dashboard" style="color:var(--indigo2)">Dashboard</a> or <a href="/explorer" style="color:var(--indigo2)">Addresses</a> page and search your SPN address. Each block you help mine adds <b>50 SPN</b> (until the next halving at block 210,000).</p>
+      </div>
+
+      <!-- ===== NODE ===== -->
+      <h2 class="sec"><span class="ic n"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="8" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/><path d="M7 8h.01M7 17h.01"/></svg></span>Part 2 — Run a full node</h2>
+      <p class="sub">A full node stores and verifies the whole chain and relays blocks to other nodes. Every independent node makes SPN more decentralized and resilient. You can run one on a small Linux server or even your own computer.</p>
+
+      <div class="step">
+        <h3><span class="n">1</span>Requirements</h3>
+        <p>A Linux machine (a small VPS or your own PC) with <b>Node.js 20 or newer</b>. Check with:</p>
+        <pre>node --version   <span class="c"># should print v20.x or higher</span></pre>
+        <p>If it's missing, install from <span class="mono">nodejs.org</span> or your package manager.</p>
+      </div>
+
+      <div class="step">
+        <h3><span class="n">2</span>Get the node software</h3>
+        <p>Download the SPN Coin node package (the same release the network runs) and unzip it, then enter the folder:</p>
+        <pre>unzip SPN_Coin.zip -d spn-node
+cd spn-node</pre>
+      </div>
+
+      <div class="step">
+        <h3><span class="n">3</span>Join the network</h3>
+        <p>Point your node at a seed node and let it sync. The project provides a helper script — pass the seed URL you were given by the network operator:</p>
+        <pre>bash scripts/join-network.sh http://SEED_IP:3000</pre>
+        <p>The script installs dependencies, creates a <span class="mono">.env</span> with your <span class="mono">PEER_URLS</span>, and starts syncing the chain from the network.</p>
+        <div class="tip">Ask the network operator for the current seed node URL. Your node connects <b>out</b> to the seed, so a home node behind a router works without any port forwarding.</div>
+      </div>
+
+      <div class="step">
+        <h3><span class="n">4</span>Keep it running (recommended)</h3>
+        <p>Use PM2 so the node restarts automatically and survives reboots:</p>
+        <pre>npm install -g pm2
+pm2 start server.js --name spn-node
+pm2 save && pm2 startup</pre>
+      </div>
+
+      <div class="step">
+        <h3><span class="n">5</span>Accept inbound peers (optional, for seed operators)</h3>
+        <p>If you want <b>other</b> nodes to connect to yours, open the P2P port in your firewall so it's reachable:</p>
+        <pre><span class="c"># SPN P2P port</span>
+ufw allow 8333/tcp</pre>
+        <div class="warn">Only do this if you intend your node to act as a public seed. A normal home node that only connects outward does <b>not</b> need any open ports.</div>
+      </div>
+
+      <div class="step">
+        <h3><span class="n">6</span>Confirm it's syncing</h3>
+        <p>Check your node's health locally — the height should climb toward the network's current height:</p>
+        <pre>curl -s http://localhost:3000/api/health</pre>
+      </div>
+
+      <div class="foot">
+        Reference parameters — P2P port: <b>8333</b> · API/HTTP port: <b>3000</b> · Consensus: <b>SHA-256d</b> · Block time: <b>10 min</b> · Reward: <b>50 SPN</b> · Halving: every <b>210,000</b> blocks.<br>
+        © 2026 SPN Coin Project. SPN is an educational network under testing; mined coins currently have no monetary value.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/nav.js?v=40" defer></script>
+<script>
+(function(){
+  var API=location.origin;
+  var $=function(id){return document.getElementById(id);};
+  function fmt(n){return n==null||isNaN(n)?'—':Number(n).toLocaleString('en-US');}
+  fetch(API+'/api/health',{headers:{'Accept':'application/json'}}).then(function(r){return r.ok?r.json():null;}).then(function(h){
+    if(!h)return;
+    var on=h.status==='ok';
+    $('sbDot').className='dot'+(on?'':' off');
+    $('sbStatus').textContent=on?'Online':'Offline';
+    $('sbHeight').textContent=fmt(h.height);
+    $('sbPeers').textContent=fmt(h.peers);
+    $('bVer').textContent='v'+(h.version||'—');
+  }).catch(function(){});
+  var sb=$('sidebar'),scrim=$('scrim');
+  $('mtoggle').addEventListener('click',function(){sb.classList.toggle('open');scrim.classList.toggle('show');});
+  scrim.addEventListener('click',function(){sb.classList.remove('open');scrim.classList.remove('show');});
+})();
+</script>
+</body>
+</html>

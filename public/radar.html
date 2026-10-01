@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<!--
+  © 2026 SPN Coin Project — PROPRIETARY AND CONFIDENTIAL
+  All Rights Reserved. Unauthorized copying, modification,
+  distribution, or use of this file is strictly prohibited.
+  See LICENSE file in the project root for full details.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="64x64" href="/sepanta-coin.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/sepanta-coin-32.png?v=5">
+  <link rel="shortcut icon" href="/sepanta-coin.ico?v=5">
+  <link rel="apple-touch-icon" sizes="180x180" href="/sepanta-coin-180.png?v=5">
+  <meta name="theme-color" content="#070a0e">
+  <meta name="description" content="SPN Coin threat radar — real-time intrusion and anomaly detection.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sepanta (SPN) — Threat Radar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#05070d;--base:#080b13;--panel:#0c1120;--surface:#0f1626;--raised:#141d31;
+  --bd:rgba(148,163,208,.14);--bd2:rgba(148,163,208,.14);--bd3:rgba(148,163,208,.14);
+  --grn:#26d07c;--grn2:#1fae66;--grn3:rgba(0,255,136,.08);--grn4:rgba(0,255,136,.16);
+  --gold:#f5b301;--gold2:rgba(240,165,0,.12);--gold3:rgba(240,165,0,.26);
+  --red:#f2555a;--red2:rgba(255,68,102,.12);
+  --cyan:#25d0ee;--cyan2:rgba(0,204,255,.10);
+  --pur:#b06bf7;--pur2:rgba(167,139,250,.10);
+  --txt:#eaf0fb;--txt2:#8a97b8;--txt3:#5a6788;--muted:#1b2740;
+  --r:14px;--r-sm:8px;
+}
+body{background:var(--base);color:var(--txt);font-family:'Sora',system-ui,sans-serif;
+  min-height:100vh;background-image:
+    radial-gradient(1000px 500px at 78% -8%,rgba(0,255,136,.06),transparent 60%),
+    radial-gradient(700px 400px at 10% 110%,rgba(0,204,255,.05),transparent 60%);}
+a{color:inherit;text-decoration:none}
+.mono{font-family:'JetBrains Mono',monospace}
+
+/* layout */
+.shell{display:flex;flex-direction:column;min-height:100vh}
+
+.main{flex:1;padding:22px 26px 50px;max-width:1200px;margin:0 auto;width:100%}
+.top{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.top h1{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.top .sub{color:var(--txt2);font-size:12.5px;margin-top:2px}
+.live{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--txt2);
+  font-family:'JetBrains Mono',monospace;background:var(--surface);border:1px solid var(--bd);
+  padding:7px 12px;border-radius:20px}
+.blip{width:8px;height:8px;border-radius:50%;background:var(--grn);animation:blip 1.6s infinite}
+@keyframes blip{0%{box-shadow:0 0 0 0 rgba(0,255,136,.5)}70%{box-shadow:0 0 0 8px rgba(0,255,136,0)}100%{box-shadow:0 0 0 0 rgba(0,255,136,0)}}
+.live.off .blip{background:var(--red);animation:none}
+
+.grid{display:grid;grid-template-columns:1.2fr 1fr;gap:18px}
+.card{background:var(--panel);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.card-h{padding:13px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;
+  justify-content:space-between;gap:10px}
+.card-h .t{font-size:13px;font-weight:700;letter-spacing:.02em;display:flex;align-items:center;gap:8px}
+.card-h .t .ic{color:var(--grn)}
+.pill{font-family:'JetBrains Mono',monospace;font-size:10.5px;padding:3px 9px;border-radius:20px;
+  background:var(--grn3);color:var(--grn);font-weight:600}
+
+/* radar */
+.radar-wrap{padding:20px;display:flex;justify-content:center}
+.radar{position:relative;width:340px;height:340px;max-width:100%}
+.radar svg{width:100%;height:100%;display:block}
+.ring{fill:none;stroke:var(--bd2);stroke-width:1}
+.cross{stroke:var(--bd);stroke-width:1}
+.sweep{transform-origin:170px 170px;animation:sweep 4s linear infinite}
+@keyframes sweep{to{transform:rotate(360deg)}}
+.contact{transition:opacity .5s}
+.contact circle{transform-origin:center}
+@keyframes ping{0%{r:2;opacity:1}100%{r:14;opacity:0}}
+.rlabel{fill:var(--txt3);font-size:9px;font-family:'JetBrains Mono',monospace}
+
+/* stat strip */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.stat{background:var(--panel);border:1px solid var(--bd);border-radius:12px;padding:13px 15px}
+.stat .k{font-size:10.5px;color:var(--txt2);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.stat .v{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;margin-top:5px;letter-spacing:-.02em}
+.stat .v.red{color:var(--red)}.stat .v.grn{color:var(--grn)}.stat .v.gold{color:var(--gold)}.stat .v.cyan{color:var(--cyan)}
+
+/* events feed */
+.feed{max-height:420px;overflow-y:auto}
+.ev{display:flex;gap:11px;padding:11px 16px;border-bottom:1px solid rgba(0,255,136,.05);font-size:12.5px}
+.ev:last-child{border-bottom:0}
+.ev .sev{width:6px;border-radius:3px;flex-shrink:0}
+.ev .body{flex:1;min-width:0}
+.ev .line1{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ev .cat{font-weight:700;font-size:12px}
+.ev .rule{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--txt3);
+  background:var(--surface);padding:1px 6px;border-radius:4px}
+.ev .meta{color:var(--txt2);font-size:11px;font-family:'JetBrains Mono',monospace;margin-top:3px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ev .age{color:var(--txt3);font-size:10.5px;font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.sev-critical{background:var(--red)}.cat-critical{color:var(--red)}
+.sev-high{background:#ff8c42}.cat-high{color:#ff8c42}
+.sev-medium{background:var(--gold)}.cat-medium{color:var(--gold)}
+.sev-low{background:var(--cyan)}.cat-low{color:var(--cyan)}
+
+.legend{display:flex;gap:14px;padding:10px 16px;border-top:1px solid var(--bd);font-size:11px;color:var(--txt2);flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
+
+.empty{padding:40px 20px;text-align:center;color:var(--txt3);font-size:13px}
+.empty .spin{width:24px;height:24px;border:3px solid var(--bd2);border-top-color:var(--grn);
+  border-radius:50%;margin:0 auto 12px;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.warn{background:var(--gold2);border:1px solid var(--gold3);color:var(--gold);
+  padding:11px 15px;border-radius:10px;font-size:12.5px;margin-bottom:16px;display:none}
+
+@media(max-width:900px){
+    .grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  }
+
+/* ══ Anomaly detection section ══ */
+.anom-section{margin-top:22px}
+.anom-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.anom-head .t{font-size:15px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
+.anom-head .t .ic{color:var(--grn)}
+.anom-baseline{font-size:11px;color:var(--txt3);background:var(--surface);border:1px solid var(--bd);
+  padding:5px 11px;border-radius:20px}
+.anom-chips{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+@media(max-width:700px){.anom-chips{grid-template-columns:repeat(2,1fr)}}
+.chip{background:var(--panel);border:1px solid var(--bd);border-radius:12px;padding:14px;
+  display:flex;flex-direction:column;align-items:center;gap:3px;transition:.2s}
+.chip .n{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;line-height:1}
+.chip .l{font-size:10.5px;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.chip-critical .n{color:var(--red)} .chip-critical{border-color:rgba(255,68,102,.25)}
+.chip-high .n{color:#ff8c42} .chip-high{border-color:rgba(255,140,66,.22)}
+.chip-medium .n{color:var(--gold)} .chip-medium{border-color:rgba(240,165,0,.22)}
+.chip-low .n{color:var(--cyan)} .chip-low{border-color:rgba(0,204,255,.2)}
+.chip-tracked .n{color:var(--grn)} .chip-tracked{border-color:rgba(0,255,136,.2)}
+.chip.pulse{animation:chipPulse 1s ease}
+@keyframes chipPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06);box-shadow:0 0 20px rgba(255,68,102,.3)}}
+.anom-filter{background:var(--surface);border:1px solid var(--bd);color:var(--txt2);
+  border-radius:6px;padding:5px 9px;font-size:11px;cursor:pointer;outline:none}
+.anom-filter:focus{border-color:var(--bd3)}
+/* flagged tx row */
+.atx{padding:12px 16px;border-bottom:1px solid rgba(0,255,136,.05)}
+.atx:last-child{border-bottom:0}
+.atx-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.atx-score{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;
+  min-width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sc-critical{background:var(--red2);color:var(--red);border:1px solid rgba(255,68,102,.3)}
+.sc-high{background:rgba(255,140,66,.12);color:#ff8c42;border:1px solid rgba(255,140,66,.3)}
+.sc-medium{background:var(--gold2);color:var(--gold);border:1px solid var(--gold3)}
+.sc-low{background:var(--cyan2);color:var(--cyan);border:1px solid rgba(0,204,255,.3)}
+.atx-id{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cyan);text-decoration:none;flex:1;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.atx-id:hover{text-decoration:underline}
+.atx-lvl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 8px;border-radius:5px}
+.atx-flags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;margin-left:48px}
+.aflag{font-family:'JetBrains Mono',monospace;font-size:10.5px;padding:3px 8px;border-radius:5px;
+  background:var(--surface);border:1px solid var(--bd);color:var(--txt2);display:flex;align-items:center;gap:5px}
+.aflag .w{color:var(--red);font-weight:700}
+@media(max-width:600px){.atx-flags{margin-left:0}}
+/* pattern legend */
+.pattern-legend{margin-top:14px;background:var(--panel);border:1px solid var(--bd);border-radius:12px;padding:14px 16px}
+.pl-title{font-size:10px;color:var(--txt3);letter-spacing:.1em;margin-bottom:10px}
+.pl-grid{display:flex;gap:10px;flex-wrap:wrap}
+.pl-grid span{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--txt2);
+  background:var(--surface);border:1px solid var(--bd);padding:5px 10px;border-radius:6px;cursor:help}
+.pl-grid span:hover{border-color:var(--bd3);color:var(--txt)}
+</style>
+  <script src="csrf-fetch.js?v=25"></script>
+  <script src="i18n.js?v=34" defer></script>
+  <script src="nav.js?v=40" defer></script><script src="/ai-bubble.js?v=5" defer></script>
+<script src="/anti-phishing.js?v=1" defer></script>
+  <script src="footer.js?v=35" defer></script>
+  <script src="ui-prefs.js?v=25" defer></script>
+</head>
+<body>
+<div class="shell">
+  <!-- Sidebar (mirrors project nav) -->
+  <!-- Main -->
+  <main class="main">
+    <div class="top">
+      <div>
+        <h1>Threat Radar</h1>
+        <div class="sub">Live intrusion-detection sweep across the SPN network perimeter</div>
+      </div>
+      <div class="live" id="liveState"><span class="blip"></span><span id="liveText">connecting…</span></div>
+    </div>
+
+    <div class="warn" id="authWarn">
+      No access token found. The radar reads live data from protected endpoints — sign in via the
+      <a href="dashboard" style="color:var(--gold);text-decoration:underline">Dashboard</a>
+      first, then return here. Showing an empty sweep until then.
+    </div>
+
+    <!-- stat strip -->
+    <div class="stats">
+      <div class="stat"><div class="k">Detections</div><div class="v red" id="st-det">—</div></div>
+      <div class="stat"><div class="k">Active bans</div><div class="v gold" id="st-ban">—</div></div>
+      <div class="stat"><div class="k">Tracked IPs</div><div class="v cyan" id="st-ips">—</div></div>
+      <div class="stat"><div class="k">Signatures</div><div class="v grn" id="st-sig">—</div></div>
+    </div>
+
+    <div class="grid">
+      <!-- radar -->
+      <div class="card">
+        <div class="card-h">
+          <div class="t"><span class="ic">📡</span>Perimeter sweep</div>
+          <span class="pill" id="modePill">mode: —</span>
+        </div>
+        <div class="radar-wrap">
+          <div class="radar">
+            <svg viewBox="0 0 340 340">
+              <defs>
+                <radialGradient id="sweepGrad" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="rgba(0,255,136,.35)"/>
+                  <stop offset="70%" stop-color="rgba(0,255,136,.05)"/>
+                  <stop offset="100%" stop-color="rgba(0,255,136,0)"/>
+                </radialGradient>
+              </defs>
+              <circle class="ring" cx="170" cy="170" r="160"/>
+              <circle class="ring" cx="170" cy="170" r="120"/>
+              <circle class="ring" cx="170" cy="170" r="80"/>
+              <circle class="ring" cx="170" cy="170" r="40"/>
+              <line class="cross" x1="170" y1="10" x2="170" y2="330"/>
+              <line class="cross" x1="10" y1="170" x2="330" y2="170"/>
+              <text class="rlabel" x="174" y="54">critical</text>
+              <text class="rlabel" x="174" y="94">high</text>
+              <text class="rlabel" x="174" y="134">medium</text>
+              <!-- sweep arm -->
+              <g class="sweep">
+                <path d="M170 170 L170 10 A160 160 0 0 1 290 90 Z" fill="url(#sweepGrad)"/>
+                <line x1="170" y1="170" x2="170" y2="10" stroke="var(--grn)" stroke-width="1.5" opacity=".7"/>
+              </g>
+              <!-- contacts injected here -->
+              <g id="contacts"></g>
+              <circle cx="170" cy="170" r="3" fill="var(--grn)"/>
+            </svg>
+          </div>
+        </div>
+        <div class="legend">
+          <span><i style="background:var(--red)"></i>critical</span>
+          <span><i style="background:#ff8c42"></i>high</span>
+          <span><i style="background:var(--gold)"></i>medium</span>
+          <span><i style="background:var(--cyan)"></i>low</span>
+        </div>
+      </div>
+
+      <!-- events -->
+      <div class="card">
+        <div class="card-h">
+          <div class="t"><span class="ic">⚠️</span>Detection feed</div>
+          <span class="pill" id="feedCount">0 events</span>
+        </div>
+        <div class="feed" id="feed">
+          <div class="empty"><div class="spin"></div>Listening for detections…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Transaction Anomaly Detection ══ -->
+    <div class="anom-section">
+      <div class="anom-head">
+        <div class="t"><span class="ic">🔎</span>Transaction Anomaly Detection</div>
+        <div class="anom-baseline mono" id="anomBaseline">baseline: learning…</div>
+      </div>
+
+      <!-- severity summary chips -->
+      <div class="anom-chips">
+        <div class="chip chip-critical"><span class="n" id="an-critical">0</span><span class="l">critical</span></div>
+        <div class="chip chip-high"><span class="n" id="an-high">0</span><span class="l">high</span></div>
+        <div class="chip chip-medium"><span class="n" id="an-medium">0</span><span class="l">medium</span></div>
+        <div class="chip chip-low"><span class="n" id="an-low">0</span><span class="l">low</span></div>
+        <div class="chip chip-tracked"><span class="n" id="an-tracked">0</span><span class="l">tracked addrs</span></div>
+      </div>
+
+      <!-- flagged transactions list -->
+      <div class="card" style="margin-top:14px">
+        <div class="card-h">
+          <div class="t"><span class="ic">⚠️</span>Flagged transactions</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="anomFilter" class="anom-filter mono">
+              <option value="all">all levels</option>
+              <option value="critical">critical</option>
+              <option value="high">high+</option>
+              <option value="medium">medium+</option>
+            </select>
+            <span class="pill" id="anomCount">0 flagged</span>
+          </div>
+        </div>
+        <div class="feed" id="anomFeed" style="max-height:340px">
+          <div class="empty">No suspicious transactions detected. Mempool is clean. ✓</div>
+        </div>
+      </div>
+
+      <!-- pattern legend -->
+      <div class="pattern-legend">
+        <div class="pl-title mono">DETECTED PATTERNS</div>
+        <div class="pl-grid">
+          <span title="Many tiny outputs — spam/dusting attack">💨 dust_flood</span>
+          <span title="Value far above network average">🐋 whale_move</span>
+          <span title="1 input → many outputs (laundering-style peeling)">🔀 fan_out</span>
+          <span title="Burst of transactions from one address">⚡ rapid_fire</span>
+          <span title="Fee far from network norm">💰 fee_anomaly</span>
+          <span title="Most value returns to sender">🔄 self_churn</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+// ── config ──
+const API = (window.SPN_COIN_API || window.SPNCOIN_API || '').replace(/\/$/,'');
+function token(){
+  return sessionStorage.getItem('adm_tok') ||
+         localStorage.getItem('mc_token')  ||
+         localStorage.getItem('myc_token') ||
+         localStorage.getItem('token') || '';
+}
+async function api(path){
+  const t = token();
+  const r = await fetch(API + path, {
+    headers: t ? { 'Authorization': 'Bearer ' + t } : {}
+  });
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  return r.json();
+}
+
+const $ = s => document.querySelector(s);
+const SEV = ['critical','high','medium','low'];
+const RADIUS = { critical:40, high:80, medium:120, low:160 };
+const now = () => Date.now();
+const ago = ts => {
+  const s=Math.floor((now()-ts)/1000);
+  if(s<1)return 'now'; if(s<60)return s+'s'; if(s<3600)return Math.floor(s/60)+'m';
+  if(s<86400)return Math.floor(s/3600)+'h'; return Math.floor(s/86400)+'d';
+};
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+let seen = new Set();
+
+function setLive(ok,text){
+  $('#liveState').classList.toggle('off',!ok);
+  $('#liveText').textContent = text;
+}
+
+function plotContacts(events){
+  const g = $('#contacts');
+  g.innerHTML='';
+  // take most recent up to 24, place by severity ring + hashed angle from ip
+  events.slice(0,24).forEach((ev,i)=>{
+    const sev = SEV.includes(ev.severity)?ev.severity:'low';
+    const rad = RADIUS[sev] - 6;
+    // deterministic angle from ip string
+    let h=0; const src=(ev.ip||'')+ev.rule+i;
+    for(const ch of src) h=(h*31+ch.charCodeAt(0))>>>0;
+    const ang = (h % 360) * Math.PI/180;
+    const x = 170 + rad*Math.cos(ang);
+    const y = 170 + rad*Math.sin(ang);
+    const color = {critical:'#f2555a',high:'#ff8c42',medium:'#f5b301',low:'#25d0ee'}[sev];
+    const fresh = (now()-ev.ts) < 8000;
+    const ns='http://www.w3.org/2000/svg';
+    const grp=document.createElementNS(ns,'g'); grp.setAttribute('class','contact');
+    if(fresh){
+      const ping=document.createElementNS(ns,'circle');
+      ping.setAttribute('cx',x);ping.setAttribute('cy',y);ping.setAttribute('r',2);
+      ping.setAttribute('fill','none');ping.setAttribute('stroke',color);ping.setAttribute('stroke-width','1.5');
+      ping.style.animation='ping 1.8s ease-out infinite';
+      grp.appendChild(ping);
+    }
+    const dot=document.createElementNS(ns,'circle');
+    dot.setAttribute('cx',x);dot.setAttribute('cy',y);
+    dot.setAttribute('r',sev==='critical'?4:3);
+    dot.setAttribute('fill',color);
+    dot.setAttribute('opacity', fresh?1:.55);
+    const title=document.createElementNS(ns,'title');
+    title.textContent=`${sev.toUpperCase()} · ${ev.category||ev.rule} · ${ev.ip||'?'}`;
+    dot.appendChild(title);
+    grp.appendChild(dot);
+    g.appendChild(grp);
+  });
+}
+
+function renderFeed(events){
+  const feed=$('#feed');
+  if(!events.length){
+    feed.innerHTML='<div class="empty">No detections recorded. Perimeter is quiet. ✓</div>';
+    return;
+  }
+  feed.innerHTML = events.slice(0,60).map(ev=>{
+    const sev = SEV.includes(ev.severity)?ev.severity:'low';
+    return `<div class="ev">
+      <div class="sev sev-${sev}"></div>
+      <div class="body">
+        <div class="line1">
+          <span class="cat cat-${sev}">${esc(ev.category||'detection')}</span>
+          <span class="rule">${esc(ev.rule||'—')}</span>
+        </div>
+        <div class="meta">${esc(ev.method||'')} ${esc(ev.path||'')} · ${esc(ev.ip||'unknown')}</div>
+      </div>
+      <div class="age">${ago(ev.ts)}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderStats(s){
+  if(!s) return;
+  $('#st-det').textContent = (s.detections!=null?s.detections:'0');
+  $('#st-ban').textContent = (s.activeBans!=null?s.activeBans:'0');
+  $('#st-ips').textContent = (s.trackedIps!=null?s.trackedIps:'0');
+  $('#st-sig').textContent = (s.signatures!=null?s.signatures:'0');
+  $('#modePill').textContent = 'mode: ' + (s.mode||'—');
+}
+
+// ── Transaction anomaly detection ──
+let _anomFilter = 'all';
+let _lastCritical = 0;
+
+function renderAnomStats(stats){
+  if(!stats) return;
+  const bl = stats.baseline || {};
+  const lv = stats.byLevel || {};
+  $('#an-critical').textContent = lv.critical||0;
+  $('#an-high').textContent     = lv.high||0;
+  $('#an-medium').textContent   = lv.medium||0;
+  $('#an-low').textContent      = lv.low||0;
+  $('#an-tracked').textContent  = stats.trackedAddresses||0;
+
+  // baseline summary
+  if(bl.samples > 0){
+    $('#anomBaseline').textContent =
+      `baseline: ${bl.samples} txs · avg ${(+bl.avgValue).toFixed(2)} SPN · ${(+bl.avgOutputs).toFixed(1)} outputs`;
+  } else {
+    $('#anomBaseline').textContent = 'baseline: learning…';
+  }
+
+  // pulse the critical chip when a new critical appears
+  if((lv.critical||0) > _lastCritical){
+    const chip = document.querySelector('.chip-critical');
+    if(chip){ chip.classList.remove('pulse'); void chip.offsetWidth; chip.classList.add('pulse'); }
+  }
+  _lastCritical = lv.critical||0;
+}
+
+const FLAG_ICON = {
+  dust_flood:'💨', whale_move:'🐋', fan_out:'🔀',
+  rapid_fire:'⚡', fee_high:'💰', fee_zero:'💰', self_churn:'🔄'
+};
+
+function renderAnomFeed(flagged){
+  const feed = $('#anomFeed');
+  const order = {critical:0,high:1,medium:2,low:3};
+  // apply filter
+  const minLevel = {all:3, medium:2, high:1, critical:0}[_anomFilter];
+  const shown = flagged.filter(f => order[f.level] <= minLevel);
+
+  $('#anomCount').textContent = shown.length + ' flagged';
+  if(!shown.length){
+    feed.innerHTML = '<div class="empty">No suspicious transactions detected. Mempool is clean. ✓</div>';
+    return;
+  }
+  feed.innerHTML = shown.slice(0,50).map(f=>{
+    const flags = (f.flags||[]).map(fl =>
+      `<span class="aflag">${FLAG_ICON[fl.type]||'🚩'} ${esc(fl.type)} <span class="w">+${fl.weight}</span></span>`
+    ).join('');
+    return `<div class="atx">
+      <div class="atx-top">
+        <div class="atx-score sc-${f.level}">${f.score}</div>
+        <a class="atx-id" href="tx?h=${esc(f.txid)}" title="${esc(f.txid)}">${esc(f.txid)}</a>
+        <span class="atx-lvl sc-${f.level}">${esc(f.level)}</span>
+      </div>
+      <div class="atx-flags">${flags}</div>
+    </div>`;
+  }).join('');
+}
+
+async function tickAnomaly(){
+  try{
+    const d = await api('/api/security/anomalies?limit=100').catch(()=>null);
+    if(!d) return;
+    renderAnomStats(d.stats);
+    // combine live mempool flags + recent recorded events
+    const flagged = (d.mempoolFlags||[]);
+    const recent = (d.recentEvents||[]).map(e=>({
+      txid:e.txid, score:e.score, level:e.level, flags:e.flags
+    }));
+    // dedupe by txid, prefer mempoolFlags
+    const seen = new Set(flagged.map(f=>f.txid));
+    const combined = flagged.concat(recent.filter(r=>!seen.has(r.txid)));
+    renderAnomFeed(combined);
+  }catch(e){}
+}
+
+async function tick(){
+  if(!token()){ $('#authWarn').style.display='block'; setLive(false,'no token'); }
+  try{
+    const [stats, evs] = await Promise.all([
+      api('/api/security/stats').catch(()=>null),
+      api('/api/security/events?limit=100').catch(()=>({events:[]}))
+    ]);
+    renderStats(stats);
+    const events = (evs.events||[]).map(e=>({...e, ts: e.ts||now()}));
+    renderFeed(events);
+    plotContacts(events);
+    $('#feedCount').textContent = events.length+' events';
+    setLive(true, 'live · '+new Date().toLocaleTimeString());
+  }catch(e){
+    setLive(false, 'offline');
+  }
+  // anomaly detection runs alongside
+  tickAnomaly();
+}
+
+// filter dropdown
+document.addEventListener('DOMContentLoaded',()=>{
+  const sel = document.getElementById('anomFilter');
+  if(sel) sel.addEventListener('change', e=>{ _anomFilter = e.target.value; tickAnomaly(); });
+});
+
+tick();
+setInterval(tick, 5000);
+</script>
+</body>
+</html>

@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<!--
+  © 2026 SPN Coin Project — PROPRIETARY AND CONFIDENTIAL
+  Server Setup Guide — Admin Access Only
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="64x64" href="/sepanta-coin.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/sepanta-coin-32.png?v=5">
+  <link rel="shortcut icon" href="/sepanta-coin.ico?v=5">
+  <link rel="apple-touch-icon" sizes="180x180" href="/sepanta-coin-180.png?v=5">
+  <meta name="theme-color" content="#070a0e">
+  <meta name="description" content="Set up and configure your SPN Coin server node.">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sepanta (SPN) — Server Setup (Admin Only)</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080b13;--c1:#0c1120;--c2:#0f1626;--c3:#141d31;
+  --bd:rgba(148,163,208,.14);--bd2:rgba(148,163,208,.14);--bd3:rgba(148,163,208,.14);
+  --grn:#26d07c;--grn2:rgba(0,255,136,.08);--grn3:rgba(0,255,136,.16);
+  --gold:#f5b301;--gold2:rgba(240,165,0,.1);--gold3:rgba(240,165,0,.25);
+  --red:#f2555a;--red2:rgba(255,68,102,.1);
+  --cyan:#25d0ee;--cyan2:rgba(0,204,255,.08);
+  --txt:#eaf0fb;--txt2:#8a97b8;--txt3:#5a6788;--mut:#5a6788;
+  --r:8px;--r2:12px;
+}
+html{scroll-behavior:smooth}
+body{font-family:"Sora",sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;font-size:14px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 60% 35% at 20% 0%,rgba(0,255,136,.05) 0%,transparent 55%)}
+
+/* ACCESS GATE */
+#accessGate{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.92);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+.gate-box{background:var(--c1);border:1px solid var(--bd2);border-radius:var(--r2);padding:28px 32px;text-align:center;max-width:360px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.7),0 0 40px rgba(0,255,136,.05)}
+.gate-ic{font-size:42px;margin-bottom:12px}
+.gate-title{font-size:16px;font-weight:900;color:var(--txt);margin-bottom:6px}
+.gate-sub{font-size:12px;color:var(--txt2);line-height:1.6;margin-bottom:18px}
+.gate-inp{width:100%;padding:10px 14px;background:var(--c2);border:1px solid var(--bd);border-radius:var(--r);color:var(--txt);font-family:inherit;font-size:13px;outline:none;transition:all .2s;margin-bottom:10px}
+.gate-inp:focus{border-color:var(--bd2);background:var(--c3)}
+.gate-btn{width:100%;padding:11px;background:linear-gradient(135deg,#1fae66,var(--grn));border:none;border-radius:var(--r);color:#000;font-family:inherit;font-size:13.5px;font-weight:900;cursor:pointer;transition:all .2s}
+.gate-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,255,136,.3)}
+.gate-err{font-size:12px;color:var(--red);display:none;margin-top:6px}
+.gate-err.on{display:block}
+.gate-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;letter-spacing:.5px;padding:3px 10px;border-radius:4px;background:var(--red2);border:1px solid rgba(255,68,102,.25);color:var(--red)}
+
+/* TOPBAR */
+.topbar{background:rgba(6,10,14,.94);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:50;backdrop-filter:blur(14px)}
+.tb-in{max-width:1100px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:52px;gap:12px}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;flex-shrink:0}
+.logo-ic{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#1fae66,var(--grn));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#000;box-shadow:0 0 12px rgba(0,255,136,.25)}
+.logo-txt{font-size:14px;font-weight:900;color:var(--grn)}
+.tb-right{display:flex;align-items:center;gap:8px}
+.admin-badge{font-size:10px;font-weight:800;letter-spacing:.5px;padding:3px 9px;border-radius:4px;background:var(--red2);color:var(--red);border:1px solid rgba(255,68,102,.2)}
+.tb-back{padding:6px 12px;border-radius:6px;background:var(--grn2);border:1px solid var(--bd);color:var(--grn);font-size:12px;font-weight:700;text-decoration:none;transition:all .15s}
+.tb-back:hover{background:var(--grn3)}
+
+/* PAGE */
+.page{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:28px 20px 80px}
+
+/* LIVE STATUS HEADER */
+.status-header{background:linear-gradient(135deg,rgba(0,255,136,.08),rgba(0,255,136,.03));border:1px solid var(--bd2);border-radius:var(--r2);padding:20px 22px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;animation:fu .35s ease both}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.sh-title{display:flex;align-items:center;gap:10px}
+.sh-dot{width:10px;height:10px;border-radius:50%;background:var(--grn);animation:pp 2s infinite;flex-shrink:0}
+@keyframes pp{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,255,136,.4)}50%{opacity:.5;box-shadow:0 0 0 6px rgba(0,255,136,0)}}
+.sh-name{font-size:16px;font-weight:900;color:var(--txt)}
+.sh-net{font-size:10px;font-weight:800;letter-spacing:.5px;padding:2px 8px;border-radius:4px;background:var(--grn2);border:1px solid var(--bd2);color:var(--grn)}
+.sh-stats{display:flex;gap:20px;flex-wrap:wrap}
+.sh-stat{text-align:center}
+.sh-val{font-family:"JetBrains Mono",monospace;font-size:18px;font-weight:700;color:var(--grn)}
+.sh-lbl{font-size:10px;color:var(--txt3);font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-top:1px}
+
+/* SECTIONS */
+.section{margin-bottom:22px;animation:fu .35s ease both}
+.section:nth-child(2){animation-delay:.04s}
+.section:nth-child(3){animation-delay:.08s}
+.sec-title{font-size:11px;font-weight:800;color:var(--txt3);letter-spacing:.7px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.sec-title::before{content:"";width:3px;height:14px;background:var(--grn);border-radius:2px}
+
+/* CONNECTION CARDS */
+.conn-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.conn-card{background:var(--c1);border:1px solid var(--bd);border-radius:var(--r2);padding:16px 18px}
+.cc-label{font-size:10px;font-weight:800;color:var(--txt3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
+.cc-val{font-family:"JetBrains Mono",monospace;font-size:16px;font-weight:700;color:var(--grn);cursor:pointer;display:flex;align-items:center;gap:8px;word-break:break-all}
+.cc-val:hover .cpic{opacity:1}
+.cpic{opacity:.3;font-size:12px;transition:opacity .15s;flex-shrink:0}
+.cc-sub{font-size:11px;color:var(--txt3);margin-top:4px;line-height:1.5}
+
+/* STEPS */
+.steps{display:flex;flex-direction:column;gap:12px}
+.step{background:var(--c1);border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden}
+.step-hd{padding:12px 17px;display:flex;align-items:center;gap:10px;background:linear-gradient(90deg,rgba(0,255,136,.04),transparent)}
+.sn{width:26px;height:26px;border-radius:7px;background:var(--grn2);border:1px solid var(--bd2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--grn);flex-shrink:0}
+.st{font-size:13px;font-weight:800;color:var(--txt)}
+.step-body{padding:14px 17px;border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:9px}
+
+/* Code blocks */
+.cb{background:var(--c2);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px;position:relative}
+.cb pre{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--grn);line-height:1.7;white-space:pre;overflow-x:auto}
+.cb .cpb{position:absolute;top:8px;right:8px;background:var(--grn2);border:1px solid var(--bd2);border-radius:5px;padding:3px 9px;font-size:10px;font-weight:700;color:var(--grn);cursor:pointer;transition:all .15s;white-space:nowrap}
+.cb .cpb:hover{background:var(--grn3)}
+.ic{font-family:"JetBrains Mono",monospace;font-size:11.5px;background:var(--grn2);color:var(--grn);padding:2px 6px;border-radius:4px}
+.txt{font-size:12.5px;color:var(--txt2);line-height:1.7}
+.txt strong{color:var(--txt)}
+.txt a{color:var(--grn);text-decoration:none}
+.txt a:hover{text-decoration:underline}
+
+/* Peer table */
+.peer-tbl{width:100%;border-collapse:collapse}
+.peer-tbl th{padding:8px 12px;text-align:left;font-size:10px;font-weight:800;color:var(--txt3);letter-spacing:.5px;text-transform:uppercase;background:rgba(0,0,0,.2);border-bottom:1px solid var(--bd)}
+.peer-tbl td{padding:9px 12px;border-bottom:1px solid rgba(0,255,136,.04);font-size:12.5px}
+.peer-tbl tr:last-child td{border-bottom:none}
+.mono{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--txt2)}
+
+/* Miner list */
+.miner-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid rgba(0,255,136,.04)}
+.miner-item:last-child{border-bottom:none}
+.mi-dot{width:7px;height:7px;border-radius:50%;background:var(--grn);flex-shrink:0;animation:pp 2s infinite}
+.mi-name{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--txt);flex:1}
+.mi-hash{color:var(--gold);font-family:"JetBrains Mono",monospace;font-size:12px}
+
+/* Add peer form */
+.peer-form{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--bd)}
+.peer-inp{flex:1;background:var(--c2);border:1px solid var(--bd);border-radius:var(--r);padding:9px 12px;color:var(--txt);font-family:"JetBrains Mono",monospace;font-size:12px;outline:none;transition:all .2s}
+.peer-inp:focus{border-color:var(--bd2)}
+.peer-inp::placeholder{color:var(--txt3)}
+.peer-btn{padding:9px 15px;border-radius:var(--r);border:none;background:var(--grn2);border:1px solid var(--bd2);color:var(--grn);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.peer-btn:hover{background:var(--grn3)}
+
+/* Info/warn boxes */
+.box{padding:10px 13px;border-radius:var(--r);font-size:12.5px;line-height:1.6}
+.box-info{background:var(--grn2);border:1px solid var(--bd2);color:#6ee7b7}
+.box-warn{background:var(--red2);border:1px solid rgba(255,68,102,.2);color:#fca5a5}
+
+/* Sys info */
+.sysinfo{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.si-card{background:var(--c1);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px}
+.si-val{font-family:"JetBrains Mono",monospace;font-size:16px;font-weight:700;color:var(--grn)}
+.si-lbl{font-size:10px;color:var(--txt3);font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-top:3px}
+
+/* Toast */
+.toast{position:fixed;bottom:22px;right:22px;z-index:9999;background:var(--c2);border:1px solid var(--bd2);color:var(--grn);font-size:12px;font-weight:700;padding:9px 16px;border-radius:var(--r);opacity:0;transform:translateY(6px);transition:all .2s;pointer-events:none}
+.toast.on{opacity:1;transform:translateY(0)}
+
+.lic{position:fixed;bottom:6px;left:12px;z-index:8999;font-size:9.5px;color:rgba(255,255,255,.18);font-family:"JetBrains Mono",monospace}
+.lic a{color:rgba(240,165,0,.35);text-decoration:none}
+.lic a:hover{color:rgba(240,165,0,.8)}
+
+@media(max-width:680px){.conn-grid{grid-template-columns:1fr}.sh-stats{gap:12px}}
+</style>
+  <script src="csrf-fetch.js?v=25"></script>
+  <script src="otp-box.js?v=1"></script>
+  <script src="i18n.js?v=34" defer></script>
+  <script src="nav.js?v=40" defer></script>
+<script src="/ai-bubble.js?v=5" defer></script>
+<script src="/anti-phishing.js?v=1" defer></script>
+  <script src="footer.js?v=35" defer></script>
+  <script src="ui-prefs.js?v=25" defer></script>
+</head>
+<body>
+
+<!-- ACCESS GATE — requires admin JWT token -->
+<div id="accessGate">
+  <div class="gate-box">
+    <div class="gate-ic">🔐</div>
+    <div class="gate-title">Admin Access Required</div>
+    <div class="gate-sub">This page is restricted to administrators only.<br>Enter your admin credentials to continue.</div>
+    <div class="gate-badge" style="margin-bottom:16px" id="gBadge">RESTRICTED — SERVER CONFIGURATION</div>
+    <div id="gCredFields">
+      <input class="gate-inp" id="gUser" type="text"     placeholder="Admin username" autocomplete="username"
+             onkeydown="if(event.key==='Enter')gateLogin()">
+      <input class="gate-inp" id="gPass" type="password" placeholder="Password" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter')gateLogin()">
+    </div>
+    <div id="g2faWrap" style="display:none">
+      <div style="text-align:center;font-size:34px;margin:4px 0 8px">🔐</div>
+      <div style="text-align:center;font-size:15px;font-weight:800;margin-bottom:4px">Two-Factor Authentication</div>
+      <div style="text-align:center;font-size:12px;color:var(--txt3,#8a97a8);margin:0 0 8px">Enter the 6-digit code from your Authenticator app</div>
+      <div class="otp-row" id="g2faRow" data-target="g2fa" data-onfull="gateLogin">
+        <input class="oi" maxlength="1" data-i="0" inputmode="numeric" autocomplete="one-time-code" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+        <input class="oi" maxlength="1" data-i="1" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+        <input class="oi" maxlength="1" data-i="2" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+        <input class="oi" maxlength="1" data-i="3" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+        <input class="oi" maxlength="1" data-i="4" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+        <input class="oi" maxlength="1" data-i="5" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+      </div>
+      <input type="hidden" id="g2fa">
+      <div style="text-align:center;margin-top:10px"><a href="#" onclick="gBack2fa();return false" style="color:var(--grn);font-size:12px;text-decoration:none">← Back to login</a></div>
+    </div>
+    <button class="gate-btn" onclick="gateLogin()" id="gBtn">Sign In →</button>
+    <div class="gate-err" id="gErr"></div>
+    <div style="margin-top:14px;font-size:11px;color:var(--txt3)">
+      Or sign in from the <a href="dashboard" style="color:var(--grn)">Dashboard</a> first.
+    </div>
+  </div>
+</div>
+
+
+
+<div class="page">
+
+  <!-- LIVE STATUS -->
+  <div class="status-header" id="statusHeader">
+    <div class="sh-title">
+      <div class="sh-dot"></div>
+      <div>
+        <div class="sh-name" id="shName">SPN Coin Node</div>
+        <div style="font-size:11px;color:var(--txt2);margin-top:2px" id="shHost">Loading...</div>
+      </div>
+      <span class="sh-net" id="shNet">—</span>
+    </div>
+    <div class="sh-stats">
+      <div class="sh-stat"><div class="sh-val" id="shHeight">—</div><div class="sh-lbl">Block Height</div></div>
+      <div class="sh-stat"><div class="sh-val" id="shPeers">—</div><div class="sh-lbl">P2P Peers</div></div>
+      <div class="sh-stat"><div class="sh-val" id="shMiners">—</div><div class="sh-lbl">Miners</div></div>
+      <div class="sh-stat"><div class="sh-val" id="shUptime">—</div><div class="sh-lbl">Uptime</div></div>
+      <div class="sh-stat"><div class="sh-val" id="shMem">—</div><div class="sh-lbl">Memory</div></div>
+    </div>
+  </div>
+
+  <!-- CONNECTION INFO -->
+  <div class="section">
+    <div class="sec-title">Connection Details</div>
+    <div class="conn-grid">
+      <div class="conn-card" onclick="cp(document.getElementById('ccHttp').textContent)">
+        <div class="cc-label">HTTP API + Dashboard</div>
+        <div class="cc-val"><span id="ccHttp">Loading...</span><span class="cpic">⎘</span></div>
+        <div class="cc-sub">All pages · REST API · WebSocket upgrade</div>
+      </div>
+      <div class="conn-card" onclick="cp(document.getElementById('ccStratum').textContent)">
+        <div class="cc-label">Stratum Mining (WebSocket)</div>
+        <div class="cc-val"><span id="ccStratum">Loading...</span><span class="cpic">⎘</span></div>
+        <div class="cc-sub">Miners connect here · same port as HTTP</div>
+      </div>
+      <div class="conn-card" onclick="cp(document.getElementById('ccP2p').textContent)">
+        <div class="cc-label">P2P Network (HTTP gossip)</div>
+        <div class="cc-val"><span id="ccP2p">Loading...</span><span class="cpic">⎘</span></div>
+        <div class="cc-sub">Add to PEER_URLS of other nodes</div>
+      </div>
+      <div class="conn-card">
+        <div class="cc-label">Database</div>
+        <div class="cc-val" id="ccDb" style="font-size:14px">—</div>
+        <div class="cc-sub">Chain persistence via DATABASE_URL</div>
+      </div>
+    </div>
+    <div class="box box-info" id="stratumNote">
+      ⛏️ Miners should connect to: <strong id="stratumFull">ws://YOUR_HOST/stratum</strong> — Click to copy.
+    </div>
+  </div>
+
+  <!-- ACTIVE PEERS -->
+  <div class="section">
+    <div class="sec-title">P2P Peers</div>
+    <div class="conn-card" style="padding:0">
+      <div id="peerList" style="min-height:48px">
+        <div style="padding:16px;text-align:center;color:var(--txt3);font-size:12px">Loading peers...</div>
+      </div>
+      <div class="peer-form">
+        <input class="peer-inp" id="newPeer" placeholder="https://node2.example.com" type="url">
+        <button class="peer-btn" onclick="addPeer()">+ Add Peer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIVE MINERS -->
+  <div class="section">
+    <div class="sec-title">Connected Miners (Stratum)</div>
+    <div class="conn-card" style="padding:0">
+      <div id="minerList" style="min-height:48px">
+        <div style="padding:16px;text-align:center;color:var(--txt3);font-size:12px">Loading miners...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SYSTEM INFO -->
+  <div class="section">
+    <div class="sec-title">System Info</div>
+    <div class="sysinfo" id="sysInfo">
+      <div class="si-card"><div class="si-val" id="siNode">—</div><div class="si-lbl">Node.js</div></div>
+      <div class="si-card"><div class="si-val" id="siPlatform">—</div><div class="si-lbl">Platform</div></div>
+      <div class="si-card"><div class="si-val" id="siEnv">—</div><div class="si-lbl">Environment</div></div>
+      <div class="si-card"><div class="si-val" id="siChain">—</div><div class="si-lbl">Chain ID</div></div>
+    </div>
+  </div>
+
+  <!-- SETUP GUIDE -->
+  <div class="section">
+    <div class="sec-title">Real Server Setup Guide</div>
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-hd"><div class="sn">1</div><div class="st">Server requirements</div></div>
+        <div class="step-body">
+          <div class="txt"><strong>Minimum:</strong> 2 vCPU · 2 GB RAM · 20 GB SSD · Ubuntu 22.04</div>
+          <div class="txt"><strong>Recommended:</strong> 4 vCPU · 8 GB RAM · 100 GB NVMe</div>
+          <div class="txt">Providers: <a href="https://hetzner.com" target="_blank">Hetzner</a> (€4/mo) · <a href="https://digitalocean.com" target="_blank">DigitalOcean</a> · <a href="https://contabo.com" target="_blank">Contabo</a> · AWS EC2</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-hd"><div class="sn">2</div><div class="st">Install Node.js 20 LTS</div></div>
+        <div class="step-body">
+          <div class="cb"><pre>curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+node --version   # Should print v20.x.x</pre><span class="cpb" onclick="cpCode(this)">Copy</span></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-hd"><div class="sn">3</div><div class="st">Upload &amp; install the node</div></div>
+        <div class="step-body">
+          <div class="cb"><pre># From your local machine — upload the zip
+scp SPN Coin_v6_Final.zip user@YOUR_SERVER_IP:/home/user/
+
+# On the server
+unzip SPN Coin_v6_Final.zip
+cd SPN Coin_v6
+npm install --production</pre><span class="cpb" onclick="cpCode(this)">Copy</span></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-hd"><div class="sn">4</div><div class="st">Create .env file</div></div>
+        <div class="step-body">
+          <div class="txt">Generate two random secrets first:</div>
+          <div class="cb"><pre>node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+# Run twice — save both outputs</pre><span class="cpb" onclick="cpCode(this)">Copy</span></div>
+          <div class="cb"><pre>cp .env.example .env
+nano .env</pre><span class="cpb" onclick="cpCode(this)">Copy</span></div>
+          <div class="cb"><pre>NODE_ENV=production
+PORT=3000
+STRATUM_PORT=3333
+CHAIN_ID=1
+JWT_SECRET=&lt;first-random-secret&gt;
+JWT_REFRESH_SECRET=&lt;second-random-secret&gt;
+ANTHROPIC_API_KEY=sk-ant-api03-...
+DATABASE_URL=postgresql://user:pass@localhost:5432/spncoin
+PEER_URLS=https://node2.example.com,https://node3.example.com</pre><span class="cpb" onclick="cpCode(this)">Copy</span></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-hd"><div class="sn">5</div><div class="st">PostgreSQL setup (for persistent state)</div></div>
+        <div class="step-body">
+          <div class="cb"><pre>sudo apt install -y postgresql postgresql-contrib
+sudo -u postgres psql -c "CREATE USER spncoin WITH PASSWORD 'strongpassword';"
+sudo -u postgres psql -c "CREATE DATABASE spncoin OWNER spncoin;"
+# Then set DATABASE_URL in .env</pre><span class="cpb" onclick="cpCode(this)">Copy</span></div>
+          <div class="txt"><strong>Or use Neon.tech</strong> (free hosted PostgreSQL) — create a project at <a href="https://neon.tech" target="_blank">neon.tech</a> and copy the connection string directly into .env</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-hd"><div class="sn">6</div><div class="st">Run with PM2 (process manager)</div></div>
+        <div class="step-body">
+          <div class="cb"><pre>sudo npm install -g pm2
+pm2 start server.js --name spncoin-node
+pm2 save
+pm2 startup   # Follow the printed command to auto-start on reboot</pre><span class="cpb" onclick="cpCode(this)">Copy</span></div>
+          <div class="cb"><pre># Useful PM2 commands
+pm2 logs spncoin-node       # View live logs
+pm2 restart spncoin-node    # Restart
+pm2 status                 # Check status</pre><span class="cpb" onclick="cpCode(this)">Copy</span></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-hd"><div class="sn">7</div><div class="st">Nginx reverse proxy + SSL (HTTPS)</div></div>
+        <div class="step-body">
+          <div class="cb"><pre>sudo apt install -y nginx certbot python3-certbot-nginx
+sudo nano /etc/nginx/sites-available/spncoin</pre><span class="cpb" onclick="cpCode(this)">Copy</span></div>
+          <div class="cb"><pre>server {
+    listen 80;
+    server_name your-domain.com;
+
+    # HTTP API + Dashboard
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}</pre><span class="cpb" onclick="cpCode(this)">Copy</span></div>
+          <div class="cb"><pre>sudo ln -s /etc/nginx/sites-available/spncoin /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+sudo certbot --nginx -d your-domain.com   # Free SSL</pre><span class="cpb" onclick="cpCode(this)">Copy</span></div>
+          <div class="box box-info">After SSL is set up, miners connect via: <strong>wss://your-domain.com/stratum</strong></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-hd"><div class="sn">8</div><div class="st">Firewall rules</div></div>
+        <div class="step-body">
+          <div class="cb"><pre>sudo ufw allow ssh
+sudo ufw allow 80/tcp    # HTTP
+sudo ufw allow 443/tcp   # HTTPS (Nginx)
+sudo ufw allow 3000/tcp  # Node.js direct (optional)
+sudo ufw allow 3333/tcp  # Stratum dedicated port (optional)
+sudo ufw enable</pre><span class="cpb" onclick="cpCode(this)">Copy</span></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-hd"><div class="sn">9</div><div class="st">Docker (alternative to manual install)</div></div>
+        <div class="step-body">
+          <div class="cb"><pre>sudo apt install -y docker.io docker-compose
+cd docker
+cp ../.env .env
+docker-compose -f docker-compose.prod.yml up -d</pre><span class="cpb" onclick="cpCode(this)">Copy</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="lic">
+  <a href="/LICENSE" target="_blank">© 2026 SPN Coin Project</a> · PROPRIETARY
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API = window.SPN_COIN_API
+  || (location.hostname==='localhost'||location.hostname==='127.0.0.1'
+      ? 'http://localhost:3000' : location.origin);
+let TOK = '';
+
+// ── Access Gate ───────────────────────────────────────────────
+(function() {
+  // Check for existing admin token
+  TOK = sessionStorage.getItem('adm_tok') || '';
+  if (TOK) { verifyAndShow(); return; }
+  // Show gate
+  document.getElementById('accessGate').style.display = 'flex';
+})();
+
+async function verifyAndShow() {
+  try {
+    const r = await fetch(API + '/api/auth/me', {
+      headers: { 'Authorization': 'Bearer ' + TOK }
+    });
+    const me = await r.json();
+    if (!r.ok || me.role !== 'admin') throw new Error('Not admin');
+    document.getElementById('accessGate').style.display = 'none';
+    loadAll();
+  } catch {
+    TOK = '';
+    document.getElementById('accessGate').style.display = 'flex';
+  }
+}
+
+async function gateLogin() {
+  const u = document.getElementById('gUser').value.trim();
+  const p = document.getElementById('gPass').value.trim();
+  const code = (document.getElementById('g2fa') ? document.getElementById('g2fa').value.trim() : '');
+  if (!u || !p) return showGateErr('Username and password required');
+  const btn = document.getElementById('gBtn');
+  btn.textContent = 'Signing in...'; btn.disabled = true;
+  try {
+    const r = await (window.csrfFetch||fetch)(API + '/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: u, password: p, totp: code || undefined }),
+    });
+    const d = await r.json();
+    if (d.require2fa) {
+      // Clean 2FA-only step: hide credential fields (like the admin panel).
+      const cf = document.getElementById('gCredFields'); if (cf) cf.style.display = 'none';
+      const bd = document.getElementById('gBadge'); if (bd) bd.style.display = 'none';
+      const w = document.getElementById('g2faWrap'); if (w) w.style.display = 'block';
+      if (code && window.otpClear) otpClear('g2faRow');
+      if (window.otpFocus) otpFocus('g2faRow');
+      if (code) showGateErr('Invalid 2FA code — try again');
+      btn.textContent = 'Verify Code'; btn.disabled = false;
+      return;
+    }
+    if (d.accessToken) {
+      TOK = d.accessToken;
+      sessionStorage.setItem('adm_tok', TOK);
+      const me = await fetch(API + '/api/auth/me', {
+        headers: { 'Authorization': 'Bearer ' + TOK }
+      }).then(r => r.json());
+      if (me.role !== 'admin') {
+        TOK = ''; sessionStorage.removeItem('adm_tok');
+        return showGateErr('Access denied: admin role required');
+      }
+      document.getElementById('accessGate').style.display = 'none';
+      loadAll();
+    } else {
+      showGateErr(d.error || 'Login failed');
+    }
+  } catch(e) { showGateErr('Connection error: ' + e.message); }
+  const in2fa = document.getElementById('g2faWrap').style.display === 'block';
+  btn.textContent = in2fa ? 'Verify Code' : 'Sign In →'; btn.disabled = false;
+}
+
+function gBack2fa() {
+  const w = document.getElementById('g2faWrap'); if (w) w.style.display = 'none';
+  if (window.otpClear) otpClear('g2faRow');
+  const cf = document.getElementById('gCredFields'); if (cf) cf.style.display = '';
+  const bd = document.getElementById('gBadge'); if (bd) bd.style.display = '';
+  const e = document.getElementById('gErr'); if (e) e.classList.remove('on');
+  document.getElementById('gBtn').textContent = 'Sign In →';
+  const p = document.getElementById('gPass'); if (p) { p.value = ''; p.focus(); }
+}
+
+function showGateErr(msg) {
+  const e = document.getElementById('gErr');
+  e.textContent = msg; e.classList.add('on');
+}
+
+// ── Load server info ──────────────────────────────────────────
+async function loadAll() {
+  await Promise.all([loadServerInfo(), loadPeers(), loadMiners()]);
+  setInterval(loadAll, 15_000);  // auto-refresh every 15s
+}
+
+async function loadServerInfo() {
+  try {
+    const d = await af('/api/admin/server-info');
+    const host = location.hostname;
+
+    // Status header
+    document.getElementById('shName').textContent    = 'SPN Coin Node — ' + host;
+    document.getElementById('shHost').textContent    = host + ':' + d.httpPort;
+    document.getElementById('shNet').textContent     = (d.network || 'mainnet').toUpperCase();
+    document.getElementById('shHeight').textContent  = (d.chainHeight || 0).toLocaleString('en');
+    document.getElementById('shPeers').textContent   = d.peersCount || 0;
+    document.getElementById('shMiners').textContent  = d.stratumMiners || 0;
+    document.getElementById('shUptime').textContent  = fmtUptime(d.uptime || 0);
+    document.getElementById('shMem').textContent     = (d.memoryMB || 0) + ' MB';
+
+    // Connection cards
+    const proto = location.protocol === 'https:' ? 'https' : 'http';
+    const wsProto = location.protocol === 'https:' ? 'wss' : 'ws';
+    document.getElementById('ccHttp').textContent    = `${proto}://${host}:${d.httpPort}`;
+    document.getElementById('ccStratum').textContent = `${wsProto}://${host}/stratum`;
+    document.getElementById('ccP2p').textContent     = `${proto}://${host}:${d.httpPort}`;
+    document.getElementById('ccDb').textContent      = d.dbConnected ? '✅ Connected' : '❌ In-memory only';
+    document.getElementById('ccDb').style.color      = d.dbConnected ? 'var(--grn)' : 'var(--red)';
+    document.getElementById('stratumFull').textContent = `${wsProto}://${host}/stratum`;
+
+    // System info
+    document.getElementById('siNode').textContent     = d.nodeVersion || '—';
+    document.getElementById('siPlatform').textContent = d.platform || '—';
+    document.getElementById('siEnv').textContent      = d.environment || '—';
+    document.getElementById('siChain').textContent    = d.chainId === 1 ? '1 (mainnet)' : '3 (testnet)';
+  } catch(e) {
+    console.warn('server-info error:', e.message);
+  }
+}
+
+async function loadPeers() {
+  try {
+    const d = await af('/api/p2p/peers');
+    const peers = d.peers || [];
+    const el = document.getElementById('peerList');
+    if (!peers.length) {
+      el.innerHTML = '<div style="padding:16px;text-align:center;color:var(--txt3);font-size:12px">No peers connected yet. Add peers below.</div>';
+    } else {
+      el.innerHTML = `<table class="peer-tbl">
+        <thead><tr><th>Peer URL</th><th>Height</th><th>Last Seen</th><th>Status</th></tr></thead>
+        <tbody>${peers.map(p => `<tr>
+          <td class="mono">${p.url}</td>
+          <td class="mono">${p.height || 0}</td>
+          <td style="color:var(--txt3);font-size:11px">${p.lastSeen ? ago(p.lastSeen) : '—'}</td>
+          <td><span style="font-size:10px;font-weight:700;color:${p.failures>0?'var(--red)':'var(--grn)'}">${p.failures>0?'⚠️ '+p.failures+' fails':'✅ OK'}</span></td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+    }
+  } catch {}
+}
+
+async function loadMiners() {
+  try {
+    const d = await af('/api/stratum/stats');
+    const miners = d.miners || [];
+    const el = document.getElementById('minerList');
+    if (!miners.length) {
+      el.innerHTML = '<div style="padding:16px;text-align:center;color:var(--txt3);font-size:12px">No miners connected. Miners connect via <strong>ws://HOST/stratum</strong></div>';
+    } else {
+      el.innerHTML = miners.map(m => `<div class="miner-item">
+        <div class="mi-dot"></div>
+        <div class="mi-name">${m.workerId || '—'}</div>
+        <div class="mi-hash">${fmtHash(m.hashrate)}</div>
+        <div style="font-size:10.5px;color:var(--txt3)">diff:${m.difficulty} · ✅${m.valid||0} ❌${m.invalid||0}</div>
+      </div>`).join('');
+    }
+  } catch {}
+}
+
+async function addPeer() {
+  const url = document.getElementById('newPeer').value.trim();
+  if (!url) return;
+  if (!url.startsWith('http')) return toast('URL must start with http:// or https://', 'e');
+  try {
+    await af('/api/p2p/peers/add', 'POST', { url });
+    toast('✅ Peer added: ' + url);
+    document.getElementById('newPeer').value = '';
+    loadPeers();
+  } catch(e) { toast('Error: ' + e.message, 'e'); }
+}
+
+// ── Utilities ─────────────────────────────────────────────────
+async function af(path, method='GET', body=null) {
+  const opt = { method, headers: { 'Content-Type':'application/json','Authorization':'Bearer '+TOK } };
+  if (body) opt.body = JSON.stringify(body);
+  const r = await fetch(API+path, opt);
+  const d = await r.json();
+  if (r.status===401) { location.reload(); throw new Error('Session expired'); }
+  if (!r.ok && d.error) throw new Error(d.error);
+  return d;
+}
+function cp(text) {
+  navigator.clipboard.writeText(text||'').catch(()=>{});
+  toast('Copied: ' + (text||'').slice(0,40));
+}
+function cpCode(btn) {
+  const pre = btn.closest('.cb').querySelector('pre');
+  const text = pre.textContent.replace(/^#.*\n?/gm,'').trim();
+  navigator.clipboard.writeText(text).catch(()=>{});
+  const o = btn.textContent; btn.textContent='✓ Copied'; btn.style.color='var(--grn)';
+  setTimeout(()=>{ btn.textContent=o; btn.style.color=''; }, 1600);
+}
+function fmtUptime(s) {
+  if (s<60) return s+'s';
+  if (s<3600) return Math.floor(s/60)+'m';
+  if (s<86400) return Math.floor(s/3600)+'h '+Math.floor((s%3600)/60)+'m';
+  return Math.floor(s/86400)+'d '+Math.floor((s%86400)/3600)+'h';
+}
+function fmtHash(h) {
+  if (!h) return '0 H/s';
+  if (h>=1e9) return (h/1e9).toFixed(2)+' GH/s';
+  if (h>=1e6) return (h/1e6).toFixed(2)+' MH/s';
+  if (h>=1e3) return (h/1e3).toFixed(1)+' KH/s';
+  return h+' H/s';
+}
+function ago(ts) {
+  const s=Math.floor((Date.now()-ts)/1000);
+  if(s<60) return s+'s ago';
+  if(s<3600) return Math.floor(s/60)+'m ago';
+  return Math.floor(s/3600)+'h ago';
+}
+let _tt;
+function toast(msg, t='') {
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.style.borderColor=t==='e'?'rgba(255,68,102,.4)':'rgba(0,255,136,.35)';
+  el.style.color=t==='e'?'var(--red)':'var(--grn)';
+  void el.offsetWidth; el.classList.add('on');
+  clearTimeout(_tt); _tt=setTimeout(()=>el.classList.remove('on'), 2500);
+}
+</script>
+</body>
+</html>

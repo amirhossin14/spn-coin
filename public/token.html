@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<!-- © 2026 SPN Coin Project — Token Detail Page -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="64x64" href="/sepanta-coin.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/sepanta-coin-32.png?v=5">
+  <link rel="shortcut icon" href="/sepanta-coin.ico?v=5">
+  <link rel="apple-touch-icon" sizes="180x180" href="/sepanta-coin-180.png?v=5">
+  <meta name="theme-color" content="#070a0e">
+  <meta name="description" content="View SPN Coin token details — supply, holders, and distribution.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Token Details — Sepanta (SPN)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080b13;--bg2:#0c1120;--card:#0f1626;--bd:rgba(255,255,255,.07);
+  --txt:#eaf0fb;--sub:#b3bdd8;--mut:#8a97b8;
+  --gold:#f5b301;--grn:#26d07c;--cyn:#25d0ee;--pur:#b06bf7;--red:#f2555a;
+  --r:12px;
+}
+body{background:var(--bg);color:var(--txt);font-family:'Sora',sans-serif;min-height:100vh;line-height:1.5}
+.wrap{max-width:1080px;margin:0 auto;padding:22px 16px 60px}
+a{color:inherit;text-decoration:none}
+.mono{font-family:'JetBrains Mono',monospace}
+
+.search{display:flex;gap:8px;margin-bottom:22px}
+.search input{flex:1;background:var(--bg2);border:1px solid var(--bd);border-radius:9px;padding:11px 15px;color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:13px;outline:none}
+.search input:focus{border-color:rgba(240,165,0,.4)}
+.search button{background:var(--gold);color:#000;border:none;border-radius:9px;padding:0 22px;font-weight:700;font-size:13px;cursor:pointer}
+
+/* header */
+.thead{display:flex;align-items:center;gap:16px;margin-bottom:8px;flex-wrap:wrap}
+.tlogo{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--gold),#ffb820);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#000;flex-shrink:0;overflow:hidden}
+.tlogo img{width:100%;height:100%;object-fit:cover}
+.thead h1{font-size:26px;font-weight:800}
+.tsym{font-family:'JetBrains Mono',monospace;color:var(--gold);font-size:14px}
+.tbadges{display:flex;gap:7px;margin-top:5px;flex-wrap:wrap}
+.badge{font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:20px;font-family:'JetBrains Mono',monospace}
+.b-kind{background:rgba(167,139,250,.14);color:var(--pur)}
+.b-mint{background:rgba(0,230,118,.13);color:var(--grn)}
+.b-renounced{background:rgba(110,120,152,.15);color:var(--sub)}
+.tdesc{color:var(--sub);font-size:13.5px;margin:14px 0 22px;max-width:640px}
+
+/* kpi cards */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:13px;margin-bottom:22px}
+.kpi{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:15px 17px}
+.kpi .l{font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.kpi .v{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600;color:var(--accent,var(--gold))}
+
+/* two column */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:820px){.cols{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.card-h{padding:13px 17px;border-bottom:1px solid var(--bd);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.card-b{padding:15px 17px}
+
+/* distribution bars */
+.distrow{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+.distrow:last-child{margin-bottom:0}
+.distrank{width:22px;height:22px;border-radius:6px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--sub);flex-shrink:0;font-family:'JetBrains Mono',monospace}
+.distaddr{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cyn);flex-shrink:0;width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.distbar{flex:1;height:20px;background:var(--bg2);border-radius:5px;overflow:hidden;position:relative}
+.distfill{height:100%;background:linear-gradient(90deg,var(--gold),#ffb820);border-radius:5px;min-width:2px;transition:width .5s}
+.distpct{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--txt);width:52px;text-align:right;flex-shrink:0}
+.frozen-tag{color:var(--cyn);font-size:11px}
+
+/* holders table */
+.htable{width:100%;border-collapse:collapse}
+.htable th{text-align:left;font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;padding:8px 10px;border-bottom:1px solid var(--bd)}
+.htable td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.04);font-size:12.5px;font-family:'JetBrains Mono',monospace}
+.htable tr:last-child td{border-bottom:none}
+.htable a{color:var(--cyn)}
+.pct-cell{color:var(--gold)}
+
+/* wallet bar */
+.wallet-bar{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:14px 17px;margin-bottom:22px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.wallet-bar.on{border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.04)}
+.wallet-bar .status{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+.wallet-bar .dot{width:8px;height:8px;border-radius:50%;background:var(--mut)}
+.wallet-bar.on .dot{background:var(--grn);box-shadow:0 0 8px var(--grn)}
+.wallet-bar input{flex:1;min-width:200px;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:9px 13px;color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:12.5px;outline:none}
+.wallet-bar button{background:var(--gold);color:#000;border:none;border-radius:8px;padding:9px 16px;font-weight:700;font-size:13px;cursor:pointer}
+.wallet-bar button.lock{background:var(--bg2);color:var(--sub);border:1px solid var(--bd)}
+.wallet-bar .myaddr{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--grn)}
+.mybal{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:13px}
+.mybal b{color:var(--gold)}
+
+.state{text-align:center;padding:70px 20px}
+.state .ic{font-size:44px;margin-bottom:14px}
+.state h2{font-size:19px;margin-bottom:8px}
+.state p{color:var(--sub);font-size:13.5px}
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--sub);font-size:13px;margin-bottom:16px}
+.back:hover{color:var(--gold)}
+.metalink{display:inline-flex;align-items:center;gap:5px;color:var(--cyn);font-size:12.5px;margin-right:14px}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="token-sign.js?v=99"></script>
+<script src="wallet-session.js?v=2"></script>
+<script src="ui-utils.js?v=25"></script>
+<script src="csrf-fetch.js?v=25"></script>
+  <script src="i18n.js?v=34" defer></script>
+  <script src="nav.js?v=40" defer></script><script src="/ai-bubble.js?v=5" defer></script>
+<script src="/anti-phishing.js?v=1" defer></script>
+  <script src="footer.js?v=35" defer></script>
+  <script src="ui-prefs.js?v=25" defer></script>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="search">
+    <input id="si" type="text" placeholder="Token ID or symbol…" onkeydown="if(event.key==='Enter')go()">
+    <button onclick="go()">View</button>
+  </div>
+
+  <a class="back" href="token-factory">← All tokens</a>
+
+  <div id="sLoad" class="state"><div class="ic">⏳</div><p>Loading token…</p></div>
+  <div id="sNF" class="state" style="display:none"><div class="ic">🔍</div><h2>Token not found</h2><p id="nfMsg">No token matches that ID.</p></div>
+
+  <div id="sMain" style="display:none">
+    <!-- header -->
+    <div class="thead">
+      <div class="tlogo" id="tLogo">?</div>
+      <div>
+        <h1 id="tName">—</h1>
+        <div class="tsym" id="tSym">—</div>
+        <div class="tbadges" id="tBadges"></div>
+      </div>
+    </div>
+    <div class="tdesc" id="tDesc" style="display:none"></div>
+    <div id="tLinks" style="margin-bottom:20px"></div>
+
+    <!-- wallet connect -->
+    <div class="wallet-bar" id="walletBar">
+      <div class="status"><span class="dot"></span><span id="wStatus">Wallet locked</span></div>
+      <input id="wKey" type="password" placeholder="private key (hex) — unlocks in your browser only" autocomplete="off">
+      <button id="wUnlock" onclick="unlockWallet()">Unlock</button>
+      <div class="mybal" id="myBal" style="display:none"></div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpis">
+      <div class="kpi" style="--accent:var(--gold)"><div class="l">Total Supply</div><div class="v" id="kSupply">—</div></div>
+      <div class="kpi" style="--accent:var(--cyn)"><div class="l">Holders</div><div class="v" id="kHolders">—</div></div>
+      <div class="kpi" style="--accent:var(--grn)"><div class="l">Transfers</div><div class="v" id="kTransfers">—</div></div>
+      <div class="kpi" style="--accent:var(--pur)"><div class="l">Decimals</div><div class="v" id="kDec">—</div></div>
+      <div class="kpi" style="--accent:var(--grn)"><div class="l">Top Holder</div><div class="v" id="kTop">—</div></div>
+    </div>
+
+    <div class="cols">
+      <!-- distribution -->
+      <div class="card">
+        <div class="card-h"><span>📊 Distribution</span><span class="mono" style="color:var(--sub);font-size:11px" id="distMeta"></span></div>
+        <div class="card-b" id="distBody"><div style="color:var(--sub);font-size:13px">Loading…</div></div>
+      </div>
+      <!-- token info -->
+      <div class="card">
+        <div class="card-h"><span>ℹ️ Token Info</span></div>
+        <div class="card-b">
+          <div style="display:flex;flex-direction:column;gap:11px">
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--sub);font-size:12.5px">Token ID</span><span class="mono" style="font-size:12px;color:var(--cyn);word-break:break-all;text-align:right;max-width:220px" id="iId">—</span></div>
+            <div style="display:flex;justify-content:space-between" id="iContractRow"><span style="color:var(--sub);font-size:12.5px" data-i18n>Contract address</span><span class="mono" style="font-size:12px;color:var(--gold);word-break:break-all;text-align:right;max-width:220px;cursor:pointer" id="iContract" title="click to copy">—</span></div>
+            <div style="display:flex;justify-content:space-between" id="iContractIdRow"><span style="color:var(--sub);font-size:12.5px" data-i18n>Contract ID</span><span class="mono" style="font-size:12px;color:var(--cyn);text-align:right" id="iContractId">—</span></div>
+            <div style="display:flex;justify-content:space-between" id="iChecksumRow"><span style="color:var(--sub);font-size:12.5px" data-i18n>Checksum</span><span class="mono" style="font-size:12px;color:var(--pur);text-align:right" id="iChecksum">—</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--sub);font-size:12.5px">Issuer</span><a class="mono" style="font-size:12px;color:var(--pur);text-align:right;max-width:220px;word-break:break-all" id="iIssuer" href="#">—</a></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--sub);font-size:12.5px">Type</span><span class="mono" style="font-size:12px" id="iKind">—</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--sub);font-size:12.5px">Mintable</span><span class="mono" style="font-size:12px" id="iMint">—</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--sub);font-size:12.5px">Frozen addresses</span><span class="mono" style="font-size:12px;color:var(--cyn)" id="iFrozen">—</span></div>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:8px">
+            <a class="metalink" id="manageLink" href="token-factory" style="background:var(--bg2);padding:8px 14px;border-radius:8px">🎛️ Manage this token</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- holders table -->
+    <div class="card" style="margin-top:16px">
+      <div class="card-h"><span>👥 Top Holders</span><span class="mono" style="color:var(--sub);font-size:11px" id="holdersCount"></span></div>
+      <div class="card-b" style="padding:0">
+        <table class="htable"><thead><tr><th>#</th><th>Address</th><th>Balance</th><th style="text-align:right">Share</th></tr></thead>
+        <tbody id="holdersBody"></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API=location.origin;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"'`]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c]));
+// Only allow safe http(s)/mailto URLs into href — blocks javascript:, data:, etc.
+function safeUrl(u){ u=String(u==null?'':u).trim(); return /^(https?:\/\/|mailto:)/i.test(u) ? u : ('https://'+u.replace(/^\/+/,'')); }
+let TOKEN=null, DECIMALS=0;
+
+function getId(){
+  const p=new URLSearchParams(location.search);
+  return p.get('id')||p.get('t')||location.hash.slice(1)||'';
+}
+function go(){ const q=$('si').value.trim(); if(q){ location.href='token?id='+encodeURIComponent(q); location.reload(); } }
+function fmtAmount(raw){
+  const n=Number(raw)/Math.pow(10,DECIMALS);
+  return n.toLocaleString('en',{maximumFractionDigits:DECIMALS});
+}
+function short(a,n=8){ return a?a.slice(0,n)+'…'+a.slice(-4):'—'; }
+
+async function load(){
+  const id=getId();
+  if(!id){ showNF('Enter a token ID.'); return; }
+  $('si').value=id;
+  try{
+    const [tok, meta, dist, holders] = await Promise.all([
+      fetch(API+'/api/tokens/'+encodeURIComponent(id)).then(r=>r.ok?r.json():null),
+      fetch(API+'/api/tokens/'+encodeURIComponent(id)+'/meta').then(r=>r.ok?r.json():null),
+      fetch(API+'/api/tokens/'+encodeURIComponent(id)+'/distribution?buckets=8').then(r=>r.ok?r.json():null),
+      fetch(API+'/api/tokens/'+encodeURIComponent(id)+'/holders').then(r=>r.ok?r.json():{holders:[]}),
+    ]);
+    if(!tok || tok.error){ showNF(); return; }
+    TOKEN=tok; DECIMALS=tok.decimals||0;
+    render(tok, meta, dist, holders.holders||[]);
+  }catch(e){ showNF('Error: '+e.message); }
+}
+
+function showNF(msg){ $('sLoad').style.display='none'; $('sMain').style.display='none'; $('sNF').style.display='block'; if(msg)$('nfMsg').textContent=msg; }
+
+function render(t, meta, dist, holders){
+  $('sLoad').style.display='none'; $('sMain').style.display='block';
+
+  // logo / name
+  const logo=meta&&meta.logo;
+  $('tLogo').innerHTML = logo ? '<img src="'+esc(logo)+'" onerror="this.parentElement.textContent=\''+esc((t.symbol||'?')[0])+'\'">' : esc((t.symbol||'?')[0]);
+  $('tName').textContent=t.name||'Unknown';
+  $('tSym').textContent=t.symbol||'—';
+
+  // badges
+  let badges='<span class="badge b-kind">'+esc(t.kind||'token')+'</span>';
+  if(t.mintable) badges+='<span class="badge b-mint">mintable</span>';
+  if(t.renounced) badges+='<span class="badge b-renounced">renounced</span>';
+  $('tBadges').innerHTML=badges;
+
+  // description + links
+  if(meta&&meta.description){ $('tDesc').textContent=meta.description; $('tDesc').style.display='block'; }
+  let links='';
+  if(meta&&meta.website) links+='<a class="metalink" href="'+esc(safeUrl(meta.website))+'" target="_blank" rel="noopener noreferrer nofollow">🌐 Website</a>';
+  if(meta&&meta.twitter) links+='<a class="metalink" href="'+esc('https://twitter.com/'+String(meta.twitter).replace('@','').replace(/[^A-Za-z0-9_]/g,''))+'" target="_blank" rel="noopener noreferrer nofollow">𝕏 '+esc(meta.twitter)+'</a>';
+  if(meta&&meta.telegram) links+='<a class="metalink" href="'+esc(safeUrl(meta.telegram))+'" target="_blank" rel="noopener noreferrer nofollow">✈️ Telegram</a>';
+  if(meta&&meta.github) links+='<a class="metalink" href="'+esc(safeUrl(meta.github))+'" target="_blank" rel="noopener noreferrer nofollow">🐙 GitHub</a>';
+  if(meta&&meta.email) links+='<a class="metalink" href="mailto:'+esc(String(meta.email).replace(/[^A-Za-z0-9_.@+-]/g,''))+'">✉️ '+esc(meta.email)+'</a>';
+  if(meta&&meta.whitepaper) links+='<a class="metalink" href="'+esc(safeUrl(meta.whitepaper))+'" target="_blank" rel="noopener noreferrer nofollow">📄 White Paper</a>';
+  if(meta&&meta.discord) links+='<a class="metalink" href="'+esc(safeUrl(meta.discord))+'" target="_blank" rel="noopener noreferrer nofollow">💬 Discord</a>';
+  if(meta&&meta.facebook) links+='<a class="metalink" href="'+esc(safeUrl(meta.facebook))+'" target="_blank" rel="noopener noreferrer nofollow">📘 Facebook</a>';
+  if(meta&&meta.reddit) links+='<a class="metalink" href="'+esc(safeUrl(meta.reddit))+'" target="_blank" rel="noopener noreferrer nofollow">🤖 Reddit</a>';
+  if(meta&&meta.medium) links+='<a class="metalink" href="'+esc(safeUrl(meta.medium))+'" target="_blank" rel="noopener noreferrer nofollow">✍️ Medium</a>';
+  $('tLinks').innerHTML=links;
+
+  // KPIs
+  $('kSupply').textContent=fmtAmount(t.supply);
+  $('kHolders').textContent=t.holders||0;
+  if($('kTransfers')) $('kTransfers').textContent=(t.transfers!=null?t.transfers:(t.meta&&t.meta.transfers)||0);
+  $('kDec').textContent=t.decimals!=null?t.decimals:'—';
+  const top=dist&&dist.top&&dist.top[0];
+  $('kTop').textContent=top?top.percent+'%':'—';
+
+  // info panel
+  $('iId').textContent=t.tokenId||getId(); $('iId').setAttribute('data-copy',t.tokenId||getId()); if(window.SPNUI)SPNUI.attachCopyButtons();
+
+  // Contract identity — each token's dedicated on-chain identity.
+  const idn = t.identity || {};
+  if (idn.contractAddress) {
+    $('iContract').textContent = short(idn.contractAddress, 14);
+    $('iContract').onclick = () => { navigator.clipboard.writeText(idn.contractAddress); if(window.SPNToast)SPNToast('Copied'); };
+    $('iContractId').textContent = idn.contractId || '—';
+    $('iChecksum').textContent = idn.checksum || '—';
+  } else {
+    ['iContractRow','iContractIdRow','iChecksumRow'].forEach(id=>{ const el=$(id); if(el)el.style.display='none'; });
+  }
+  const iss=$('iIssuer'); iss.textContent=short(t.issuer,12); iss.href='explorer?q='+encodeURIComponent(t.issuer||'');
+  $('iKind').textContent=t.kind||'token';
+  $('iMint').textContent=t.mintable?'yes':'no (fixed)';
+  const frozen=(meta&&meta.frozen)||[];
+  $('iFrozen').textContent=frozen.length;
+  $('manageLink').href='token-factory#'+encodeURIComponent(t.tokenId||getId());
+
+  // distribution
+  renderDist(dist, frozen);
+  // holders
+  renderHolders(holders, t.supply, frozen);
+}
+
+function renderDist(dist, frozen){
+  const body=$('distBody');
+  if(!dist||!dist.top||!dist.top.length){ body.innerHTML='<div style="color:var(--sub);font-size:13px">No distribution data.</div>'; return; }
+  $('distMeta').textContent=dist.totalHolders+' holders';
+  const frozenSet=new Set(frozen);
+  let html=dist.top.slice(0,8).map((h,i)=>{
+    const isF=frozenSet.has(h.address);
+    return '<div class="distrow">'+
+      '<div class="distrank">'+(i+1)+'</div>'+
+      '<a class="distaddr" href="explorer?q='+esc(h.address)+'" title="'+esc(h.address)+'">'+short(h.address,7)+(isF?' 🧊':'')+'</a>'+
+      '<div class="distbar"><div class="distfill" style="width:'+Math.max(2,h.percent)+'%"></div></div>'+
+      '<div class="distpct">'+h.percent+'%</div>'+
+    '</div>';
+  }).join('');
+  if(dist.others&&dist.others.percent>0){
+    html+='<div class="distrow"><div class="distrank">·</div><div class="distaddr" style="color:var(--sub)">others</div>'+
+      '<div class="distbar"><div class="distfill" style="width:'+Math.max(2,dist.others.percent)+'%;background:var(--mut)"></div></div>'+
+      '<div class="distpct">'+dist.others.percent+'%</div></div>';
+  }
+  body.innerHTML=html;
+}
+
+function renderHolders(holders, supply, frozen){
+  $('holdersCount').textContent=holders.length+' total';
+  const frozenSet=new Set(frozen);
+  const sup=Number(supply)||1;
+  const sorted=[...holders].sort((a,b)=>Number(BigInt(b.amount)-BigInt(a.amount))).slice(0,25);
+  $('holdersBody').innerHTML=sorted.map((h,i)=>{
+    const pct=((Number(h.amount)/sup)*100).toFixed(2);
+    const isF=frozenSet.has(h.address);
+    return '<tr><td>'+(i+1)+'</td>'+
+      '<td><a href="explorer?q='+esc(h.address)+'">'+short(h.address,10)+'</a>'+(isF?' <span class="frozen-tag">🧊 frozen</span>':'')+'</td>'+
+      '<td>'+fmtAmount(h.amount)+'</td>'+
+      '<td style="text-align:right" class="pct-cell">'+pct+'%</td></tr>';
+  }).join('')||'<tr><td colspan="4" style="text-align:center;color:var(--sub);padding:20px">No holders yet</td></tr>';
+}
+
+// ── Wallet connect ──
+async function unlockWallet(){
+  const key=$('wKey').value.trim();
+  const btn=$('wUnlock');
+  if(!key){ return; }
+  btn.disabled=true; btn.textContent='…';
+  try{
+    const addr=await WalletSession.unlock(key);
+    if(!addr) throw new Error('could not derive address');
+    $('wKey').value='';
+  }catch(e){
+    $('wStatus').textContent='Failed: '+e.message;
+    btn.disabled=false; btn.textContent='Unlock';
+  }
+}
+
+WalletSession.onChange(async (unlocked, addr)=>{
+  const bar=$('walletBar'), btn=$('wUnlock');
+  if(unlocked){
+    bar.classList.add('on');
+    $('wStatus').innerHTML='Unlocked · <span class="myaddr">'+short(addr,12)+'</span>';
+    $('wKey').style.display='none';
+    btn.textContent='Lock'; btn.className='lock'; btn.disabled=false;
+    btn.onclick=()=>{ WalletSession.lock(); };
+    // fetch my balance of this token
+    if(TOKEN){
+      try{
+        const b=await fetch(API+'/api/tokens/'+encodeURIComponent(getId())+'/balance/'+addr).then(r=>r.json());
+        $('myBal').style.display='block';
+        $('myBal').innerHTML='Your balance: <b>'+fmtAmount(b.balance||0)+' '+esc(TOKEN.symbol||'')+'</b>';
+      }catch(e){}
+    }
+  }else{
+    bar.classList.remove('on');
+    $('wStatus').textContent='Wallet locked';
+    $('wKey').style.display='block';
+    $('myBal').style.display='none';
+    btn.textContent='Unlock'; btn.className=''; btn.disabled=false;
+    btn.onclick=unlockWallet;
+  }
+});
+
+load();
+</script>
+</body>
+</html>

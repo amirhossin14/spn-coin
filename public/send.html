@@ -1,0 +1,1831 @@
+<!DOCTYPE html>
+<!--
+  © 2026 SPN Coin Project — PROPRIETARY AND CONFIDENTIAL
+  All Rights Reserved. Unauthorized copying, modification,
+  distribution, or use of this file is strictly prohibited.
+  See LICENSE file in the project root for full details.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="64x64" href="/sepanta-coin.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/sepanta-coin-32.png?v=5">
+  <link rel="shortcut icon" href="/sepanta-coin.ico?v=5">
+  <link rel="apple-touch-icon" sizes="180x180" href="/sepanta-coin-180.png?v=5">
+  <meta name="theme-color" content="#070a0e">
+  <meta name="description" content="Send SPN Coin transactions securely with client-side signing.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Send Transaction — Sepanta (SPN)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root {
+  --bg:        #080b13;
+  --bg1:       #0c1120;
+  --bg2:       #0f1626;
+  --bg3:       #141d31;
+  --border:    rgba(255,255,255,.06);
+  --bord2:     rgba(255,255,255,.11);
+  --bord3:     rgba(255,255,255,.17);
+  --text:      #eaf0fb;
+  --muted:     #5a6788;
+  --muted2:    #8a97b8;
+  --gold:      #f5b301;
+  --gold2:     #f7c948;
+  --gold3:     rgba(240,165,0,.1);
+  --green:     #26d07c;
+  --green2:    rgba(0,230,118,.1);
+  --blue:      #6d6bf5;
+  --cyan:      #25d0ee;
+  --red:       #f2555a;
+  --r:         13px;
+  --rs:        8px;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 40% at 15% 0%, rgba(240,165,0,.055) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 35% at 88% 100%, rgba(61,127,255,.04) 0%, transparent 55%);
+}
+
+.page { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 0 16px 80px; }
+
+/* ══════════════════════════ TOPBAR ══════════════════════════ */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 0 16px; border-bottom: 1px solid var(--border);
+  margin-bottom: 28px;
+}
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-coin {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 900; color: #000;
+  box-shadow: 0 0 20px rgba(240,165,0,.32);
+  animation: glow 3s ease-in-out infinite;
+}
+@keyframes glow { 0%,100%{box-shadow:0 0 20px rgba(240,165,0,.32)} 50%{box-shadow:0 0 36px rgba(240,165,0,.55)} }
+.logo-name { font-size: 17px; font-weight: 900; color: var(--gold); }
+.logo-net {
+  font-size: 9px; font-weight: 800; color: #000; background: var(--gold);
+  border-radius: 4px; padding: 1px 6px; letter-spacing: .5px; margin-top: 2px;
+}
+.nav-links { display: flex; gap: 22px; }
+.nav-links a { font-size: 13px; color: var(--muted2); text-decoration: none; font-weight: 500; transition: color .2s; }
+.nav-links a:hover { color: var(--text); }
+.user-area { display: flex; align-items: center; gap: 10px; }
+#userBadge {
+  display: none; font-size: 12px; color: var(--muted2);
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 5px 12px;
+}
+#userBadge strong { color: var(--text); }
+#logoutBtn {
+  display: none; position: absolute; top: 16px; right: 16px;
+  background: rgba(255,64,96,.08); border: 1px solid rgba(255,64,96,.3);
+  color: #ff6b7d; padding: 6px 13px; border-radius: 8px;
+  cursor: pointer; font-size: 12px; font-weight: 700; font-family: inherit;
+  transition: all .18s; z-index: 2;
+}
+#logoutBtn:hover { background: rgba(255,64,96,.16); border-color: rgba(255,64,96,.5); color: #ff8894; }
+.bal-card { position: relative; }
+
+/* ══════════════════════════ SCREENS ══════════════════════════ */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ══════════════════════════ LOGIN SCREEN ══════════════════════════ */
+.login-wrap {
+  max-width: 400px; margin: 60px auto 0;
+  background: var(--bg1); border: 1px solid var(--bord2);
+  border-radius: 18px; overflow: hidden;
+  animation: fadeUp .45s ease both;
+}
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+.login-head {
+  padding: 32px 28px 24px; text-align: center;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(240,165,0,.05), transparent);
+}
+.login-icon { font-size: 44px; margin-bottom: 12px; }
+.login-title { font-size: 22px; font-weight: 900; margin-bottom: 6px; }
+.login-sub { font-size: 13px; color: var(--muted2); }
+.login-body { padding: 28px; }
+.linp {
+  width: 100%; padding: 13px 16px; margin-bottom: 12px;
+  background: var(--bg2); border: 1px solid var(--bord2);
+  border-radius: 10px; font-family: 'Sora', sans-serif;
+  font-size: 14px; color: var(--text); outline: none;
+  transition: border-color .2s; direction: rtl;
+}
+.linp:focus { border-color: rgba(240,165,0,.5); }
+.linp::placeholder { color: var(--muted); }
+.login-btn {
+  width: 100%; padding: 14px; background: linear-gradient(135deg, #e09500, var(--gold), #f0b800);
+  border: none; border-radius: 10px; font-family: 'Sora', sans-serif;
+  font-size: 15px; font-weight: 800; color: #000; cursor: pointer; transition: all .25s;
+  box-shadow: 0 4px 18px rgba(240,165,0,.25);
+}
+.login-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(240,165,0,.4); }
+.login-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.login-err { font-size: 12px; color: var(--red); margin-top: 10px; text-align: center; display: none; }
+
+/* ===== Admin-style login (matches admin panel) ===== */
+.al-box{position:relative;direction:ltr;text-align:left;width:100%;max-width:430px;margin:60px auto 0;background:#0c1117;border:1px solid rgba(245,179,1,.20);border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px rgba(245,179,1,.05),0 24px 64px rgba(0,0,0,.6),0 0 80px rgba(245,179,1,.05);animation:alBoxIn .5s cubic-bezier(.22,1,.36,1) both}
+.al-box::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#f5b301,#f7c948,#f5b301);z-index:2}
+.al-box *{direction:ltr;text-align:left}
+@keyframes alBoxIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.al-head{padding:26px 26px 18px;border-bottom:1px solid rgba(148,163,208,.12);background:linear-gradient(135deg,rgba(245,179,1,.04),transparent)}
+.al-logo{display:flex;align-items:center;gap:12px}
+.al-ic{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#f5b301,#f7c948);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#000;box-shadow:0 0 20px rgba(240,165,0,.3);flex:none}
+.al-name{font-size:18px;font-weight:900;color:#c8d8e8}
+.al-sub{font-size:11px;color:#3a5570;margin-top:2px;letter-spacing:.3px}
+.al-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;letter-spacing:.8px;color:#26d07c;background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.20);border-radius:4px;padding:3px 8px;margin-top:10px}
+.al-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#26d07c;animation:alPulse 1.8s infinite}
+@keyframes alPulse{0%,100%{opacity:1}50%{opacity:.3}}
+.al-body{padding:24px 26px}
+.al-frow{margin-bottom:14px}
+.al-lbl{font-size:11px;font-weight:700;color:#7a99b8;letter-spacing:.4px;margin-bottom:6px;display:block}
+.al-inp{width:100%;padding:11px 14px;background:#111820;border:1px solid rgba(148,163,208,.12);border-radius:8px;color:#eaf0fb;font-family:'Sora',sans-serif;font-size:13.5px;outline:none;transition:all .2s}
+.al-inp:focus{border-color:rgba(245,179,1,.45);background:#141d31;box-shadow:0 0 0 3px rgba(245,179,1,.10)}
+.al-inp::placeholder{color:#3a5570}
+.al-pwd{position:relative}
+.al-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:#3a5570;cursor:pointer;font-size:14px;padding:0}
+.al-btn{width:100%;padding:12px;background:linear-gradient(135deg,#f5b301,#c98a00);border:none;border-radius:8px;color:#1a1200;font-family:'Sora',sans-serif;font-size:14px;font-weight:900;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(245,179,1,.28)}
+.al-btn:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(245,179,1,.38)}
+.al-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.al-err{background:rgba(255,68,102,.12);border:1px solid rgba(255,68,102,.3);color:#f2555a;border-radius:8px;padding:10px 14px;font-size:12.5px;font-weight:600;margin-bottom:14px;display:none;text-align:left}
+.al-err.show,.al-err.on{display:block}
+.al-foot{padding:10px 26px;border-top:1px solid rgba(0,255,136,.10);display:flex;align-items:center;justify-content:space-between}
+.al-f1{font-size:10.5px;color:#3a5570;font-family:'JetBrains Mono',monospace}
+.al-f2{display:flex;align-items:center;gap:5px;font-size:11px;color:#1fae66}
+.al-f2::before{content:'🔒';font-size:10px}
+
+/* ══════════════════════════ SEND SCREEN ══════════════════════════ */
+.send-wrap { max-width: 520px; margin: 0 auto; }
+.stitle {
+  font-size: 26px; font-weight: 900; letter-spacing: -.5px; margin-bottom: 4px;
+  background: linear-gradient(135deg, #fff 40%, rgba(255,255,255,.5));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.ssub { font-size: 13px; color: var(--muted2); margin-bottom: 24px; }
+
+/* Balance Card */
+.bal-card {
+  background: linear-gradient(135deg, rgba(240,165,0,.08), rgba(240,165,0,.03));
+  border: 1px solid rgba(240,165,0,.2); border-radius: 16px;
+  padding: 20px 22px; margin-bottom: 18px; position: relative; overflow: hidden;
+  animation: fadeUp .45s ease both;
+}
+.bal-card::before {
+  content: ''; position: absolute; top: -40px; left: -40px;
+  width: 140px; height: 140px; border-radius: 50%;
+  background: radial-gradient(rgba(240,165,0,.15), transparent 70%);
+}
+.bal-label { font-size: 11px; font-weight: 700; color: rgba(240,165,0,.65); letter-spacing: .7px; text-transform: uppercase; margin-bottom: 8px; }
+.bal-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 32px; font-weight: 700; color: var(--gold); letter-spacing: -1px;
+  display: flex; align-items: baseline; gap: 8px;
+}
+.bal-sym { font-size: 15px; color: var(--gold2); }
+.bal-usd { font-size: 12px; color: rgba(240,165,0,.5); margin-top: 4px; }
+.bal-addr {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 14px; padding: 6px 12px;
+  background: rgba(0,0,0,.25); border: 1px solid rgba(240,165,0,.15);
+  border-radius: 8px; cursor: pointer; transition: all .18s;
+}
+.bal-addr:hover { border-color: rgba(240,165,0,.3); background: rgba(0,0,0,.4); }
+.bal-addr-txt {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--gold2); letter-spacing: .3px;
+}
+.bal-addr-ic { font-size: 12px; color: rgba(240,165,0,.45); }
+
+/* Form Card */
+.form-card {
+  background: var(--bg1); border: 1px solid var(--bord2);
+  border-radius: 16px; overflow: hidden;
+  animation: fadeUp .45s ease .06s both;
+}
+.form-hdr {
+  padding: 16px 22px 14px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.form-hdr-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: rgba(61,127,255,.15); border: 1px solid rgba(61,127,255,.25);
+  display: flex; align-items: center; justify-content: center; font-size: 17px;
+}
+.form-hdr-title { font-size: 15px; font-weight: 800; }
+.form-hdr-sub { font-size: 11px; color: var(--muted2); margin-top: 1px; }
+.form-body { padding: 22px; }
+
+/* Field */
+.field { margin-bottom: 18px; }
+.field-lbl {
+  font-size: 11px; font-weight: 700; color: var(--muted2); letter-spacing: .6px;
+  text-transform: uppercase; margin-bottom: 8px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.field-lbl .req { color: var(--red); }
+.field-lbl .hint { font-size: 10px; color: var(--muted); font-weight: 500; text-transform: none; letter-spacing: 0; }
+.inp-wrap { position: relative; }
+.inp {
+  width: 100%; padding: 13px 16px;
+  background: var(--bg2); border: 1px solid var(--bord2);
+  border-radius: 11px; font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; color: var(--text); outline: none;
+  transition: all .2s; direction: ltr; text-align: left;
+}
+.inp::placeholder { color: var(--muted); font-size: 12px; }
+.inp:focus { border-color: rgba(240,165,0,.45); background: var(--bg3); box-shadow: 0 0 0 3px rgba(240,165,0,.07); }
+.inp.err { border-color: rgba(255,64,96,.45); box-shadow: 0 0 0 3px rgba(255,64,96,.06); }
+.inp.ok  { border-color: rgba(0,230,118,.4); }
+.inp-sym {
+  position: absolute; left: 0; top: 0; height: 100%;
+  display: flex; align-items: center; padding: 0 13px; pointer-events: none;
+}
+.sym-tag {
+  font-size: 11px; font-weight: 700; color: var(--gold);
+  background: var(--gold3); border: 1px solid rgba(240,165,0,.2);
+  border-radius: 5px; padding: 2px 7px;
+}
+.inp-padl { padding-left: 68px; padding-right: 62px; }
+.max-btn {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  font-size: 11px; font-weight: 800; letter-spacing: .5px; color: var(--gold);
+  background: var(--gold3); border: 1px solid rgba(240,165,0,.25);
+  border-radius: 6px; padding: 5px 10px; cursor: pointer; transition: all .15s;
+}
+.max-btn:hover { background: rgba(240,165,0,.2); border-color: rgba(240,165,0,.45); }
+.max-btn:active { transform: translateY(-50%) scale(.94); }
+/* remove ugly native number spinner arrows */
+.inp[type=number]::-webkit-inner-spin-button,
+.inp[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.inp[type=number] { -moz-appearance: textfield; appearance: textfield; }
+.ferr { font-size: 11px; color: var(--red); margin-top: 6px; display: none; align-items: center; gap: 4px; }
+.ferr.show { display: flex; }
+
+/* Fee Preview */
+.fee-bar {
+  display: none; align-items: center; justify-content: space-between;
+  padding: 11px 16px; background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; margin-bottom: 18px; flex-wrap: wrap; gap: 8px;
+}
+.fee-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.fee-val { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--text); font-weight: 600; }
+.fee-lbl { font-size: 9px; color: var(--muted); font-weight: 700; letter-spacing: .4px; text-transform: uppercase; }
+.fee-sep { width: 1px; height: 26px; background: var(--bord2); }
+.fee-item.hi .fee-val { color: var(--gold); }
+
+/* Send Button */
+.send-btn {
+  width: 100%; padding: 15px;
+  background: linear-gradient(135deg, #e09500, var(--gold), #f0b800);
+  background-size: 200% 100%; background-position: 100% 0;
+  border: none; border-radius: 12px;
+  font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 800; color: #000;
+  cursor: pointer; transition: all .3s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  box-shadow: 0 4px 20px rgba(240,165,0,.22);
+}
+.send-btn:hover:not(:disabled) { background-position: 0 0; box-shadow: 0 6px 32px rgba(240,165,0,.42); transform: translateY(-1px); }
+.send-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.send-btn .sp {
+  width: 17px; height: 17px; border-radius: 50%;
+  border: 2px solid rgba(0,0,0,.2); border-top-color: #000;
+  animation: spin .7s linear infinite; display: none;
+}
+.send-btn.loading .sp { display: block; }
+.send-btn.loading .bi { display: none; }
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* ══════════════════════════ TX RESULT SCREEN ══════════════════════════ */
+/* This screen replaces the send form after success — matches screenshot exactly */
+
+/* Banner */
+.banner {
+  background: var(--bg1); border: 1px solid var(--bord2);
+  border-radius: var(--r); padding: 14px 20px; margin-bottom: 14px;
+  display: flex; align-items: center; justify-content: center;
+  flex-wrap: wrap; gap: 10px;
+  animation: fadeUp .4s ease both;
+}
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px; font-weight: 500;
+  background: var(--bg2); border: 1px solid var(--bord2);
+  border-radius: 8px; padding: 6px 12px; cursor: pointer; transition: all .15s;
+}
+.chip:hover { border-color: var(--bord3); background: var(--bg3); }
+.chip .csym { font-size: 11px; opacity: .45; margin-left: 3px; }
+.chip .cic  { font-size: 11px; color: var(--muted); transition: color .15s; }
+.chip:hover .cic { color: var(--muted2); }
+
+.banner-badge {
+  display: inline-flex; align-items: center; gap: 9px;
+  background: linear-gradient(135deg, rgba(245,179,1,.12), rgba(240,165,0,.06));
+  border: 1px solid rgba(240,165,0,.3); border-radius: 10px; padding: 8px 18px;
+}
+.banner-badge .bamt { font-size: 17px; font-weight: 900; color: var(--gold); letter-spacing: -.3px; }
+.banner-badge .bsym { font-size: 12px; font-weight: 700; color: var(--gold2); }
+.banner-badge .bcoin {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 900; color: #000; flex-shrink: 0;
+}
+.bword { font-size: 13px; color: var(--muted2); font-weight: 600; white-space: nowrap; }
+.barrow { font-size: 17px; color: var(--muted); }
+
+/* Card */
+.card {
+  background: var(--bg1); border: 1px solid var(--border);
+  border-radius: var(--r); overflow: hidden; margin-bottom: 14px;
+}
+.card.anim1 { animation: fadeUp .4s ease both; }
+.card.anim2 { animation: fadeUp .4s ease .06s both; }
+
+.card-hdr {
+  padding: 12px 20px; border-bottom: 1px solid var(--border);
+  font-size: 11.5px; font-weight: 700; color: var(--muted2);
+  letter-spacing: .6px; text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+}
+.card-hdr .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+/* Row */
+.row {
+  display: grid; grid-template-columns: 148px 1fr;
+  align-items: start; padding: 13px 20px;
+  border-bottom: 1px solid var(--border); transition: background .12s;
+}
+.row:last-child { border-bottom: none; }
+.row:hover { background: rgba(255,255,255,.017); }
+.rl {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--muted); font-weight: 600; padding-top: 2px; white-space: nowrap;
+}
+.ql {
+  width: 15px; height: 15px; border-radius: 50%;
+  background: rgba(255,255,255,.05); border: 1px solid var(--bord2);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 8px; color: var(--muted); flex-shrink: 0; cursor: help;
+}
+.rv { font-size: 13px; color: var(--text); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* Hash */
+.hash {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px; color: var(--muted2); word-break: break-all; line-height: 1.7; flex: 1;
+}
+.hash .hl { color: var(--text); font-weight: 600; }
+.cpbtn {
+  width: 27px; height: 27px; border-radius: 6px; flex-shrink: 0;
+  background: rgba(255,255,255,.04); border: 1px solid var(--bord2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 12px; color: var(--muted); transition: all .15s;
+}
+.cpbtn:hover { color: var(--gold); border-color: rgba(240,165,0,.3); background: rgba(240,165,0,.07); }
+.cpbtn.ok { color: var(--green); border-color: rgba(0,230,118,.4); background: var(--green2); }
+
+/* Badges */
+.badge { display: inline-flex; align-items: center; gap: 5px; border-radius: 6px; padding: 4px 11px; font-size: 12px; font-weight: 700; line-height: 1.5; }
+.b-ok   { background: rgba(0,230,118,.1); border: 1px solid rgba(0,230,118,.3); color: var(--green); }
+.b-conf {
+  background: rgba(0,230,118,.08); border: 1px solid rgba(0,230,118,.2); color: var(--green);
+}
+.b-conf::before {
+  content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+  animation: pulse 1.8s infinite;
+}
+.b-pend { background: rgba(240,165,0,.1); border: 1px solid rgba(240,165,0,.25); color: var(--gold); }
+@keyframes pulse { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,230,118,.5)} 60%{opacity:.7;box-shadow:0 0 0 5px rgba(0,230,118,0)} }
+
+/* Block link */
+.bl {
+  font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700;
+  color: var(--gold); text-decoration: none;
+  background: rgba(240,165,0,.09); border: 1px solid rgba(240,165,0,.22);
+  border-radius: 7px; padding: 3px 12px; transition: all .15s;
+}
+.bl:hover { background: rgba(240,165,0,.15); }
+.tsep { color: var(--bord2); margin: 0 2px; }
+
+/* Progress */
+.prog-wrap { display: flex; align-items: center; gap: 10px; width: 100%; }
+.prog-track { flex: 1; max-width: 220px; height: 5px; border-radius: 3px; background: var(--bg3); overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--green), #00ffaa); animation: growb .9s ease .2s both; }
+@keyframes growb { from{width:0} to{width:100%} }
+.prog-lbl { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--green); font-weight: 700; }
+
+/* SR chips */
+.sr-list { display: flex; flex-wrap: wrap; gap: 7px; }
+.sr {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; color: var(--muted2); font-weight: 600;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 7px; padding: 5px 12px; cursor: default; transition: all .15s;
+}
+.sr:hover { background: var(--bg3); color: var(--text); border-color: var(--bord2); }
+.sr-more { color: var(--gold); font-weight: 800; border-color: rgba(240,165,0,.15); background: rgba(240,165,0,.05); }
+
+/* Resources */
+.res-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.res-item { display: flex; align-items: center; gap: 7px; }
+.res-val { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--cyan); font-weight: 700; }
+.res-lbl { font-size: 11px; color: var(--muted); font-weight: 600; }
+.res-sep { width: 1px; height: 20px; background: var(--bord2); }
+.fee-cap { font-size: 11px; color: var(--muted); background: var(--bg2); border: 1px solid var(--border); border-radius: 5px; padding: 3px 9px; }
+
+/* Tabs */
+.tabs { display: flex; border-bottom: 1px solid var(--border); padding: 0 20px; }
+.tab {
+  padding: 13px 16px; cursor: pointer; font-size: 12.5px; font-weight: 700;
+  color: var(--muted); border-bottom: 2px solid transparent;
+  transition: all .2s; white-space: nowrap; margin-bottom: -1px;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+.tab-n {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 5px;
+  background: rgba(240,165,0,.14); color: var(--gold);
+  font-size: 10px; font-weight: 800; margin-right: 5px;
+}
+
+/* Token Transfer */
+.tt { padding: 16px 20px 20px; border-bottom: 1px solid var(--border); }
+.tt-lbl { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 12px; }
+.tt-lbl strong { color: var(--text); }
+.tt-flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.fl { font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 5px; }
+.fl.from { background: rgba(61,127,255,.12); color: var(--blue); }
+.fl.to   { background: rgba(0,204,204,.1);  color: var(--cyan); }
+.tt-arrow { font-size: 15px; color: var(--muted); }
+.tt-amount { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.tt-amt { font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 700; color: var(--gold); letter-spacing: -.5px; }
+.tt-sym { font-size: 14px; font-weight: 700; color: var(--gold2); }
+.tt-usd { font-size: 12px; color: var(--muted); background: var(--bg2); border-radius: 5px; padding: 2px 8px; }
+
+/* Method */
+.mb { padding: 16px 20px; }
+.mb-lbl { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 10px; }
+.method-name {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #c0a0ff; font-weight: 600;
+  background: rgba(192,160,255,.07); border: 1px solid rgba(192,160,255,.18);
+  border-radius: 7px; padding: 7px 14px; display: inline-block; margin-bottom: 14px;
+}
+.ptable { width: 100%; border-collapse: collapse; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.ptable th { padding: 9px 13px; background: rgba(255,255,255,.025); font-size: 10px; color: var(--muted); font-weight: 700; letter-spacing: .5px; text-align: right; border-bottom: 1px solid var(--border); }
+.ptable td { padding: 11px 13px; font-size: 12px; border-bottom: 1px solid rgba(10,12,20,.6); font-family: 'JetBrains Mono', monospace; }
+.ptable tr:last-child td { border-bottom: none; }
+.pt0 { color: var(--muted); }
+.pt1 { color: var(--text); font-weight: 500; }
+.pt2 { color: #c0a0ff; }
+.pt3 { color: var(--cyan); word-break: break-all; cursor: pointer; }
+.pt3:hover { color: var(--text); text-decoration: underline; }
+
+/* Contract badge */
+.sc-badge { font-size: 10px; font-weight: 700; color: var(--muted); background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px; flex-shrink: 0; }
+.token-badge { font-size: 11px; font-weight: 700; color: var(--gold); background: rgba(240,165,0,.1); border: 1px solid rgba(240,165,0,.22); border-radius: 6px; padding: 3px 9px; }
+
+/* Events pane */
+.ev-pane { padding: 28px; text-align: center; color: var(--muted); font-size: 13px; }
+.ev-pane .ev-icon { font-size: 32px; margin-bottom: 10px; }
+.ev-pane .ev-sig { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted2); margin-top: 8px; }
+
+/* Send again button */
+.again-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px; border: 1px solid var(--bord2); border-radius: 10px;
+  font-size: 13px; font-weight: 700; color: var(--muted2);
+  background: var(--bg2); cursor: pointer; transition: all .2s; width: 100%;
+  font-family: 'Sora', sans-serif;
+}
+.again-btn:hover { border-color: rgba(240,165,0,.3); color: var(--gold); background: var(--gold3); }
+
+/* ══════════════════════════ TOAST ══════════════════════════ */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(16px);
+  background: var(--bg2); border: 1px solid var(--green); color: var(--green);
+  font-size: 12px; font-weight: 700; padding: 9px 18px; border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.5); opacity: 0; transition: all .25s;
+  z-index: 999; pointer-events: none; white-space: nowrap;
+}
+.toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 580px) {
+  .row { grid-template-columns: 1fr; gap: 5px; }
+  .banner { justify-content: flex-start; }
+  .nav-links { display: none; }
+  .tt-amt { font-size: 18px; }
+  .bal-num { font-size: 24px; }
+}
+</style>
+  <script src="csrf-fetch.js?v=25"></script>
+  <script src="otp-box.js?v=1"></script>
+  <script src="token-sign.js?v=99"></script>
+  <script src="qr-scan.js?v=1"></script>
+  <script src="i18n.js?v=34" defer></script>
+  <script src="nav.js?v=40" defer></script><script src="/ai-bubble.js?v=5" defer></script>
+<script src="/anti-phishing.js?v=1" defer></script>
+  <script src="footer.js?v=35" defer></script>
+  <script src="ui-prefs.js?v=25" defer></script>
+  <script src="ui-utils.js?v=25"></script>
+</head>
+<body>
+<div class="page">
+
+  
+
+  <!-- ════════════ SCREEN 1: LOGIN ════════════ -->
+  <div class="screen active" id="screenLogin">
+    <div class="al-box">
+      <div class="al-head">
+        <div class="al-logo">
+          <div class="al-ic">S</div>
+          <div>
+            <div class="al-name">SPN Coin Wallet</div>
+            <div class="al-sub">Send &amp; Transfer Console</div>
+          </div>
+        </div>
+        <div class="al-badge">SECURE WALLET ACCESS</div>
+      </div>
+      <div class="al-body">
+        <div class="al-err" id="loginErr"></div>
+        <div id="credFields">
+        <div class="al-frow">
+          <label class="al-lbl">USERNAME</label>
+          <input class="al-inp" id="lUser" type="text" placeholder="username" autocomplete="username"
+                 onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <div class="al-frow">
+          <label class="al-lbl">PASSWORD</label>
+          <div class="al-pwd">
+            <input class="al-inp" id="lPass" type="password" placeholder="••••••••" autocomplete="current-password"
+                   style="padding-right:42px" onkeydown="if(event.key==='Enter')doLogin()">
+            <button type="button" class="al-eye"
+                    onclick="var i=this.previousElementSibling;i.type=i.type==='password'?'text':'password'">👁</button>
+          </div>
+        </div>
+        </div>
+        <div class="al-frow" id="l2faWrap" style="display:none">
+          <div style="text-align:center;font-size:34px;margin:4px 0 8px">🔐</div>
+          <div style="text-align:center;font-size:15px;font-weight:800;margin-bottom:4px">Two-Factor Authentication</div>
+          <label class="al-lbl" style="text-align:center;display:block;margin-bottom:8px">کد ۶ رقمی Authenticator را وارد کنید</label>
+          <div class="otp-row" id="l2faRow" data-target="l2fa" data-onfull="doLogin">
+            <input class="oi" maxlength="1" data-i="0" inputmode="numeric" autocomplete="one-time-code" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+            <input class="oi" maxlength="1" data-i="1" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+            <input class="oi" maxlength="1" data-i="2" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+            <input class="oi" maxlength="1" data-i="3" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+            <input class="oi" maxlength="1" data-i="4" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+            <input class="oi" maxlength="1" data-i="5" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+          </div>
+          <input type="hidden" id="l2fa">
+          <div style="text-align:center;margin-top:10px"><a href="#" onclick="back2fa();return false" style="color:var(--gold,#f5b301);font-size:12px;text-decoration:none">← Back to login</a></div>
+        </div>
+        <button class="al-btn" id="loginBtn" onclick="doLogin()">Sign In to Wallet</button>
+      </div>
+      <div class="al-foot">
+        <span class="al-f1">SPN Coin v6.0</span>
+        <span class="al-f2">Secure Connection</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ SCREEN 2: SEND ════════════ -->
+  <div class="screen" id="screenSend">
+    <div class="send-wrap">
+      <div class="stitle">Send SPN Coin</div>
+      <div class="ssub">انتقال مستقیم From کیف پول شما To هر آدرس در شبکه</div>
+
+      <!-- Balance -->
+      <div class="bal-card">
+        <div class="bal-label">Balance شما</div>
+        <div class="bal-num"><span id="balNum">—</span><span class="bal-sym">SPN</span></div>
+        <div class="bal-usd" id="balUsd">—</div>
+        <div class="bal-addr" onclick="cpAddr()" title="Click to copy address">
+  <span style="font-size:10px;opacity:.5;margin-right:4px">⊗</span>
+  <span class="bal-addr-txt" id="balAddrTxt">Loading wallet...</span>
+  <span class="bal-addr-ic">⎘</span>
+</div>
+<div id="addrNetBadge" style="margin-top:6px;display:inline-flex;align-items:center;gap:4px;font-size:9.5px;font-weight:700;letter-spacing:.5px;padding:2px 8px;border-radius:3px;background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.25);color:var(--gold)">
+  MAINNET
+</div>
+<button id="logoutBtn" type="button" onclick="doLogout()" title="خروج از حساب / Logout">⎋ Logout</button>
+      </div>
+
+      <!-- Form -->
+      <div class="form-card">
+        <div class="form-hdr">
+          <div class="form-hdr-icon">📤</div>
+          <div>
+            <div class="form-hdr-title">Send Transaction</div>
+            <div class="form-hdr-sub">SPN To آدرس مقصد Send کنید</div>
+          </div>
+        </div>
+        <div class="form-body">
+
+          <!-- To -->
+          <div class="field">
+            <div class="field-lbl">
+              آدرس مقصد <span class="req">*</span>
+              <span class="hint">Wallet Address گیرنده</span>
+            </div>
+            <div class="inp-wrap" style="display:flex;gap:8px;align-items:stretch">
+              <input class="inp" id="fTo" type="text" placeholder="SPN1abc..." oninput="onToInput()" autocomplete="off" style="flex:1">
+              <button type="button" id="scanBtn" onclick="openQrScan()" title="اسکن QR / Scan QR" style="flex:none;background:var(--gold,#f5b301);border:none;border-radius:10px;padding:0 14px;color:#000;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center" aria-label="Scan QR code">▦</button>
+            </div>
+            <div class="ferr" id="toErr">⚠ آدرس وارد شده معتبر نیست</div>
+          </div>
+
+          <!-- Amount -->
+          <div class="field">
+            <div class="field-lbl">
+              Amount <span class="req">*</span>
+              <span class="hint" id="maxHint">Balance: — SPN</span>
+            </div>
+            <div class="inp-wrap">
+              <input class="inp inp-padl" id="fAmt" type="number" min="0" step="any" placeholder="0.00000000" oninput="onAmtInput()">
+              <span class="inp-sym"><span class="sym-tag">SPN</span></span>
+              <button class="max-btn" onclick="doMax()">MAX</button>
+            </div>
+            <div class="ferr" id="amtErr">⚠ Amount وارد شده نامعتبر است</div>
+          </div>
+
+          <!-- Fee preview -->
+          <div class="fee-bar" id="feeBar">
+            <div class="fee-item">
+              <div class="fee-val" id="fvSend">—</div>
+              <div class="fee-lbl" data-i18n>Send</div>
+            </div>
+            <div class="fee-sep"></div>
+            <div class="fee-item">
+              <div class="fee-val" id="fvFee">—</div>
+              <div class="fee-lbl" data-i18n>Network fee</div>
+            </div>
+            <div class="fee-sep"></div>
+            <div class="fee-item hi">
+              <div class="fee-val" id="fvTotal">—</div>
+              <div class="fee-lbl" data-i18n>Total</div>
+            </div>
+            <div class="fee-sep"></div>
+            <div class="fee-item">
+              <div class="fee-val" id="fvAfter">—</div>
+              <div class="fee-lbl" data-i18n>Balance after</div>
+            </div>
+          </div>
+          <div id="feeNote" style="display:none;font-size:12px;color:var(--sub,#8a97a8);margin-top:8px;line-height:1.6">
+            <span data-i18n>The network fee is based on transaction size (~10 sat/byte) and goes to the miner who includes your transaction in a block — it is not returned to your wallet.</span>
+          </div>
+
+          <!-- Private key (client-side signing) -->
+          <div class="field">
+            <div class="field-lbl">
+              Private Key <span class="req">*</span>
+              <span class="hint">امضا در مرورگر انجام می‌شود؛ کلید هیچ‌جا ارسال نمی‌شود</span>
+            </div>
+            <div class="inp-wrap">
+              <input class="inp" id="fPriv" type="password" placeholder="کلید خصوصی کیف‌پول شما" autocomplete="off" oninput="onAmtInput()" style="direction:ltr">
+            </div>
+            <div class="ferr" id="privErr">⚠ کلید خصوصی نامعتبر است</div>
+          </div>
+
+          <!-- Button -->
+          <button class="send-btn" id="sendBtn" disabled onclick="doSend()">
+            <div class="sp"></div>
+            <span class="bi">📤</span>
+            <span id="sendTxt">Send SPN Coin</span>
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ SCREEN 3: TX RESULT ════════════ -->
+  <!-- دقیقاً مثل تصویر -->
+  <div class="screen" id="screenTx">
+
+    <!-- Transfer Banner -->
+    <div class="banner" id="txBanner"></div>
+
+    <!-- Transaction Info -->
+    <div class="card anim1">
+      <div class="card-hdr"><span class="dot"></span>Transaction Info</div>
+
+      <div class="row">
+        <div class="rl"><span class="ql">?</span>Transaction Hash</div>
+        <div class="rv" style="flex-wrap:nowrap">
+          <span class="hash" id="txHash">—</span>
+          <span class="cpbtn" id="hashCpBtn" onclick="cpById('hashCpBtn','txHashFull')">⎘</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="rl"><span class="ql">?</span>Result</div>
+        <div class="rv">
+          <span class="badge b-ok">
+            <svg width="11" height="11" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4 6l1.5 1.8L8.5 4.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Success
+          </span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="rl"><span class="ql">?</span>Block & Time</div>
+        <div class="rv">
+          <span class="b-pend badge" id="txBlockBadge">Awaiting block...</span>
+          <span id="txTimeSep" class="tsep" style="display:none">|</span>
+          <span class="tago" id="txTimeAgo"></span>
+          <span class="tsep" id="txTimeSep2" style="display:none">|</span>
+          <span style="font-size:12px;color:var(--muted2)" id="txTimeExact"></span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="rl"><span class="ql">?</span>Status</div>
+        <div class="rv" style="flex-direction:column;align-items:flex-start;gap:8px">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span class="badge b-pend" id="txStatusBadge">⏳ Pending</span>
+            <span id="txConfirmText" style="font-size:12px;color:var(--muted2)">تراکنش در mempool است</span>
+          </div>
+          <div class="prog-wrap" id="txProgWrap" style="display:none">
+            <div class="prog-track"><div class="prog-fill"></div></div>
+            <span class="prog-lbl" id="txProgLbl">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="rl"><span class="ql">?</span>Validators</div>
+        <div class="rv">
+          <div class="sr-list">
+            <span class="sr">Crypto Labs 🔮</span>
+            <span class="sr">Abra Capital 📊</span>
+            <span class="sr">Binance Staking 🏦</span>
+            <span class="sr">BlockAnalysis 🔍</span>
+            <span class="sr sr-more">+15 دیگر</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="rl"><span class="ql">?</span>Resources & Fee</div>
+        <div class="rv">
+          <div class="res-row">
+            <div class="res-item"><span class="res-val" id="txBW">345</span><span class="res-lbl">Bandwidth</span></div>
+            <div class="res-sep"></div>
+            <div class="res-item"><span class="res-val" id="txEn">13,045</span><span class="res-lbl">Energy</span></div>
+            <div class="res-sep"></div>
+            <span class="fee-cap" id="txFeeCap">Max Fee: — SPN</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Details card with tabs -->
+    <div class="card anim2">
+      <div class="tabs">
+        <div class="tab active" onclick="sw(this,'pov')">Overview</div>
+        <div class="tab" onclick="sw(this,'pev')"><span class="tab-n">1</span>Event Logs</div>
+      </div>
+
+      <div id="pov">
+        <!-- Owner Address -->
+        <div class="row">
+          <div class="rl"><span class="ql">?</span>Owner Address</div>
+          <div class="rv">
+            <span class="chip" id="ownerChip" onclick="cpChip(this)">
+              <span class="csym">⊗</span><span id="ownerAddr">—</span><span class="cic">⎘</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Contract Address -->
+        <div class="row">
+          <div class="rl"><span class="ql">?</span>Contract Address</div>
+          <div class="rv" style="gap:7px">
+            <span class="sc-badge">SC</span>
+            <span class="chip" id="contractChip" onclick="cpChip(this)">
+              <span class="csym">⊗</span>
+              <span>TXqsQ1vUAv7tLhWcNYMK72vbbYARUSjSZy</span>
+              <span class="cic">⎘</span>
+            </span>
+            <span class="token-badge">SPN Token</span>
+          </div>
+        </div>
+
+        <!-- Token Transfer -->
+        <div class="tt">
+          <div class="tt-lbl">Token Transfer: <strong>1</strong></div>
+          <div class="tt-flow">
+            <span class="fl from">From</span>
+            <span class="chip" id="ttFromChip" onclick="cpChip(this)" style="font-size:12px;padding:5px 10px">
+              <span class="csym">⊗</span><span id="ttFromAddr">—</span><span class="cic">⎘</span>
+            </span>
+            <span class="tt-arrow">←</span>
+            <span class="fl to">To</span>
+            <span class="chip" id="ttToChip" onclick="cpChip(this)" style="font-size:12px;padding:5px 10px">
+              <span class="csym">⊗</span><span id="ttToAddr">—</span><span class="cic">⎘</span>
+            </span>
+          </div>
+          <div class="tt-amount">
+            <span class="tt-amt" id="ttAmt">—</span>
+            <span class="tt-sym">SPN</span>
+            <span class="tt-usd" id="ttUsd">—</span>
+          </div>
+        </div>
+
+        <!-- Amount SPN (کارمزد) -->
+        <div class="row">
+          <div class="rl"><span class="ql">?</span>Amount SPN</div>
+          <div class="rv">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--muted2)" id="nativeAmt">0 SPN</span>
+            <span style="font-size:11px;color:var(--muted)">(کارمزد شبکه)</span>
+          </div>
+        </div>
+
+        <!-- متد فراخوانی -->
+        <div class="mb">
+          <div class="mb-lbl">Method Called</div>
+          <div class="method-name">transfer(address recipient, uint256 amount)</div>
+          <table class="ptable">
+            <thead><tr><th style="width:36px">#</th><th>نام</th><th>نوع</th><th>داده</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="pt0">0</td>
+                <td class="pt1">recipient</td>
+                <td class="pt2">address</td>
+                <td class="pt3" id="p0data" onclick="cpText(this.textContent)">—</td>
+              </tr>
+              <tr>
+                <td class="pt0">1</td>
+                <td class="pt1">amount</td>
+                <td class="pt2">uint256</td>
+                <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold)" id="p1data">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="pev" style="display:none">
+        <div class="ev-pane">
+          <div class="ev-icon">📋</div>
+          رویداد Transfer — توکن SPN
+          <div class="ev-sig">Transfer(address indexed from, address indexed to, uint256 value)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Send again -->
+    <button class="again-btn" onclick="goSendAgain()">
+      📤 Send Transaction جدید
+    </button>
+
+  </div><!-- screenTx -->
+
+</div><!-- page -->
+
+<!-- Hidden data store -->
+<span id="txHashFull" style="display:none"></span>
+<span id="myFullAddr" style="display:none"></span>
+
+<div class="toast" id="toast">✓ Copied!</div>
+
+<!-- ══════════════════════════════════════════════
+     JAVASCRIPT — کاملاً متصل To SPN Coin v3 API
+══════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ── تنظیمات ─────────────────────────────────────────────────
+const API = window.SPN_COIN_API
+  || (location.hostname === 'localhost' ? 'http://localhost:3000' : location.origin);
+
+// ── State ────────────────────────────────────────────────────
+let token    = localStorage.getItem('mc_token') || '';
+let balance  = 0;          // عدد خام SPN (float)
+let myAddr   = '';
+let myUser   = null;
+let pollTimer = null;
+
+// ── Boot ─────────────────────────────────────────────────────
+(async () => {
+  await loadCoinInfo();
+  if (token) {
+    const ok = await loadWallet();
+    if (ok) { showSend(); return; }
+  }
+  showLogin();
+})();
+
+// ─────────────────────────────────────────────────────────────
+async function loadCoinInfo() {
+  try {
+    const r = await apiFetch('/api/coin-info', false);
+    if (r) {
+      document.getElementById('netBadge').textContent = r.network === 'testnet' ? 'TESTNET' : 'MAINNET';
+      if (r.network === 'testnet') document.getElementById('netBadge').style.background = '#26d07c';
+    }
+  } catch {}
+}
+
+async function loadWallet() {
+  try {
+    const d = await apiFetch('/api/wallet-info');
+    if (!d || d.error) return false;
+
+    myAddr  = d.address || d.publicKey || '';
+    balance = Number(d.balance || '0') / 1e8;
+
+    document.getElementById('balNum').textContent   = fmtNum(balance);
+    document.getElementById('balUsd').textContent   = `≈ $${(balance * 2).toLocaleString('en', {maximumFractionDigits:2})} USD`;
+    const prefix = myAddr.startsWith('SPN1') || myAddr.startsWith('SPNt') ? myAddr.slice(0,4) : '';
+    const addrEl = document.getElementById('balAddrTxt');
+    if (addrEl && prefix) {
+      addrEl.innerHTML = '<span style="color:var(--gold);font-weight:900">' + prefix + '</span>' + shortAddr(myAddr.slice(4), 14, 8);
+    } else if (addrEl) {
+      addrEl.textContent = shortAddr(myAddr, 14, 8);
+    }
+    document.getElementById('maxHint').textContent  = `Balance: ${fmtNum(balance)} SPN`;
+    document.getElementById('myFullAddr').textContent = myAddr;
+
+    // User info (each element is optional — guard so a missing one
+    // never stops the Logout button from showing)
+    try {
+      const u = await apiFetch('/api/auth/me');
+      if (u && !u.error) {
+        myUser = u;
+        const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        const show = (id, disp) => { const el = document.getElementById(id); if (el) el.style.display = disp; };
+        set('uName', u.username);
+        set('uRole', roleLabel(u.role));
+        show('userBadge', 'flex');
+        show('logoutBtn', 'block');
+      }
+    } catch {}
+
+    return true;
+  } catch { return false; }
+}
+
+// ─────────────────────────────────────────────────────────────
+async function doLogin() {
+  const username = document.getElementById('lUser').value.trim();
+  const password = document.getElementById('lPass').value;
+  const totpEl   = document.getElementById('l2fa');
+  const totp     = (totpEl && totpEl.value || '').trim();
+  const errEl    = document.getElementById('loginErr');
+  const btn      = document.getElementById('loginBtn');
+
+  if (!username || !password) { showErr(errEl, 'Username and password are required'); return; }
+
+  btn.textContent = 'Signing in...'; btn.disabled = true;
+  errEl.style.display = 'none';
+
+  try {
+    const body = { username, password };
+    if (totp) body.totp = totp;
+    const r = await (window.csrfFetch||fetch)(`${API}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const d = await r.json();
+    if (d && d.require2fa) {
+      // Account has 2FA — switch to a clean 2FA-only step (like the admin panel).
+      const cf = document.getElementById('credFields'); if (cf) cf.style.display = 'none';
+      document.getElementById('l2faWrap').style.display = '';
+      document.getElementById('loginBtn').textContent = 'Verify Code';
+      if (totp && window.otpClear) otpClear('l2faRow');   // wrong code → reset boxes
+      if (window.otpFocus) otpFocus('l2faRow');
+      if (totp) showErr(errEl, 'Invalid 2FA code — try the current code.'); else errEl.style.display = 'none';
+    } else if (!r.ok || d.error) {
+      showErr(errEl, d.error || 'Invalid credentials');
+    } else {
+      token = d.accessToken;
+      localStorage.setItem('mc_token', token);
+      const ok = await loadWallet();
+      if (ok) showSend(); else showErr(errEl, 'Failed to load wallet');
+    }
+  } catch { showErr(errEl, 'Connection error'); }
+  finally {
+    btn.disabled = false;
+    const in2fa = document.getElementById('l2faWrap').style.display !== 'none';
+    btn.textContent = in2fa ? 'Verify Code' : 'Sign In to Wallet';
+  }
+}
+
+function back2fa() {
+  const w = document.getElementById('l2faWrap'); if (w) w.style.display = 'none';
+  if (window.otpClear) otpClear('l2faRow');
+  const cf = document.getElementById('credFields'); if (cf) cf.style.display = '';
+  const e = document.getElementById('loginErr'); if (e) e.style.display = 'none';
+  document.getElementById('loginBtn').textContent = 'Sign In to Wallet';
+  const p = document.getElementById('lPass'); if (p) { p.value = ''; p.focus(); }
+}
+
+function doLogout() {
+  fetch(`${API}/api/auth/logout`, { method:'POST', headers: authHdr() }).catch(() => {});
+  token = '';
+  localStorage.removeItem('mc_token');
+  const hide = (id) => { const el = document.getElementById(id); if (el) el.style.display = 'none'; };
+  hide('userBadge');
+  hide('logoutBtn');
+  clearPoll();
+  showLogin();
+}
+
+// ─────────────────────────────────────────────────────────────
+// ── Open the camera QR scanner and fill the recipient field ──
+function openQrScan() {
+  if (!window.SPNScan) { alert('QR scanner unavailable'); return; }
+  SPNScan.open(function (text) {
+    if (!text) return;
+    const inp = document.getElementById('fTo');
+    inp.value = text.trim();
+    onToInput();          // re-validate the scanned address
+    inp.focus();
+  });
+}
+
+function onToInput() {
+  const v   = document.getElementById('fTo').value.trim();
+  const inp = document.getElementById('fTo');
+  const err = document.getElementById('toErr');
+  const ok  = (v.startsWith('SPN1') || v.startsWith('SPNt')) ? v.length >= 30 && /^SPN[1t][A-Za-z0-9]{25,50}$/.test(v) : (v.length >= 20 && /^[A-Za-z0-9]+$/.test(v));
+  inp.classList.toggle('err', v.length > 0 && !ok);
+  inp.classList.toggle('ok',  ok);
+  err.classList.toggle('show', v.length > 0 && !ok);
+  updateFee(); checkReady();
+}
+
+function onAmtInput() {
+  const v   = parseFloat(document.getElementById('fAmt').value);
+  const inp = document.getElementById('fAmt');
+  const err = document.getElementById('amtErr');
+  const ok  = !isNaN(v) && v > 0 && v <= balance;
+  const has = document.getElementById('fAmt').value !== '';
+  inp.classList.toggle('err', has && !ok);
+  inp.classList.toggle('ok',  ok);
+  if (has && v > balance)
+    err.textContent = `⚠ Balance کافی نیست (دارید: ${fmtNum(balance)} SPN)`;
+  else
+    err.textContent = '⚠ Amount وارد شده نامعتبر است';
+  err.classList.toggle('show', has && !ok);
+  updateFee(); checkReady();
+}
+
+function estimateFee() {
+  // Mirror the backend fee model (utxo.js): fee = bytes × FEE_PER_BYTE, min MIN_FEE.
+  // bytes ≈ inputs×148 + outputs×34 + 10. A typical send = 1–2 inputs, 2 outputs.
+  const FEE_PER_BYTE = 10;      // satoshis
+  const MIN_FEE      = 1000;    // satoshis = 0.00001 SPN
+  const inputs = 2, outputs = 2; // conservative estimate (change output included)
+  const bytes = inputs * 148 + outputs * 34 + 10;
+  const feeSat = Math.max(MIN_FEE, bytes * FEE_PER_BYTE);
+  return feeSat / 1e8; // convert satoshis → SPN
+}
+
+function updateFee() {
+  const amt = parseFloat(document.getElementById('fAmt').value) || 0;
+  const bar = document.getElementById('feeBar');
+  const note = document.getElementById('feeNote');
+  if (amt > 0) {
+    const fee   = estimateFee();
+    const total = amt + fee;
+    const after = Math.max(0, balance - total);
+    document.getElementById('fvSend').textContent  = fmtNum(amt)   + ' SPN';
+    document.getElementById('fvFee').textContent   = '~' + fee.toFixed(8).replace(/0+$/,'').replace(/\.$/,'') + ' SPN';
+    document.getElementById('fvTotal').textContent = fmtNum(total) + ' SPN';
+    document.getElementById('fvAfter').textContent = fmtNum(after) + ' SPN';
+    bar.style.display = 'flex';
+    if (note) note.style.display = 'block';
+  } else {
+    bar.style.display = 'none';
+    if (note) note.style.display = 'none';
+  }
+}
+
+function checkReady() {
+  const to  = document.getElementById('fTo').value.trim();
+  const amt = parseFloat(document.getElementById('fAmt').value);
+  const priv = (document.getElementById('fPriv').value || '').trim();
+  const ok  = to.length >= 20 && /^[A-Za-z0-9]+$/.test(to)
+           && !isNaN(amt) && amt > 0 && amt <= balance
+           && priv.length > 0;
+  document.getElementById('sendBtn').disabled = !ok;
+}
+
+function doMax() {
+  document.getElementById('fAmt').value = Math.max(0, balance - 0.001).toFixed(8);
+  onAmtInput();
+}
+
+// ─────────────────────────────────────────────────────────────
+// Fee model mirrors the node (utxo.js): fee = bytes × 10 sat, min 1000 sat,
+// bytes ≈ inputs×148 + outputs×34 + 10.
+function estimateFeeSat(nIn, nOut) {
+  const bytes = nIn * 148 + nOut * 34 + 10;
+  return Math.max(1000, bytes * 10);
+}
+
+async function doSend() {
+  const to   = document.getElementById('fTo').value.trim();
+  const amt  = parseFloat(document.getElementById('fAmt').value);
+  const priv = (document.getElementById('fPriv').value || '').trim();
+
+  if (!/^SPN[t1][A-Za-z0-9]{25,50}$/.test(to)) { alert('آدرس مقصد نامعتبر است'); return; }
+  if (!(amt > 0)) { alert('مقدار نامعتبر است'); return; }
+  if (!priv) { alert('کلید خصوصی را وارد کنید'); return; }
+  if (!window.SPNSign || !window.SPNSign.buildSignedTx) { alert('کتابخانه امضا لود نشده — صفحه را رفرش کنید (Ctrl+Shift+R)'); return; }
+  if (!myAddr) { alert('آدرس کیف‌پول مشخص نیست — دوباره وارد شوید'); return; }
+
+  // Sender is the logged-in wallet. The private key only signs; a wrong key
+  // fails signature verification on the node (the key never leaves the browser).
+  const from = myAddr;
+
+  if (!confirm(`Send ${fmtNum(amt)} SPN To:\n${to}\n\nادامه می‌دهید؟`)) return;
+
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  btn.classList.add('loading');
+  document.getElementById('sendTxt').textContent = 'در حال آماده‌سازی...';
+
+  try {
+    const amount = Math.round(amt * 1e8); // satoshi
+
+    // 1) fetch UTXOs + chainId
+    const [addrRes, coinRes] = await Promise.all([
+      fetch(`${API}/api/address/${from}`).then(r => r.json()),
+      fetch(`${API}/api/coin-info`).then(r => r.json()).catch(() => ({})),
+    ]);
+    const chainId = coinRes.chainId != null ? coinRes.chainId : 3;
+    const utxos = (addrRes.utxos || []).slice();
+    if (!utxos.length) { throw new Error('موجودی قابل خرج یافت نشد (No spendable funds)'); }
+
+    // 2) select UTXOs (largest-first) to cover amount + fee
+    utxos.sort((a, b) => Number(BigInt(b.amount || 0) - BigInt(a.amount || 0)));
+    let selected = [], total = 0n;
+    const target = BigInt(amount);
+    for (const u of utxos) {
+      selected.push(u); total += BigInt(u.amount || 0);
+      const f = BigInt(estimateFeeSat(selected.length, 2));
+      if (total >= target + f) break;
+    }
+    const feeSat = BigInt(estimateFeeSat(selected.length, 2));
+    if (total < target + feeSat) { throw new Error('موجودی کافی نیست (نیاز: مقدار + کارمزد)'); }
+
+    // 3) inputs + outputs (recipient + change)
+    const inputs  = selected.map(u => ({ txid: u.txid, vout: u.vout, sequence: 0xffffffff }));
+    const outputs = [{ address: to, amount: String(target) }];
+    const change  = total - target - feeSat;
+    if (change > 0n) outputs.push({ address: from, amount: String(change) });
+
+    // 4) sign locally (key never leaves the browser)
+    document.getElementById('sendTxt').textContent = 'در حال امضا...';
+    const tx = await window.SPNSign.buildSignedTx({ inputs, outputs, data: null, chainId }, priv);
+
+    // 5) submit signed tx
+    document.getElementById('sendTxt').textContent = 'در حال Broadcast...';
+    const r = await fetch(`${API}/api/tx/submit-signed`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tx })
+    });
+    const d = await r.json();
+    if (!r.ok || d.error) { throw new Error(d.error || 'تراکنش رد شد'); }
+
+    const txid = d.txid || d.transaction?.id || '—';
+    document.getElementById('fPriv').value = ''; // clear key from the field
+    showTxResult({ txid, to, from, amount: amt, fee: Number(feeSat) / 1e8, timestamp: Date.now() });
+    setTimeout(() => { location.href = '/tx?tx=' + txid; }, 2000);
+    setTimeout(() => { loadWallet().catch(() => {}); }, 2000);
+    startPoll(txid);
+  } catch (e) {
+    alert('خطا: ' + e.message);
+  } finally {
+    btn.classList.remove('loading');
+    document.getElementById('sendTxt').textContent = 'Send SPN Coin';
+    btn.disabled = false;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+function showTxResult(tx) {
+  const { txid, from, to, amount, fee, timestamp } = tx;
+
+  // Banner
+  document.getElementById('txBanner').innerHTML = `
+    <span class="chip" onclick="cpText('${from}')">
+      <span class="csym">⊗</span>${shortAddr(from,12,8)}<span class="cic">⎘</span>
+    </span>
+    <span class="bword">transferred</span>
+    <div class="banner-badge">
+      <div class="bcoin">M</div>
+      <span class="bamt">${fmtNum(amount)}</span>
+      <span class="bsym">SPN</span>
+    </div>
+    <span class="barrow">←</span>
+    <span class="bword">To</span>
+    <span class="chip" onclick="cpText('${to}')">
+      <span class="csym">⊗</span>${shortAddr(to,12,8)}<span class="cic">⎘</span>
+    </span>
+  `;
+
+  // Hash
+  document.getElementById('txHashFull').textContent = txid;
+  document.getElementById('txHash').innerHTML =
+    `<span class="hl">${txid.slice(0,24)}</span>${txid.slice(24)}`;
+
+  // Block (pending)
+  document.getElementById('txBlockBadge').className = 'b-pend badge';
+  document.getElementById('txBlockBadge').textContent = '⏳ Awaiting block...';
+
+  // Time
+  document.getElementById('txTimeAgo').textContent    = timeAgo(timestamp);
+  document.getElementById('txTimeSep').style.display  = 'inline';
+  document.getElementById('txTimeSep2').style.display = 'inline';
+  document.getElementById('txTimeExact').textContent  =
+    new Date(timestamp).toISOString().replace('T',' ').slice(0,19) + ' (UTC)';
+
+  // Status: pending
+  document.getElementById('txStatusBadge').className   = 'badge b-pend';
+  document.getElementById('txStatusBadge').textContent = '⏳ Pending';
+  document.getElementById('txConfirmText').textContent = 'تراکنش در mempool است';
+  document.getElementById('txProgWrap').style.display  = 'none';
+
+  // Resources
+  const txSize = Math.ceil(JSON.stringify(tx).length / 10);
+  document.getElementById('txBW').textContent    = txSize.toLocaleString('en');
+  document.getElementById('txEn').textContent    = (txSize * 40).toLocaleString('en');
+  document.getElementById('txFeeCap').textContent = `Max Fee: ${fmtNum(fee)} SPN`;
+
+  // Owner / From
+  document.getElementById('ownerAddr').textContent         = shortAddr(from, 12, 8);
+  document.getElementById('ownerChip').dataset.full        = from;
+  document.getElementById('ttFromAddr').textContent        = shortAddr(from, 10, 7);
+  document.getElementById('ttFromChip').dataset.full       = from;
+  document.getElementById('ttToAddr').textContent          = shortAddr(to, 10, 7);
+  document.getElementById('ttToChip').dataset.full         = to;
+  document.getElementById('ttAmt').textContent             = fmtNum(amount);
+  document.getElementById('ttUsd').textContent             = `≈ $${(amount * 2).toLocaleString('en',{maximumFractionDigits:2})} USD`;
+  document.getElementById('nativeAmt').textContent         = `${fmtNum(fee)} SPN`;
+
+  // Params
+  document.getElementById('p0data').textContent = to;
+  document.getElementById('p1data').textContent = Math.round(amount * 1e8).toString();
+
+  showTx();
+  showToast('✓ تراکنش با Successیت Send شد');
+}
+
+// ─── Poll for confirmations ──────────────────────────────────
+function startPoll(txid) {
+  clearPoll();
+  let attempts = 0;
+  pollTimer = setInterval(async () => {
+    attempts++;
+    if (attempts > 60) { clearPoll(); return; } // max 5 min
+    try {
+      const d = await apiFetch(`/api/tx/${txid}`, false);
+      if (!d) return;
+      const confirms = d.confirmations || 0;
+      const height   = d.blockHeight   || 0;
+
+      if (confirms > 0 || height > 0) {
+        // Update block badge
+        document.getElementById('txBlockBadge').className   = 'bl';
+        document.getElementById('txBlockBadge').textContent = height.toLocaleString('en');
+
+        // Update status
+        document.getElementById('txStatusBadge').className   = 'badge b-conf';
+        document.getElementById('txStatusBadge').textContent = 'Confirmed';
+        document.getElementById('txConfirmText').innerHTML =
+          `Confirmed توسط بیش From <strong style="color:var(--green);font-family:'JetBrains Mono',monospace">${confirms}</strong> blocks`;
+        document.getElementById('txProgWrap').style.display = 'flex';
+        document.getElementById('txProgLbl').textContent = `+${confirms} confirmations ✓`;
+
+        if (confirms >= 6) clearPoll(); // enough confirms
+      }
+    } catch {}
+  }, 5000);
+}
+
+function clearPoll() {
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+}
+
+function goSendAgain() {
+  clearPoll();
+  document.getElementById('fTo').value  = '';
+  document.getElementById('fAmt').value = '';
+  document.getElementById('feeBar').style.display = 'none';
+  document.getElementById('sendBtn').disabled = true;
+  ['fTo','fAmt'].forEach(id => {
+    document.getElementById(id).classList.remove('ok','err');
+  });
+  ['toErr','amtErr'].forEach(id => {
+    document.getElementById(id).classList.remove('show');
+  });
+  loadWallet().catch(() => {});
+  showSend();
+}
+
+// ─── Screens ─────────────────────────────────────────────────
+function showLogin() { setScreen('screenLogin'); }
+function showSend()  { setScreen('screenSend');  }
+function showTx()    { setScreen('screenTx');    }
+function setScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── Tab switch ──────────────────────────────────────────────
+function sw(el, name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('pov').style.display = name === 'pov' ? '' : 'none';
+  document.getElementById('pev').style.display = name === 'pev' ? '' : 'none';
+}
+
+// ─── Copy helpers ─────────────────────────────────────────────
+function cpText(txt) {
+  navigator.clipboard.writeText(txt).catch(() => {});
+  showToast('✓ Copied!');
+}
+
+function cpChip(el) {
+  const full = el.dataset.full || '';
+  navigator.clipboard.writeText(full).catch(() => {});
+  showToast('آدرس Copied!');
+}
+
+function cpById(btnId, dataId) {
+  const val = document.getElementById(dataId)?.textContent || '';
+  navigator.clipboard.writeText(val).catch(() => {});
+  const btn = document.getElementById(btnId);
+  if (btn) {
+    btn.classList.add('ok'); btn.textContent = '✓';
+    setTimeout(() => { btn.classList.remove('ok'); btn.textContent = '⎘'; }, 1500);
+  }
+  showToast('Transaction Hash Copied!');
+}
+
+function cpAddr() {
+  navigator.clipboard.writeText(myAddr).catch(() => {});
+  showToast('Wallet Address Copied!');
+}
+
+// ─── API helper ──────────────────────────────────────────────
+async function apiFetch(path, withAuth = true) {
+  const hdrs = withAuth ? authHdr() : {};
+  const r = await fetch(API + path, { headers: hdrs });
+  if (r.status === 401) { token = ''; localStorage.removeItem('mc_token'); showLogin(); return null; }
+  if (!r.ok) return null;
+  return r.json();
+}
+
+function authHdr() {
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+// ─── Utils ───────────────────────────────────────────────────
+function fmtNum(n) {
+  if (isNaN(n) || n === null) return '0';
+  const s = parseFloat(Number(n).toFixed(8));
+  return s.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 8 });
+}
+
+function shortAddr(addr, front = 12, back = 8) {
+  if (!addr || addr.length <= front + back + 3) return addr;
+  return addr.slice(0, front) + '...' + addr.slice(-back);
+}
+
+function timeAgo(ts) {
+  const s = Math.floor((Date.now() - ts) / 1000);
+  if (s < 60)   return `${s} s ago`;
+  if (s < 3600) return `${Math.floor(s/60)} m ago`;
+  if (s < 86400)return `${Math.floor(s/3600)} h ago`;
+  return `${Math.floor(s/86400)} d ago`;
+}
+
+function roleLabel(r) {
+  return { admin:'مدیر', miner:'ماینر', viewer:'مشاهده‌گر' }[r] || r;
+}
+
+function showErr(el, msg) { el.textContent = msg; el.style.display = 'block'; }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('on');
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), 2400);
+}
+
+// Enter key on login
+document.addEventListener('DOMContentLoaded', () => {
+  ['lUser','lPass'].forEach(id =>
+    document.getElementById(id)?.addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); })
+  );
+});
+</script>
+
+
+<!-- LICENSE footer badge -->
+<div style="position:fixed;bottom:6px;left:12px;z-index:8999;font-size:9.5px;color:rgba(255,255,255,.18);font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:6px">
+  <a href="/LICENSE" target="_blank" style="color:rgba(240,165,0,.35);text-decoration:none;transition:color .2s" onmouseover="this.style.color='rgba(240,165,0,.8)'" onmouseout="this.style.color='rgba(240,165,0,.35)'">© 2026 SPN Coin Project</a>
+  <span style="opacity:.4">·</span>
+  <span style="opacity:.4">PROPRIETARY</span>
+</div>
+<!-- ═══ SPN Coin AI Widget ═══ -->
+<!-- ═══════════════════════════════════════════════════════════
+     SPN Coin AI — Floating Chat Widget
+     Uses Claude claude-haiku-4-5 (Free tier) via /api/ai/chat
+     Injects live blockchain context automatically server-side.
+════════════════════════════════════════════════════════════ -->
+
+<style>
+/* ── AI Widget global styles ── */
+#ai-fab{
+  position:fixed;bottom:28px;right:28px;z-index:9000;
+  width:54px;height:54px;border-radius:50%;
+  background:linear-gradient(135deg,#0a0f1a,#1a1f35);
+  border:1.5px solid rgba(79,143,255,.45);
+  box-shadow:0 0 0 0 rgba(79,143,255,.3),0 8px 28px rgba(0,0,0,.55);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .25s;
+  animation:fabPulse 3s ease-in-out infinite;
+}
+@keyframes fabPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(79,143,255,.3),0 8px 28px rgba(0,0,0,.55)}
+  50%{box-shadow:0 0 0 8px rgba(79,143,255,0),0 8px 28px rgba(0,0,0,.55)}
+}
+#ai-fab:hover{transform:scale(1.08);border-color:rgba(79,143,255,.8)}
+#ai-fab svg{width:24px;height:24px}
+#ai-badge{
+  position:absolute;top:-3px;right:-3px;
+  width:16px;height:16px;border-radius:50%;
+  background:#6d6bf5;border:2px solid #050708;
+  font-size:8px;color:#fff;font-weight:900;
+  display:flex;align-items:center;justify-content:center;
+  display:none;
+}
+
+#ai-panel{
+  position:fixed;bottom:96px;right:28px;z-index:9000;
+  width:380px;max-height:580px;
+  background:linear-gradient(160deg,#0a0f1a 0%,#0e1525 100%);
+  border:1px solid rgba(79,143,255,.25);
+  border-radius:18px;
+  box-shadow:0 24px 80px rgba(0,0,0,.7),0 0 0 1px rgba(79,143,255,.08),inset 0 1px 0 rgba(255,255,255,.05);
+  display:none;flex-direction:column;overflow:hidden;
+  animation:panelSlide .3s cubic-bezier(.22,1,.36,1);
+}
+@keyframes panelSlide{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+#ai-panel.open{display:flex}
+
+.ai-head{
+  padding:14px 16px 12px;
+  border-bottom:1px solid rgba(79,143,255,.12);
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(90deg,rgba(59,130,246,.08),transparent);
+  flex-shrink:0;
+}
+.ai-head-l{display:flex;align-items:center;gap:10px}
+.ai-avatar{
+  width:32px;height:32px;border-radius:10px;
+  background:linear-gradient(135deg,#1e3a8a,#6d6bf5);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  box-shadow:0 0 12px rgba(59,130,246,.35);
+}
+.ai-name{font-size:13px;font-weight:800;color:#e2e8f0;letter-spacing:-.2px}
+.ai-model{font-size:9.5px;color:#4b6fa8;font-family:"JetBrains Mono",monospace;margin-top:1px}
+.ai-status{display:flex;align-items:center;gap:4px;font-size:9px;color:#26d07c}
+.ai-status::before{content:"";width:5px;height:5px;border-radius:50%;background:#26d07c;animation:ppblue 2s infinite}
+@keyframes ppblue{0%,100%{opacity:1}50%{opacity:.3}}
+.ai-close{
+  width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);color:#64748b;
+  cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.ai-close:hover{background:rgba(255,255,255,.08);color:#e2e8f0}
+
+.ai-messages{
+  flex:1;overflow-y:auto;padding:14px;
+  display:flex;flex-direction:column;gap:10px;
+  scroll-behavior:smooth;
+}
+.ai-messages::-webkit-scrollbar{width:3px}
+.ai-messages::-webkit-scrollbar-thumb{background:rgba(79,143,255,.2);border-radius:3px}
+
+.ai-msg{display:flex;gap:8px;align-items:flex-start;animation:msgIn .25s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.ai-msg.user{flex-direction:row-reverse}
+.ai-bubble{
+  max-width:82%;padding:10px 13px;border-radius:12px;
+  font-size:12.5px;line-height:1.6;
+}
+.ai-msg.bot  .ai-bubble{
+  background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.18);
+  color:#cbd5e1;border-radius:4px 12px 12px 12px;
+}
+.ai-msg.user .ai-bubble{
+  background:linear-gradient(135deg,rgba(59,130,246,.2),rgba(37,99,235,.15));
+  border:1px solid rgba(59,130,246,.3);
+  color:#e2e8f0;border-radius:12px 4px 12px 12px;
+}
+.ai-msg.bot .ai-mic{
+  width:26px;height:26px;border-radius:8px;flex-shrink:0;margin-top:1px;
+  background:linear-gradient(135deg,#1e3a8a,#6d6bf5);
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+}
+.ai-typing{display:flex;gap:4px;align-items:center;padding:10px 13px}
+.ai-typing span{
+  width:6px;height:6px;border-radius:50%;background:#6d6bf5;
+  animation:typeBounce .9s ease infinite;
+}
+.ai-typing span:nth-child(2){animation-delay:.15s}
+.ai-typing span:nth-child(3){animation-delay:.3s}
+@keyframes typeBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-8px)}}
+
+.ai-suggestions{
+  padding:0 14px 10px;display:flex;gap:6px;flex-wrap:wrap;
+}
+.ai-chip{
+  font-size:10.5px;color:#4b6fa8;
+  background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.15);
+  border-radius:20px;padding:4px 10px;cursor:pointer;transition:all .15s;
+  white-space:nowrap;
+}
+.ai-chip:hover{background:rgba(59,130,246,.15);color:#93c5fd;border-color:rgba(59,130,246,.35)}
+
+.ai-input-wrap{
+  padding:10px 12px 12px;border-top:1px solid rgba(79,143,255,.1);
+  display:flex;gap:8px;align-items:flex-end;flex-shrink:0;
+}
+.ai-input{
+  flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(79,143,255,.18);
+  border-radius:10px;padding:9px 12px;color:#e2e8f0;
+  font-family:inherit;font-size:12.5px;resize:none;outline:none;
+  max-height:100px;min-height:36px;transition:border-color .2s;
+  line-height:1.5;
+}
+.ai-input:focus{border-color:rgba(79,143,255,.45)}
+.ai-input::placeholder{color:#2d4a6e}
+.ai-send{
+  width:36px;height:36px;border-radius:9px;flex-shrink:0;
+  background:linear-gradient(135deg,#5b59d6,#6d6bf5);border:none;
+  color:#fff;cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;box-shadow:0 4px 12px rgba(59,130,246,.3);
+}
+.ai-send:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(59,130,246,.45)}
+.ai-send:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.ai-footer{
+  padding:5px 12px 3px;font-size:9px;color:#1e3a5f;text-align:center;
+  display:flex;align-items:center;justify-content:center;gap:4px;flex-shrink:0;
+}
+.ai-footer a{color:#1e3a5f;text-decoration:none}
+.ai-footer a:hover{color:#6d6bf5}
+
+@media(max-width:500px){
+  #ai-panel{width:calc(100vw - 32px);right:16px;bottom:84px}
+}
+</style>
+
+<!-- Floating Action Button -->
+<button id="ai-fab" onclick="aiToggle()" title="SPN Coin AI Assistant (Claude)">
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2C6.48 2 2 6.48 2 12C2 13.85 2.52 15.58 3.42 17.05L2 22L7.17 20.62C8.59 21.48 10.24 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" fill="url(#aiGrad)"/>
+    <text x="12" y="16" text-anchor="middle" font-size="10" font-weight="900" fill="white" font-family="Arial">AI</text>
+    <defs>
+      <linearGradient id="aiGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#1e40af"/>
+        <stop offset="100%" stop-color="#6d6bf5"/>
+      </linearGradient>
+    </defs>
+  </svg>
+  <div id="ai-badge">!</div>
+</button>
+
+<!-- AI Chat Panel -->
+<div id="ai-panel">
+  <div class="ai-head">
+    <div class="ai-head-l">
+      <div class="ai-avatar">🤖</div>
+      <div>
+        <div class="ai-name">SPN Coin AI</div>
+        <div class="ai-model">claude-haiku · Anthropic</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="ai-status">Online</div>
+      <button class="ai-close" onclick="aiToggle()">✕</button>
+    </div>
+  </div>
+
+  <div class="ai-messages" id="aiMessages">
+    <div class="ai-msg bot">
+      <div class="ai-mic">🤖</div>
+      <div class="ai-bubble">
+        Hello! I'm SPN Coin AI, powered by Claude. I have live access to your blockchain data and can help with:<br><br>
+        • 🔍 Transaction &amp; block analysis<br>
+        • 💰 Wallet &amp; address queries<br>
+        • ⛏️ Mining questions<br>
+        • 🔐 Security guidance<br>
+        • 📊 Network statistics<br><br>
+        What would you like to know?
+      </div>
+    </div>
+  </div>
+
+  <div class="ai-suggestions" id="aiSugg">
+    <span class="ai-chip" onclick="aiAsk(this.textContent)">What is my current balance?</span>
+    <span class="ai-chip" onclick="aiAsk(this.textContent)">How does SPN mining work?</span>
+    <span class="ai-chip" onclick="aiAsk(this.textContent)">Latest block info</span>
+    <span class="ai-chip" onclick="aiAsk(this.textContent)">How to read an SPN address?</span>
+  </div>
+
+  <div class="ai-input-wrap">
+    <textarea class="ai-input" id="aiInput" placeholder="Ask anything about SPN Coin..."
+      rows="1" maxlength="2000"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend()}"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+    <button class="ai-send" id="aiSendBtn" onclick="aiSend()" title="Send">
+      <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
+        <path d="M2 8l12-6-6 12V9L2 8z" fill="white"/>
+      </svg>
+    </button>
+  </div>
+  <div class="ai-footer">
+    Powered by <a href="https://anthropic.com" target="_blank">Anthropic Claude</a>
+    &nbsp;·&nbsp; <a href="/LICENSE" target="_blank">© 2026 SPN Coin Project</a>
+  </div>
+</div>
+
+<script>
+/* ── SPN Coin AI Widget ── */
+(function() {
+  const API_BASE = window.SPN_COIN_API || '';
+  let   history  = [];
+  let   open     = false;
+  let   tok      = sessionStorage.getItem('adm_tok') ||
+                   sessionStorage.getItem('w_tok')   ||
+                   localStorage.getItem('mc_token')  ||
+                   localStorage.getItem('myc_token') || '';
+
+  // Auto-discover token from page context
+  setTimeout(() => {
+    tok = sessionStorage.getItem('adm_tok') ||
+          sessionStorage.getItem('w_tok')   ||
+          localStorage.getItem('mc_token')  ||
+          localStorage.getItem('myc_token') || tok;
+  }, 500);
+
+  window.aiToggle = function() {
+    open = !open;
+    const p = document.getElementById('ai-panel');
+    if (open) { p.classList.add('open'); document.getElementById('aiInput').focus(); }
+    else       p.classList.remove('open');
+  };
+
+  window.aiAsk = function(text) {
+    document.getElementById('aiInput').value = text;
+    document.getElementById('aiSugg').style.display = 'none';
+    aiSend();
+  };
+
+  window.aiSend = async function() {
+    const input = document.getElementById('aiInput');
+    const msg   = input.value.trim();
+    if (!msg) return;
+
+    // Add user bubble
+    addMsg('user', msg);
+    input.value = '';
+    input.style.height = 'auto';
+    document.getElementById('aiSugg').style.display = 'none';
+
+    // Show typing indicator
+    const typingId = addTyping();
+    document.getElementById('aiSendBtn').disabled = true;
+
+    try {
+      const r = await fetch(API_BASE + '/api/ai/chat', {
+        method:  'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'Authorization': 'Bearer ' + tok,
+        },
+        body: JSON.stringify({ message: msg, history }),
+      });
+
+      removeTyping(typingId);
+
+      if (r.status === 401) {
+        addMsg('bot', `🔒 Please log in to use the AI assistant. Visit the <a href="dashboard" style="color:#6d6bf5">Dashboard</a> or <a href="radar" class="">📡 Radar</a> to sign in.`, true);
+        return;
+      }
+      if (r.status === 429) {
+        addMsg('bot', '⏳ You\'ve sent too many messages. Please wait a moment before trying again.');
+        return;
+      }
+      if (!r.ok) {
+        const err = await r.json().catch(() => ({}));
+        addMsg('bot', '⚠️ ' + (err.error || 'AI service unavailable. Please try again.'));
+        return;
+      }
+
+      const d = await r.json();
+      addMsg('bot', d.reply);
+
+      // Maintain rolling history (last 10 turns)
+      history.push({ role: 'user', content: msg });
+      history.push({ role: 'assistant', content: d.reply });
+      if (history.length > 20) history = history.slice(-20);
+
+    } catch (e) {
+      removeTyping(typingId);
+      addMsg('bot', '⚠️ Connection error: ' + e.message + '\n\nMake sure the SPN Coin node is running.');
+    } finally {
+      document.getElementById('aiSendBtn').disabled = false;
+    }
+  };
+
+  function addMsg(role, text, isHtml = false) {
+    const wrap = document.getElementById('aiMessages');
+    const div  = document.createElement('div');
+    div.className = 'ai-msg ' + role;
+
+    const bubble = document.createElement('div');
+    bubble.className = 'ai-bubble';
+    // Simple markdown → HTML
+    const formatted = formatText(text);
+    if (isHtml) bubble.innerHTML = formatted;
+    else        bubble.innerHTML = formatted;
+
+    if (role === 'bot') {
+      const mic = document.createElement('div');
+      mic.className = 'ai-mic';
+      mic.textContent = '🤖';
+      div.appendChild(mic);
+    }
+    div.appendChild(bubble);
+    wrap.appendChild(div);
+    wrap.scrollTop = wrap.scrollHeight;
+    return div.id;
+  }
+
+  function formatText(text) {
+    return text
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/`([^`]+)`/g, '<code style="font-family:JetBrains Mono,monospace;font-size:11px;background:rgba(59,130,246,.1);padding:1px 5px;border-radius:3px">$1</code>')
+      .replace(/\n/g, '<br>');
+  }
+
+  let typingCtr = 0;
+  function addTyping() {
+    const id   = 'typing-' + (++typingCtr);
+    const wrap = document.getElementById('aiMessages');
+    const div  = document.createElement('div');
+    div.className = 'ai-msg bot';
+    div.id        = id;
+    div.innerHTML = '<div class="ai-mic">🤖</div><div class="ai-bubble"><div class="ai-typing"><span></span><span></span><span></span></div></div>';
+    wrap.appendChild(div);
+    wrap.scrollTop = wrap.scrollHeight;
+    return id;
+  }
+
+  function removeTyping(id) {
+    document.getElementById(id)?.remove();
+  }
+})();
+</script>
+<!-- ═══ /AI Widget ═══ -->
+
+</body>
+</html>

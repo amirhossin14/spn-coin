@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bootstrap Mine — SPN Coin</title>
+<style>
+  :root{--bg:#0a0d14;--ink:#121722;--line:#232b3a;--gold:#f0a500;--gold3:rgba(240,165,0,.12);--text:#e8edf5;--mut:#8a97a8;--grn:#00e676;--red:#ff5566}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',Sora,system-ui,sans-serif;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px}
+  .card{background:var(--ink);border:1px solid var(--line);border-radius:16px;padding:28px;width:100%;max-width:520px}
+  h1{margin:0 0 4px;font-size:20px}
+  .sub{color:var(--mut);font-size:13px;margin-bottom:20px}
+  label{display:block;font-size:12px;font-weight:700;letter-spacing:.4px;color:var(--mut);margin:14px 0 6px}
+  input{width:100%;padding:12px 14px;background:#0b0e16;border:1px solid var(--line);border-radius:10px;color:var(--text);font-size:14px;font-family:'JetBrains Mono',monospace;outline:none}
+  input:focus{border-color:rgba(240,165,0,.45)}
+  input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+  input[type=number]{-moz-appearance:textfield;appearance:textfield}
+  button{width:100%;margin-top:20px;padding:14px;background:var(--gold);color:#000;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;transition:.15s}
+  button:hover:not(:disabled){filter:brightness(1.06)}
+  button:disabled{opacity:.55;cursor:not-allowed}
+  .log{margin-top:18px;background:#070a10;border:1px solid var(--line);border-radius:10px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.7;max-height:240px;overflow:auto;white-space:pre-wrap}
+  .bar{height:8px;background:#0b0e16;border-radius:6px;margin-top:14px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:var(--gold);transition:width .2s}
+  .ok{color:var(--grn)} .err{color:var(--red)} .mut{color:var(--mut)}
+  a{color:var(--gold);text-decoration:none;font-size:12px}
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>⛏ Bootstrap Mine</h1>
+    <div class="sub">بلاک ماین می‌کند و پاداش را به آدرس زیر واریز می‌کند. باید با حساب ادمین لاگین باشید.</div>
+
+    <label for="addr">Reward address (آدرس دریافت پاداش)</label>
+    <input id="addr" type="text" value="SPN1BKmpwpCzjKr9jmdSLsr12rWuWpi3zTbqBD" spellcheck="false">
+
+    <label for="count">Blocks to mine (تعداد بلاک)</label>
+    <input id="count" type="number" value="130" min="1" max="1000">
+
+    <button id="go">Start mining</button>
+
+    <div class="bar"><i id="barFill"></i></div>
+    <div class="log" id="log"><span class="mut">آماده…</span></div>
+    <div style="margin-top:14px;text-align:center"><a href="/send.html">← بازگشت به Send</a></div>
+  </div>
+
+<script>
+const $ = id => document.getElementById(id);
+function token(){
+  return localStorage.getItem('mc_token')
+      || localStorage.getItem('myc_token')
+      || sessionStorage.getItem('adm_tok')
+      || sessionStorage.getItem('w_tok') || '';
+}
+function line(txt, cls){
+  const el = document.createElement('div');
+  if(cls) el.className = cls;
+  el.textContent = txt;
+  $('log').appendChild(el);
+  $('log').scrollTop = $('log').scrollHeight;
+}
+$('go').addEventListener('click', async () => {
+  const addr  = ($('addr').value||'').trim();
+  const count = Math.max(1, Math.min(1000, parseInt($('count').value)||0));
+  const t = token();
+  if(!/^SPN[t1][A-Za-z0-9]{25,50}$/.test(addr)){ line('⚠ آدرس نامعتبر است', 'err'); return; }
+  if(!t){ line('⚠ توکن پیدا نشد — اول در همین مرورگر لاگین کنید (صفحه Send).', 'err'); return; }
+
+  $('go').disabled = true;
+  $('log').innerHTML = '';
+  line('شروع ماین ' + count + ' بلاک به ' + addr.slice(0,14) + '…', 'mut');
+  let ok = 0, fail = 0, firstErr = '';
+  for(let i=1;i<=count;i++){
+    try{
+      const r = await fetch('/api/mine', {
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+t},
+        body: JSON.stringify({ address: addr })
+      });
+      if(r.ok){ ok++; }
+      else {
+        fail++;
+        if(!firstErr){ try{ const j=await r.json(); firstErr=(r.status+' '+(j.error||'')); }catch(e){ firstErr=String(r.status); } }
+      }
+    }catch(e){ fail++; if(!firstErr) firstErr=e.message; }
+    $('barFill').style.width = Math.round(i/count*100) + '%';
+    if(i % 10 === 0 || i === count) line('ماین‌شده ' + i + ' / ' + count + '  (موفق: ' + ok + ' — خطا: ' + fail + ')');
+    await new Promise(s=>setTimeout(s,180));
+  }
+  line('DONE ✓  موفق: ' + ok + '  —  خطا: ' + fail, ok>0 ? 'ok':'err');
+  if(fail && firstErr) line('اولین خطا: ' + firstErr + (firstErr.indexOf('401')>=0 ? '  → لاگین منقضی شده، دوباره لاگین کنید' : ''), 'err');
+  if(ok) line('حالا صفحه Send یا mywallet را رفرش کنید — موجودی باید بیاید (بلاک‌های اولیه بعد از ۱۰۰ تأیید قابل خرج می‌شوند).', 'mut');
+  $('go').disabled = false;
+});
+</script>
+</body>
+</html>

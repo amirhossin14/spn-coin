@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<!--
+  © 2026 SPN Coin Project — PROPRIETARY AND CONFIDENTIAL
+  All Rights Reserved. See LICENSE file in the project root.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="64x64" href="/sepanta-coin.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/sepanta-coin-32.png?v=5">
+  <link rel="shortcut icon" href="/sepanta-coin.ico?v=5">
+  <link rel="apple-touch-icon" sizes="180x180" href="/sepanta-coin-180.png?v=5">
+  <meta name="theme-color" content="#080b13">
+  <meta name="description" content="Live SPN Coin network status — node health, peers, and chain details.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sepanta (SPN) — Network Status</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080b13;--bg2:#0c1120;--card:#0f1626;--raised:#141d31;
+  --bd:rgba(255,255,255,.08);--bd2:rgba(148,163,208,.14);
+  --txt:#eaf0fb;--sub:#b3bdd8;--mut:#8a97b8;
+  --grn:#26d07c;--red:#f2555a;--gold:#f5b301;--cyn:#25d0ee;--pur:#b06bf7;
+  --r:16px;
+}
+[data-theme="light"]{--bg:#f4f6fb;--bg2:#e9edf5;--card:#fff;--raised:#f0f2f8;--txt:#1a2238;--sub:#5a6588;--mut:#9aa4c0;--bd:rgba(0,0,0,.1)}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;line-height:1.5}
+.wrap{max-width:1120px;margin:0 auto;padding:32px 20px 60px}
+
+/* Hero */
+.hero{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:26px}
+.hero .left h1{font-size:30px;font-weight:800;display:flex;align-items:center;gap:12px}
+.hero .left .lead{color:var(--sub);font-size:14px;margin-top:4px}
+.status-line{display:inline-flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--bd);border-radius:100px;padding:10px 20px;font-size:14px;font-weight:600}
+.dot{width:11px;height:11px;border-radius:50%;background:var(--mut);flex-shrink:0}
+.dot.up{background:var(--grn);animation:pulse 2s infinite}
+.dot.down{background:var(--red)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(0,230,118,.5)}70%{box-shadow:0 0 0 9px rgba(0,230,118,0)}100%{box-shadow:0 0 0 0 rgba(0,230,118,0)}}
+
+/* Stat cards */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+@media(max-width:820px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:440px){.grid{grid-template-columns:1fr}}
+.stat{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:20px 18px;position:relative;overflow:hidden;transition:.18s}
+.stat:hover{border-color:var(--bd2);transform:translateY(-3px)}
+.stat::after{content:'';position:absolute;top:0;right:0;width:60px;height:60px;opacity:.05;background:radial-gradient(circle,currentColor,transparent 70%)}
+.stat .lbl{font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.6px;font-weight:600;display:flex;align-items:center;gap:6px}
+.stat .val{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;margin-top:10px;letter-spacing:-.5px}
+.stat .val.gold{color:var(--gold)}.stat .val.grn{color:var(--grn)}.stat .val.cyn{color:var(--cyn)}.stat .val.pur{color:var(--pur)}
+.stat .sub{font-size:12px;color:var(--mut);margin-top:3px}
+.stat .spark{position:absolute;bottom:0;left:0;right:0;height:32px;opacity:.5}
+
+/* Two column layout */
+.cols{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;margin-bottom:18px}
+@media(max-width:900px){.cols{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:22px}
+.panel h2{font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:9px}
+.panel h2 .badge{margin-inline-start:auto;font-size:11px;font-weight:600;color:var(--sub);background:var(--bg2);padding:3px 10px;border-radius:100px}
+
+/* Chart */
+.chart-wrap{position:relative;height:180px}
+.chart-wrap svg{width:100%;height:100%;overflow:visible}
+.chart-empty{display:flex;align-items:center;justify-content:center;height:180px;color:var(--mut);font-size:13px;text-align:center}
+
+/* Supply bar */
+.supply-bar{height:12px;background:var(--bg2);border-radius:100px;overflow:hidden;margin:14px 0 8px}
+.supply-fill{height:100%;background:linear-gradient(90deg,var(--gold),#ffb820);border-radius:100px;transition:width 1s ease}
+.supply-legend{display:flex;justify-content:space-between;font-size:12px;color:var(--sub)}
+.supply-legend b{color:var(--txt);font-family:'JetBrains Mono',monospace}
+
+/* Detail rows */
+.row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd);font-size:13.5px}
+.row:last-child{border-bottom:none}
+.row .k{color:var(--sub)}
+.row .v{font-family:'JetBrains Mono',monospace;font-weight:600}
+.tag{font-size:11px;padding:2px 10px;border-radius:100px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.tag.testnet{background:rgba(240,165,0,.15);color:var(--gold)}
+.tag.mainnet{background:rgba(0,230,118,.15);color:var(--grn)}
+
+/* Recent blocks */
+.blocks-list{display:flex;flex-direction:column;gap:8px}
+.blk{display:flex;align-items:center;gap:14px;padding:12px 14px;background:var(--bg2);border:1px solid transparent;border-radius:11px;transition:.15s;text-decoration:none;color:inherit}
+.blk:hover{border-color:var(--bd2);transform:translateX(-2px)}
+[dir="rtl"] .blk:hover{transform:translateX(2px)}
+.blk .bh{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--gold);font-size:15px;min-width:64px}
+.blk .bmid{flex:1;min-width:0}
+.blk .bhash{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.blk .bmeta{font-size:11px;color:var(--mut);margin-top:2px}
+.blk .btime{font-size:11px;color:var(--mut);white-space:nowrap;font-family:'JetBrains Mono',monospace}
+
+/* Peers */
+.peer{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--bd)}
+.peer:last-child{border-bottom:none}
+.peer .pd{width:9px;height:9px;border-radius:50%;background:var(--grn);flex-shrink:0;animation:pulse 2s infinite}
+.peer .purl{font-family:'JetBrains Mono',monospace;font-size:13px;word-break:break-all}
+.peer .ph{margin-inline-start:auto;font-size:12px;color:var(--sub);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.empty{text-align:center;color:var(--mut);padding:24px 10px;font-size:13px;line-height:1.7}
+.mono{font-family:'JetBrains Mono',monospace;color:var(--cyn)}
+
+/* Connection tester */
+.tester{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.tester input{flex:1;min-width:180px;background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:11px 14px;color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:13px;outline:none}
+.tester input:focus{border-color:var(--bd2)}
+.tester button{background:var(--grn);color:#000;border:none;border-radius:10px;padding:11px 20px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap}
+.tester button:hover{background:#00c766}
+.tester button:disabled{opacity:.5;cursor:not-allowed}
+#testResult{margin-top:12px;font-size:13px;padding:11px 14px;border-radius:10px;display:none;font-family:'JetBrains Mono',monospace}
+#testResult.ok{display:block;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);color:var(--grn)}
+#testResult.err{display:block;background:rgba(255,84,112,.1);border:1px solid rgba(255,84,112,.3);color:var(--red)}
+#testResult.pending{display:block;background:var(--bg2);border:1px solid var(--bd);color:var(--sub)}
+
+.refresh{font-size:12px;color:var(--mut);text-align:center;margin-top:20px;display:flex;align-items:center;justify-content:center;gap:8px}
+.refresh .rd{width:6px;height:6px;border-radius:50%;background:var(--grn);animation:pulse 2s infinite}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="left">
+      <h1>🌐 <span data-i18n>Network Status</span></h1>
+      <div class="lead" data-i18n>Live health of this SPN Coin node and the peers it's connected to.</div>
+    </div>
+    <div class="status-line"><span class="dot" id="statusDot"></span><span id="statusText" data-i18n>Checking…</span></div>
+  </div>
+
+  <!-- Top stats -->
+  <div class="grid">
+    <div class="stat" style="color:var(--gold)"><div class="lbl">⛓️ <span data-i18n>Block Height</span></div><div class="val gold" id="sHeight">—</div><div class="sub" data-i18n>latest block</div></div>
+    <div class="stat" style="color:var(--grn)"><div class="lbl">🖧 <span data-i18n>Connected Peers</span></div><div class="val grn" id="sPeers">—</div><div class="sub" data-i18n>other nodes</div></div>
+    <div class="stat" style="color:var(--cyn)"><div class="lbl">⚡ <span data-i18n>Difficulty</span></div><div class="val cyn" id="sDiff">—</div><div class="sub" data-i18n>network difficulty</div></div>
+    <div class="stat" style="color:var(--pur)"><div class="lbl">⏱️ <span data-i18n>Uptime</span></div><div class="val pur" id="sUptime">—</div><div class="sub" data-i18n>this node</div></div>
+  </div>
+
+  <div class="cols">
+    <!-- Chart -->
+    <div class="panel">
+      <h2>📈 <span data-i18n>Difficulty Trend</span><span class="badge" id="chartBadge" data-i18n>last blocks</span></h2>
+      <div id="chartArea"><div class="chart-empty" data-i18n>Mine some blocks to see the trend.</div></div>
+    </div>
+    <!-- Chain details -->
+    <div class="panel">
+      <h2>📊 <span data-i18n>Chain Details</span></h2>
+      <div class="row"><span class="k" data-i18n>Network</span><span class="v" id="dNet">—</span></div>
+      <div class="row"><span class="k" data-i18n>Chain ID</span><span class="v" id="dChainId">—</span></div>
+      <div class="row"><span class="k" data-i18n>Hashrate</span><span class="v" id="dHashrate">—</span></div>
+      <div class="row"><span class="k" data-i18n>Avg Block Time</span><span class="v" id="dBlockTime">—</span></div>
+      <div class="row"><span class="k" data-i18n>PoW Algorithm</span><span class="v" id="dPow">—</span></div>
+      <div class="row"><span class="k" data-i18n>Node Version</span><span class="v" id="dVer">—</span></div>
+    </div>
+  </div>
+
+  <!-- Supply -->
+  <div class="panel" style="margin-bottom:18px">
+    <h2>🪙 <span data-i18n>Coin Supply</span></h2>
+    <div class="supply-bar"><div class="supply-fill" id="supplyFill" style="width:0%"></div></div>
+    <div class="supply-legend">
+      <span><span data-i18n>Circulating</span>: <b id="circSupply">—</b> SPN</span>
+      <span><span data-i18n>Max</span>: <b id="maxSupply">21,000,000</b> SPN</span>
+    </div>
+  </div>
+
+  <div class="cols">
+    <!-- Recent blocks -->
+    <div class="panel">
+      <h2>🧱 <span data-i18n>Recent Blocks</span></h2>
+      <div class="blocks-list" id="blocksList"><div class="empty" data-i18n>Loading blocks…</div></div>
+    </div>
+    <!-- Peers + tester -->
+    <div class="panel">
+      <h2>🖧 <span data-i18n>Peers</span></h2>
+      <div id="peerList"><div class="empty" data-i18n>Loading peers…</div></div>
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--bd)">
+        <div style="font-size:13px;color:var(--sub);margin-bottom:8px" data-i18n>Test a peer connection:</div>
+        <div class="tester">
+          <input id="testUrl" placeholder="http://seed-ip:3000" spellcheck="false">
+          <button id="testBtn" data-i18n>Test</button>
+        </div>
+        <div id="testResult"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="refresh"><span class="rd"></span><span data-i18n>Auto-refreshes every 15s</span> · <span id="lastUpdate">—</span></div>
+</div>
+
+<script src="csrf-fetch.js?v=25"></script>
+<script src="i18n.js?v=34"></script>
+<script src="nav.js?v=40"></script><script src="/ai-bubble.js?v=5" defer></script>
+<script src="/anti-phishing.js?v=1" defer></script>
+<script src="realtime.js?v=1"></script>
+<script src="footer.js?v=35"></script>
+<script src="ui-prefs.js?v=25"></script>
+<script>
+const API = window.SPN_COIN_API || (location.hostname==='localhost'||location.hostname==='127.0.0.1' ? 'http://localhost:3000' : location.origin);
+
+const $ = id => document.getElementById(id);
+function fmt(n){ return (n==null||isNaN(n)) ? '—' : Number(n).toLocaleString(); }
+function fmtUptime(s){ if(s==null)return '—'; s=Math.floor(s); const d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60); if(d>0)return d+'d '+h+'h'; if(h>0)return h+'h '+m+'m'; return m+'m '+(s%60)+'s'; }
+function fmtHashrate(h){ if(h==null||isNaN(h))return '—'; h=Number(h); const u=['H/s','KH/s','MH/s','GH/s','TH/s','PH/s']; let i=0; while(h>=1000&&i<u.length-1){h/=1000;i++;} return h.toFixed(2)+' '+u[i]; }
+function ago(ts){ if(!ts)return ''; const s=Math.floor(Date.now()/1000 - ts); if(s<0)return 'now'; if(s<60)return s+'s ago'; if(s<3600)return Math.floor(s/60)+'m ago'; if(s<86400)return Math.floor(s/3600)+'h ago'; return Math.floor(s/86400)+'d ago'; }
+
+function drawChart(series){
+  const area = $('chartArea');
+  const pts = (series||[]).map(s=>Number(s.difficulty!=null?s.difficulty:s)).filter(v=>!isNaN(v));
+  if(pts.length<2){ area.innerHTML = '<div class="chart-empty" data-i18n>Mine some blocks to see the trend.</div>'; return; }
+  const W=100, H=100, max=Math.max(...pts), min=Math.min(...pts), rng=(max-min)||1;
+  const step = W/(pts.length-1);
+  const xy = pts.map((v,i)=>[i*step, H - ((v-min)/rng)*H]);
+  const line = xy.map((p,i)=>(i?'L':'M')+p[0].toFixed(2)+' '+p[1].toFixed(2)).join(' ');
+  const fill = 'M0 '+H+' '+xy.map(p=>'L'+p[0].toFixed(2)+' '+p[1].toFixed(2)).join(' ')+' L'+W+' '+H+' Z';
+  area.innerHTML =
+    '<div class="chart-wrap"><svg viewBox="0 0 100 100" preserveAspectRatio="none">'+
+    '<defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">'+
+    '<stop offset="0%" stop-color="var(--cyn)" stop-opacity="0.35"/>'+
+    '<stop offset="100%" stop-color="var(--cyn)" stop-opacity="0"/></linearGradient></defs>'+
+    '<path d="'+fill+'" fill="url(#cg)"/>'+
+    '<path d="'+line+'" fill="none" stroke="var(--cyn)" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>'+
+    xy.map(p=>'<circle cx="'+p[0].toFixed(2)+'" cy="'+p[1].toFixed(2)+'" r="1.4" fill="var(--cyn)" vector-effect="non-scaling-stroke"/>').join('')+
+    '</svg></div>';
+}
+
+async function load(){
+  try{
+    const [health, stats, analytics, blocksR] = await Promise.all([
+      fetch(API+'/api/health').then(r=>r.json()).catch(()=>null),
+      fetch(API+'/api/stats').then(r=>r.json()).catch(()=>null),
+      fetch(API+'/api/analytics?window=20').then(r=>r.json()).catch(()=>null),
+      fetch(API+'/api/blocks?limit=6').then(r=>r.json()).catch(()=>null),
+    ]);
+
+    const up = !!(health && health.status==='ok');
+    $('statusDot').className = 'dot '+(up?'up':'down');
+    $('statusText').textContent = up ? 'Node online' : 'Node offline';
+
+    if(stats){
+      $('sHeight').textContent = fmt(stats.height);
+      $('sDiff').textContent = fmt(stats.difficulty);
+      $('dNet').innerHTML = stats.networkType ? '<span class="tag '+(stats.networkType==='mainnet'?'mainnet':'testnet')+'">'+stats.networkType+'</span>' : '—';
+      $('dChainId').textContent = stats.chainId ?? '—';
+      $('dHashrate').textContent = fmtHashrate(stats.hashrate);
+      $('dPow').textContent = stats.powAlgorithm || '—';
+    }
+    if(health){
+      $('sPeers').textContent = fmt(health.peers);
+      $('sUptime').textContent = fmtUptime(health.uptime);
+      $('dVer').textContent = health.version ? 'v'+health.version : '—';
+    }
+    if(analytics && analytics.summary){
+      const sm = analytics.summary;
+      $('dBlockTime').textContent = sm.avgBlockTime ? Math.round(sm.avgBlockTime)+'s' : '—';
+      const circ = sm.circulatingSupply||0, mx = sm.maxSupply||21000000;
+      $('circSupply').textContent = fmt(circ);
+      $('maxSupply').textContent = fmt(mx);
+      $('supplyFill').style.width = Math.min(100, (circ/mx)*100)+'%';
+      drawChart(analytics.series);
+      $('chartBadge').textContent = (analytics.series&&analytics.series.length?analytics.series.length:0)+' blocks';
+    }
+    if(blocksR && blocksR.blocks){ renderBlocks(blocksR.blocks); }
+
+    await loadPeers(health);
+    $('lastUpdate').textContent = new Date().toLocaleTimeString();
+  }catch(e){
+    $('statusDot').className = 'dot down';
+    $('statusText').textContent = 'Connection error';
+  }
+}
+
+function renderBlocks(blocks){
+  const box = $('blocksList');
+  if(!blocks.length){ box.innerHTML = '<div class="empty">No blocks yet.</div>'; return; }
+  box.innerHTML = blocks.map(b=>{
+    const hash = (b.hash||'').slice(0,20)+'…';
+    return '<a class="blk" href="block?h='+b.height+'">'+
+      '<span class="bh">#'+b.height+'</span>'+
+      '<span class="bmid"><div class="bhash">'+hash+'</div>'+
+      '<div class="bmeta">'+(b.txCount||0)+' tx · '+(b.size||0)+' B · '+(b.miner||'—').slice(0,12)+'</div></span>'+
+      '<span class="btime">'+ago(b.timestamp)+'</span></a>';
+  }).join('');
+}
+
+async function loadPeers(health){
+  const box = $('peerList');
+  try{
+    const r = await fetch(API+'/api/p2p/peers').then(r=>r.ok?r.json():null).catch(()=>null);
+    const peers = r && (r.peers||[]);
+    if(peers && peers.length){
+      box.innerHTML = peers.map(p=>{
+        const url = typeof p==='string'?p:(p.url||p.address||JSON.stringify(p));
+        const h = (typeof p==='object'&&p.height!=null)?('h '+fmt(p.height)):'';
+        return '<div class="peer"><span class="pd"></span><span class="purl">'+url+'</span>'+(h?'<span class="ph">'+h+'</span>':'')+'</div>';
+      }).join('');
+      return;
+    }
+  }catch(e){}
+  const count = health && health.peers;
+  box.innerHTML = (count&&count>0)
+    ? '<div class="empty">'+count+' peer(s) connected.<br>Sign in as admin to see details.</div>'
+    : '<div class="empty">No peers connected yet.<br>Add one via <span class="mono">PEER_URLS</span> in .env,<br>or see <span class="mono">docs/LAUNCH_NETWORK.md</span>.</div>';
+}
+
+// Connection tester — probes a peer's /api/health from the browser.
+$('testBtn').addEventListener('click', async ()=>{
+  const url = $('testUrl').value.trim().replace(/\/$/,'');
+  const box = $('testResult');
+  if(!url || !/^https?:\/\//.test(url)){ box.className='err'; box.textContent='✗ Enter a URL starting with http:// or https://'; return; }
+  box.className='pending'; box.textContent='⏳ Testing '+url+' …';
+  $('testBtn').disabled = true;
+  const t0 = Date.now();
+  try{
+    const r = await fetch(url+'/api/health', {signal: AbortSignal.timeout(8000)});
+    const ms = Date.now()-t0;
+    if(r.ok){
+      const j = await r.json().catch(()=>({}));
+      box.className='ok';
+      box.textContent = '✓ Reachable ('+ms+'ms) · height '+(j.height??'?')+' · '+(j.network||j.chainId||'')+' · v'+(j.version||'?');
+    }else{
+      box.className='err'; box.textContent='✗ Responded '+r.status+' (not a healthy node?)';
+    }
+  }catch(e){
+    box.className='err';
+    box.textContent = '✗ Unreachable — '+(e.name==='TimeoutError'?'timed out':'no response (CORS, offline, or wrong URL)');
+  }finally{ $('testBtn').disabled=false; }
+});
+$('testUrl').addEventListener('keydown', e=>{ if(e.key==='Enter') $('testBtn').click(); });
+
+load();
+setInterval(load, 15000);
+document.addEventListener('spn-lang-change', ()=>{ if(window.SPNi18n) SPNi18n.refresh(); });
+</script>
+</body>
+</html>

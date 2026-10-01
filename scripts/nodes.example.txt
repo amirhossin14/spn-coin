@@ -1,0 +1,7 @@
+# SPN Coin network nodes to monitor — one URL per line.
+# Copy to nodes.txt and add your real node addresses.
+# Lines starting with # are ignored.
+
+http://localhost:3000
+# http://seed1.yourdomain.com:3000
+# http://seed2.yourdomain.com:3000

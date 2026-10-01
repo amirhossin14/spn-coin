@@ -1,0 +1,39 @@
+# ─────────────────────────────────────────────────────────────
+#  © 2026 SPN Coin Project — Caddy reverse proxy config.
+#  Replace example.com with your domain. Caddy auto-obtains and
+#  renews a real TLS certificate from Let's Encrypt.
+# ─────────────────────────────────────────────────────────────
+
+example.com {
+	# automatic HTTPS + HTTP→HTTPS redirect are on by default in Caddy
+
+	# ── Extra real security layer for the admin panel ────────────────
+	# A second password gate at the EDGE, before the request ever reaches
+	# the app. This is a genuine control (unlike hiding the nav link).
+	# Generate the hash on the server with:   caddy hash-password
+	# then paste it below (format:  <username> <bcrypt-hash>).
+	@admin path /admin /admin.html /admin/*
+	basicauth @admin {
+		spnadmin REPLACE_WITH_BCRYPT_HASH_FROM_caddy_hash-password
+	}
+
+	# forward the real protocol so the node can emit HSTS correctly
+	reverse_proxy spn-node:8080 {
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Real-IP {remote_host}
+	}
+
+	# security headers at the edge
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	# basic edge rate limit is handled by the node's DDoS guard;
+	# add Caddy-level limits here too if desired.
+
+	encode gzip zstd
+}

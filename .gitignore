@@ -1,0 +1,39 @@
+node_modules/
+*.log
+.env
+.env.*
+!.env.example
+data/
+testnet/data/
+dist/
+contracts/node_modules/
+contracts/artifacts/
+contracts/cache/
+.DS_Store
+coverage/
+*.lock
+access.lock
+
+# TLS certificates (never commit private keys)
+certs/*.pem
+.access-key
+.env.production
+
+# Node wallet private key — a fund-controlling secret, never commit it
+.node-wallet.key
+*.key
+
+# ── Extra safety for public GitHub (added for open-source publish) ──
+certs/
+*.pem
+*.crt
+*.p12
+*.pfx
+.env.keys
+.env.local
+.env.production
+*.sqlite
+*.sqlite3
+*.db
+backups/
+*.bak

@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My Wallet — Spn coin</title>
+<meta name="description" content="Create or restore your SPN wallet with a 12-word recovery phrase. View balance and tokens, send and receive." />
+<link rel="icon" type="image/png" sizes="64x64" href="/sepanta-coin.png?v=5" />
+<link rel="icon" type="image/png" sizes="32x32" href="/sepanta-coin-32.png?v=5" />
+<link rel="shortcut icon" href="/sepanta-coin.ico?v=5" />
+<link rel="apple-touch-icon" sizes="180x180" href="/sepanta-coin-180.png?v=5" />
+<style>
+  :root{ --bg:#080b13; --ink:#0f1626; --ink2:#141d31; --line:rgba(255,255,255,.08);
+    --gold:#f5b301; --grn:#26d07c; --txt:#eaf0fb; --mut:#8a97b8; --red:#f2555a; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:"Sora",system-ui,sans-serif;line-height:1.5}
+  .wrap{max-width:760px;margin:0 auto;padding:24px 18px 80px}
+  h1{font-size:22px;font-weight:900;margin:0 0 4px}
+  .sub{color:var(--mut);font-size:13px;margin-bottom:24px}
+  .card{background:var(--ink);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:18px}
+  .mono{font-family:"JetBrains Mono",monospace}
+  button{font-family:inherit;cursor:pointer;border:none;border-radius:10px;font-weight:700;transition:.18s}
+  .btn-gold{background:linear-gradient(135deg,#d49000,var(--gold));color:#1a1205;padding:13px 20px;font-size:14px;width:100%}
+  .btn-gold:hover{transform:translateY(-1px)}
+  .btn-ghost{background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--txt);padding:12px 18px;font-size:13px}
+  .btn-ghost:hover{background:rgba(255,255,255,.09)}
+  input{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:#0b0e16;color:var(--txt);font-size:14px;font-family:inherit}
+  label{display:block;font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--mut);margin:0 0 6px}
+  .hidden{display:none!important}
+  /* hero */
+  .hero{background:linear-gradient(135deg,rgba(240,165,0,.12),rgba(240,165,0,.04));border:1px solid rgba(240,165,0,.25);border-radius:16px;padding:26px;margin-bottom:18px;position:relative;overflow:hidden}
+  .hero-lbl{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:rgba(240,165,0,.65);margin-bottom:6px}
+  .hero-bal{font-family:"JetBrains Mono",monospace;font-size:38px;font-weight:700;color:var(--gold);line-height:1}
+  .hero-bal span{font-size:15px;color:rgba(240,165,0,.6);margin-inline-start:6px}
+  .hero-addr{margin-top:16px;display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:9px;padding:10px 13px;cursor:pointer}
+  .hero-addr .mono{font-size:12px;color:var(--txt);word-break:break-all;flex:1;min-width:0}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+  .actions button{padding:13px;font-size:14px}
+  /* seed words */
+  .seed-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+  .seed-word{background:#0b0e16;border:1px solid var(--line);border-radius:9px;padding:11px 12px;font-family:"JetBrains Mono",monospace;font-size:13px;display:flex;gap:8px;align-items:center}
+  .seed-word b{color:var(--mut);font-size:11px;min-width:16px}
+  .warn-box{background:rgba(255,85,102,.08);border:1px solid rgba(255,85,102,.3);border-radius:12px;padding:16px;margin:16px 0;font-size:13px;line-height:1.6}
+  .warn-box b{color:var(--red)}
+  .tok{display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid var(--line);text-decoration:none;color:inherit}
+  .tok:last-child{border-bottom:none}
+  .tok-ava{width:40px;height:40px;border-radius:50%;flex:none;background:linear-gradient(135deg,#f7931a,#ffb84d);display:flex;align-items:center;justify-content:center;font-weight:800;color:#1a1205;font-size:15px}
+  .ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .ch h3{margin:0;font-size:15px;font-weight:800}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink2);border:1px solid var(--line);border-radius:10px;padding:12px 20px;font-size:13px;font-weight:600;z-index:99;opacity:0;transition:.3s;pointer-events:none}
+  .toast.show{opacity:1}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
+  .modal.show{display:flex}
+  .modal-box{background:var(--ink);border:1px solid var(--line);border-radius:16px;padding:24px;width:100%;max-width:440px}
+  .qr-box{background:#fff;padding:16px;border-radius:12px;display:inline-block;margin:12px auto}
+  a.link{color:var(--gold);text-decoration:none}
+  input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+  input[type=number]{-moz-appearance:textfield;appearance:textfield}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>💼 Spn coin Wallet</h1>
+  <div class="sub" data-i18n>Create a new wallet or restore one with your 12-word recovery phrase.</div>
+
+  <!-- ═══ NO WALLET: create, unlock, or restore ═══ -->
+  <div id="setupView">
+    <!-- Unlock a wallet saved on THIS browser with your password -->
+    <div class="card hidden" id="unlockCard">
+      <div class="ch"><h3>🔓 ورود به کیف پول / Unlock wallet</h3></div>
+      <p style="color:var(--mut);font-size:13px;margin-top:0" data-i18n>A saved wallet was found on this browser. Enter your password to unlock it.</p>
+      <label for="unlockPass">Password</label>
+      <div style="position:relative">
+        <input id="unlockPass" type="password" placeholder="Your wallet password" autocomplete="current-password" style="padding-right:44px" />
+        <button type="button" id="unlockEye" aria-label="Show/hide password"
+                onclick="var i=document.getElementById('unlockPass');var s=i.type==='password';i.type=s?'text':'password';this.textContent=s?'🙈':'👁';"
+                style="position:absolute;top:50%;right:8px;transform:translateY(-50%);background:none;border:none;padding:4px;font-size:16px;cursor:pointer;line-height:1">👁</button>
+      </div>
+      <div class="ferr hidden" id="unlockErr" style="color:var(--red);font-size:12px;margin-top:6px"></div>
+      <button class="btn-gold" id="btnUnlock" style="width:100%;margin-top:12px">Unlock</button>
+      <button class="btn-ghost" id="btnForget" style="width:100%;margin-top:8px;font-size:12px">Use a different wallet</button>
+    </div>
+
+    <div class="card" id="createCard">
+      <div class="ch"><h3 id="createHead">🆕 Create a new wallet</h3></div>
+      <p id="createDesc" style="color:var(--mut);font-size:13px;margin-top:0">A new wallet gives you a 12-word recovery phrase. Write it down and keep it safe — it's the only way to restore your wallet.</p>
+      <p id="loginOnlyDesc" class="hidden" style="color:var(--mut);font-size:13px;margin-top:0">A wallet is already saved on this browser. Enter with your password.</p>
+      <button class="btn-gold" id="btnCreate">Create new wallet</button>
+      <button class="btn-ghost" id="btnLoginToWallet" style="width:100%;margin-top:10px">🔓 Login to wallet</button>
+    </div>
+    <div class="card">
+      <div class="ch"><h3>♻️ Restore existing wallet</h3></div>
+      <label for="restoreInput">Recovery phrase (12 or 24 words)</label>
+      <input id="restoreInput" placeholder="word1 word2 word3 …" autocomplete="off" />
+      <label for="restorePass" style="margin-top:12px">Set a password (required — to unlock faster next time) *</label>
+      <input id="restorePass" type="password" placeholder="Min 8 chars, letter + number + symbol" autocomplete="new-password" oninput="showPwHint('restorePass','restorePwHint')" />
+      <div id="restorePwHint" style="font-size:11.5px;color:var(--mut);margin-top:5px;line-height:1.7"></div>
+      <button class="btn-ghost" id="btnRestore" style="width:100%;margin-top:12px">Restore wallet</button>
+    </div>
+  </div>
+
+  <!-- ═══ SEED REVEAL (after create) ═══ -->
+  <div id="seedView" class="hidden">
+    <div class="card">
+      <div class="ch"><h3>🔑 Your 12-word recovery phrase</h3></div>
+      <div class="warn-box">
+        ⚠️ <b data-i18n>Write these 12 words down on paper and store them somewhere safe.</b><br>
+        <span data-i18n>Anyone with these words can access your wallet. We do NOT store them — if you lose them, your wallet cannot be recovered. Never share them with anyone.</span>
+      </div>
+      <div class="seed-grid" id="seedGrid"></div>
+      <button class="btn-ghost" id="btnCopySeed" style="width:100%;margin-bottom:10px">📋 Copy phrase</button>
+      <label for="newWalletPass" style="margin-top:6px">🔑 Set a password (required — to unlock this wallet faster next time) *</label>
+      <input id="newWalletPass" type="password" placeholder="Min 8 chars, letter + number + symbol" autocomplete="new-password" oninput="showPwHint('newWalletPass','newPwHint')" />
+      <div id="newPwHint" style="font-size:11.5px;color:var(--mut);margin-top:5px;line-height:1.7"></div>
+      <div class="warn-box" style="margin-top:12px">
+        📝 <b data-i18n>Save BOTH in a safe place:</b><br>
+        <span data-i18n>1) your 12-word recovery phrase, and 2) the password you set above. The password only unlocks this wallet on THIS browser — if you clear your browser or move to another device, you can only get back in with your 12 words. If you forget the password, use your 12-word phrase to restore. We store neither — losing both means losing the wallet forever.</span>
+      </div>
+      <label style="display:flex;gap:9px;align-items:flex-start;text-transform:none;letter-spacing:0;font-size:13px;color:var(--txt);margin:14px 0;cursor:pointer">
+        <input type="checkbox" id="seedConfirm" style="width:auto;margin-top:3px" />
+        <span data-i18n>I have written down my 12 words (and password) and stored them safely.</span>
+      </label>
+      <button class="btn-gold" id="btnSeedDone" disabled>Continue to my wallet</button>
+    </div>
+  </div>
+
+  <!-- ═══ WALLET (unlocked) ═══ -->
+  <div id="walletView" class="hidden">
+    <div class="hero">
+      <div class="hero-lbl" data-i18n>Total Balance</div>
+      <div class="hero-bal"><span id="balVal">0</span><span>SPN</span></div>
+      <div class="hero-addr" id="addrBox" title="Click to copy">
+        <span class="mono" id="addrText">—</span>
+        <span style="color:var(--gold);flex:none">📋</span>
+      </div>
+      <div class="actions">
+        <button class="btn-gold" id="btnSend">↑ Send</button>
+        <button class="btn-ghost" id="btnReceive">↓ Receive</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><h3>🪙 My Tokens</h3><button class="btn-ghost" id="btnRefresh" style="padding:6px 12px;font-size:12px">🔄</button></div>
+      <div id="tokenList"><div style="padding:24px;text-align:center;color:var(--mut)">Loading…</div></div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><h3>🔑 کلید خصوصی / Private Key</h3></div>
+      <div style="font-size:12.5px;color:var(--mut);line-height:1.7;margin-bottom:12px">
+        این کلید کنترل کامل کیف‌پول را می‌دهد — هیچ‌وقت آن را به کسی نده و در جای امن نگه‌دار.
+        برای ارسال از صفحه‌ی <b>Send</b>، کلید <b>DER</b> (شروع با 3081) را کپی کن و در فیلد Private Key بگذار.
+      </div>
+      <button class="btn-ghost" id="btnRevealKey" style="width:100%">👁 نمایش کلید خصوصی</button>
+      <div id="keyBox" class="hidden" style="margin-top:12px">
+        <div style="font-size:11px;color:var(--mut);margin-bottom:4px">DER (برای صفحه Send)</div>
+        <div class="mono" id="privDer" style="font-size:11px;word-break:break-all;background:#0b0e16;border:1px solid var(--line);border-radius:8px;padding:10px"></div>
+        <button class="btn-ghost" id="btnCopyDer" style="width:100%;margin-top:8px">📋 کپی کلید DER</button>
+        <div style="font-size:11px;color:var(--mut);margin:12px 0 4px">Base64 (کوتاه‌تر)</div>
+        <div class="mono" id="privB64" style="font-size:11px;word-break:break-all;background:#0b0e16;border:1px solid var(--line);border-radius:8px;padding:10px"></div>
+        <button class="btn-ghost" id="btnCopyB64" style="width:100%;margin-top:8px">📋 کپی Base64</button>
+        <button class="btn-ghost" id="btnHideKey" style="width:100%;margin-top:8px">🙈 پنهان کردن</button>
+      </div>
+    </div>
+
+    <button class="btn-ghost" id="btnLock" style="width:100%">🔒 Lock wallet</button>
+  </div>
+</div>
+
+<!-- Send modal -->
+<div class="modal" id="sendModal">
+  <div class="modal-box">
+    <div class="ch"><h3>↑ Send SPN</h3><button class="btn-ghost" style="padding:6px 12px" onclick="closeModal('sendModal')">✕</button></div>
+    <label for="sendTo">Recipient address</label>
+    <input id="sendTo" placeholder="SPN1…" autocomplete="off" />
+    <label for="sendAmt" style="margin-top:12px">Amount (SPN)</label>
+    <input id="sendAmt" type="number" placeholder="0.00" min="0" step="0.00000001" />
+    <div id="sendMsg" style="font-size:12px;margin-top:10px"></div>
+    <button class="btn-gold" id="btnSendGo" style="margin-top:14px">Send</button>
+  </div>
+</div>
+
+<!-- Receive modal -->
+<div class="modal" id="receiveModal">
+  <div class="modal-box" style="text-align:center">
+    <div class="ch" style="text-align:left"><h3>↓ Receive SPN</h3><button class="btn-ghost" style="padding:6px 12px" onclick="closeModal('receiveModal')">✕</button></div>
+    <p style="color:var(--mut);font-size:13px">Share this address to receive SPN or tokens.</p>
+    <div class="qr-box" id="qrBox"></div>
+    <div class="mono" id="recvAddr" style="font-size:12px;word-break:break-all;margin-top:12px;color:var(--txt)"></div>
+    <button class="btn-ghost" id="btnCopyRecv" style="width:100%;margin-top:14px">📋 Copy address</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/csrf-fetch.js?v=25"></script>
+<script src="/i18n.js?v=34" defer></script>
+<script src="/nav.js?v=40" defer></script><script src="/ai-bubble.js?v=5" defer></script>
+<script src="/anti-phishing.js?v=1" defer></script>
+<script src="/footer.js?v=35" defer></script>
+<script src="/wallet-session.js?v=2"></script>
+<script src="/keystore-browser.js?v=2"></script>
+<script src="/token-sign.js?v=99"></script>
+<script src="/hd-wallet-wordlist.js?v=1"></script>
+<script src="/hd-wallet.js?v=1"></script>
+<script src="/qr.js?v=1"></script>
+<script>
+const API = window.SPN_COIN_API || (location.hostname==='localhost'||location.hostname==='127.0.0.1' ? 'http://localhost:3000' : location.origin);
+const $ = id => document.getElementById(id);
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2600); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+// Live checklist shown as the user types a password.
+function showPwHint(inputId, hintId) {
+  const pw = document.getElementById(inputId).value || '';
+  const el = document.getElementById(hintId);
+  if (!pw) { el.innerHTML = ''; return; }
+  const rules = [
+    { ok: pw.length >= 8,            txt: 'At least 8 characters' },
+    { ok: /[a-zA-Z]/.test(pw),       txt: 'A letter (a–z)' },
+    { ok: /[0-9]/.test(pw),          txt: 'A number (0–9)' },
+    { ok: /[^a-zA-Z0-9]/.test(pw),   txt: 'A symbol (@ # ! $ …)' },
+  ];
+  el.innerHTML = rules.map(r =>
+    '<span style="color:' + (r.ok ? 'var(--grn)' : 'var(--mut)') + '">' +
+    (r.ok ? '✓' : '○') + ' ' + r.txt + '</span>'
+  ).join('&nbsp;&nbsp;');
+}
+
+// Validate wallet password strength. Returns an error string, or '' if valid.
+// Rules: >= 8 chars, at least one letter, one number, one special character.
+function checkPasswordStrength(pw) {
+  if (!pw || pw.length < 8)        return 'Password must be at least 8 characters.';
+  if (!/[a-zA-Z]/.test(pw))        return 'Password must contain a letter (a–z).';
+  if (!/[0-9]/.test(pw))           return 'Password must contain a number (0–9).';
+  if (!/[^a-zA-Z0-9]/.test(pw))    return 'Password must contain a special character (e.g. @ # ! $).';
+  return '';
+}
+function show(v){ ['setupView','seedView','walletView'].forEach(x=>$(x).classList.toggle('hidden', x!==v)); }
+// Once a wallet is saved on THIS browser, hide "Create new wallet" — the user
+// can only Login. (They can still make another wallet via "Use a different wallet".)
+function syncSetupView(){
+  try {
+    const has = !!(window.SPNKeystore && window.SPNKeystore.has());
+    const btn = $('btnCreate'), cd = $('createDesc'), lo = $('loginOnlyDesc'), h = $('createHead');
+    if (btn) btn.classList.toggle('hidden', has);
+    if (cd)  cd.classList.toggle('hidden', has);
+    if (lo)  lo.classList.toggle('hidden', !has);
+    if (h)   h.textContent = has ? '🔐 Your wallet' : '🆕 Create a new wallet';
+    if (has) { const uc = $('unlockCard'); if (uc) uc.classList.remove('hidden'); }
+  } catch(e){}
+}
+function closeModal(id){ $(id).classList.remove('show'); }
+const cfetch = (u,o)=> (window.csrfFetch? window.csrfFetch(u,o) : fetch(u,o));
+
+let pendingMnemonic = null;
+
+// ── Create new wallet ──
+$('btnCreate').addEventListener('click', async ()=>{
+  try{
+    if(!window.SPNHDWallet) throw new Error('wallet module not loaded — reload the page');
+    // FULLY CLIENT-SIDE: the 12-word phrase and private key are generated in THIS
+    // browser and never sent to the server. Only the public key is sent to derive
+    // the address.
+    const d = await window.SPNHDWallet.createWallet();
+    if(!d.mnemonic) throw new Error('could not generate wallet');
+    pendingMnemonic = d.mnemonic;
+    const words = d.mnemonic.split(' ');
+    $('seedGrid').innerHTML = words.map((w,i)=>'<div class="seed-word"><b>'+(i+1)+'</b>'+esc(w)+'</div>').join('');
+    // stash key(DER, node-compatible)+addr to unlock after confirmation
+    $('btnSeedDone')._data = { priv:d.privateKey, addr:d.address };
+    show('seedView');
+  }catch(e){
+    console.error('create wallet failed:', e);
+    toast('Could not create wallet: ' + (e.message||e));
+  }
+});
+
+// ── Restore wallet ──
+$('btnRestore').addEventListener('click', async ()=>{
+  const m = ($('restoreInput').value||'').trim();
+  if(!m){ toast('Enter your recovery phrase'); return; }
+  const pw = ($('restorePass').value||'').trim();
+  // Password is now REQUIRED when restoring a wallet.
+  if (!pw) { toast('Please set a password to protect this wallet.'); $('restorePass').focus(); return; }
+  { const err = checkPasswordStrength(pw); if (err) { toast(err); return; } }
+  // Encrypted keystore is required to save the password — needs a secure context (https or localhost).
+  if (!(window.SPNKeystore && window.isSecureContext !== false && window.crypto?.subtle)) {
+    toast('A secure connection (https) is required to set a wallet password.'); return;
+  }
+  try{
+    if(!window.SPNHDWallet) throw new Error('wallet module not loaded — reload the page');
+    // FULLY CLIENT-SIDE restore: the phrase never leaves the browser; the private
+    // key is re-derived locally and only the public key is sent to get the address.
+    const d = await window.SPNHDWallet.restoreWallet(m);
+    if(!d.address) throw new Error('invalid');
+    await window.WalletSession.unlock(d.privateKey, d.address);
+    // If a password was given, save an encrypted copy so next time the user can
+    // just enter the password (needs a secure context: https or localhost).
+    if (pw && window.SPNKeystore && window.isSecureContext !== false && window.crypto?.subtle) {
+      try { await window.SPNKeystore.save(d.privateKey, pw, d.address); toast('Wallet saved — use your password next time'); }
+      catch(e){ console.warn('save failed:', e); }
+    }
+    enterWallet(d.address);
+  }catch(e){ toast('Invalid recovery phrase'); }
+});
+
+// ── Copy seed ──
+$('btnCopySeed').addEventListener('click', ()=>{ if(pendingMnemonic){ navigator.clipboard.writeText(pendingMnemonic); toast('Recovery phrase copied'); } });
+$('seedConfirm').addEventListener('change', e=>{ $('btnSeedDone').disabled = !e.target.checked; });
+$('btnSeedDone').addEventListener('click', async ()=>{
+  const d = $('btnSeedDone')._data;
+  const pw = ($('newWalletPass').value||'').trim();
+  // Password is now REQUIRED when creating a new wallet.
+  if (!pw) { toast('Please set a password to protect this wallet.'); $('newWalletPass').focus(); return; }
+  { const err = checkPasswordStrength(pw); if (err) { toast(err); return; } }
+  // Encrypted keystore is required to save the password — needs a secure context (https or localhost).
+  if (!(window.SPNKeystore && window.isSecureContext !== false && window.crypto?.subtle)) {
+    toast('A secure connection (https) is required to set a wallet password.'); return;
+  }
+  // Final reminder — this is the last chance to save the recovery phrase.
+  const msg = pw
+    ? 'Have you saved BOTH your 12-word recovery phrase AND your password in a safe place?\n\nThis is the only time your recovery phrase is shown.'
+    : 'Have you saved your 12-word recovery phrase in a safe place?\n\nThis is the only time it is shown — without it, a lost wallet cannot be recovered.';
+  if (!confirm(msg)) return;
+  // Always unlock the session so the wallet opens.
+  try { await window.WalletSession.unlock(d.priv, d.addr); }
+  catch(e){ toast('Could not open wallet'); return; }
+  // If a password was set, save an encrypted copy so next time the user can
+  // just click "Login to wallet" and enter this password.
+  if (pw && window.SPNKeystore && window.isSecureContext !== false && window.crypto?.subtle) {
+    try { await window.SPNKeystore.save(d.priv, pw, d.addr); toast('Wallet saved — use your password next time'); }
+    catch(e){ console.warn('save failed:', e); }
+  }
+  pendingMnemonic = null;
+  enterWallet(d.addr);
+});
+
+// "Login to wallet" — reveal the unlock card (for a wallet saved on this browser).
+$('btnLoginToWallet').addEventListener('click', ()=>{
+  if (!window.SPNKeystore) {
+    toast('Login is unavailable — the keystore module did not load. Reload the page.');
+    return;
+  }
+  if (window.SPNKeystore.has()) {
+    $('unlockCard').classList.remove('hidden');
+    $('unlockCard').scrollIntoView({ behavior:'smooth', block:'center' });
+    const pf = $('unlockPass'); if (pf) pf.focus();
+  } else {
+    // No wallet is saved on THIS browser yet — there is nothing to log into.
+    // Guide the user to create or restore one (with a password) first.
+    toast('هنوز هیچ کیف پولی روی این مرورگر ذخیره نشده. اول یک کیف پول بساز یا با ۱۲ کلمه بازیابی کن و پسورد بذار — بعد از آن Login کار می‌کند. / No wallet saved on this browser yet — create or restore one with a password first.');
+    const cc = $('createCard'); if (cc) cc.scrollIntoView({ behavior:'smooth', block:'center' });
+  }
+});
+
+// Unlock session + optionally save encrypted keystore (prompt for password)
+async function unlockAndSave(priv, addr, mnemonic){
+  // 1) Unlock the in-memory session — this is what lets you use the wallet.
+  try {
+    await window.WalletSession.unlock(priv, addr);
+  } catch (e) {
+    console.error('unlock failed:', e);
+    toast('Could not open wallet');
+    return;
+  }
+
+  // 2) OPTIONAL: offer to save an encrypted copy in the browser.
+  //    This uses Web Crypto (crypto.subtle), which only works on HTTPS or
+  //    localhost — NOT on a plain http://<ip> address. If it isn't available
+  //    or fails, we skip saving but STILL open the wallet.
+  try {
+    const secureCtx = (typeof window.isSecureContext === 'undefined') ? true : window.isSecureContext;
+    const hasSubtle = !!(window.crypto && window.crypto.subtle);
+    if (window.SPNKeystore && secureCtx && hasSubtle) {
+      const pw = prompt('Set a password to save this wallet encrypted in your browser (leave empty to skip):');
+      if (pw && pw.length >= 8) {
+        try { await window.SPNKeystore.save(priv, pw, addr); toast('Wallet saved (encrypted)'); }
+        catch (e) { console.warn('keystore save failed:', e); toast('Could not save (wallet still open)'); }
+      }
+    }
+    // If not a secure context, we silently skip saving (wallet still opens).
+  } catch (e) {
+    console.warn('save step skipped:', e);
+  }
+
+  // 3) ALWAYS enter the wallet, even if saving was skipped or failed.
+  enterWallet(addr);
+}
+
+// ── Enter wallet view ──
+async function enterWallet(addr){
+  show('walletView');
+  $('addrText').textContent = addr;
+  loadBalance(addr);
+  loadTokens(addr);
+}
+
+async function loadBalance(addr){
+  try{
+    const r = await fetch(API+'/api/address/'+addr);
+    const d = await r.json();
+    const bal = Number(d.balanceMYC || (Number(d.balance||0)/1e8) || 0);
+    $('balVal').textContent = bal.toLocaleString(undefined,{maximumFractionDigits:8});
+  }catch(e){ $('balVal').textContent='0'; }
+}
+
+async function loadTokens(addr){
+  const box = $('tokenList');
+  try{
+    const r = await fetch(API+'/api/address/'+addr+'/tokens');
+    const d = await r.json();
+    const tokens = (d&&d.tokens)||[];
+    if(!tokens.length){ box.innerHTML='<div style="padding:24px;text-align:center;color:var(--mut)">No tokens yet.<br><a class="link" href="/token-factory">Create one →</a></div>'; return; }
+    box.innerHTML = tokens.map(t=>{
+      const dec=t.decimals||0; const amt=fmtAmt(t.amount,dec);
+      const sym=esc(t.symbol||'?'); const name=esc(t.name||t.symbol||'Token');
+      const logo=(typeof t.logo==='string'&&/^(https:\/\/|data:image\/)/.test(t.logo))?t.logo:'';
+      const ava=logo?'<img src="'+esc(logo)+'" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none" onerror="this.replaceWith(document.createTextNode(\'\'))">':'<div class="tok-ava">'+sym.slice(0,2).toUpperCase()+'</div>';
+      return '<a class="tok" href="/token?id='+encodeURIComponent(t.tokenId)+'">'+ava+
+        '<div style="flex:1;min-width:0"><div style="font-weight:700">'+name+'</div><div style="font-size:12px;color:var(--mut)">'+sym+'</div></div>'+
+        '<div class="mono" style="font-weight:700">'+amt+' <span style="color:var(--mut)">'+sym+'</span></div></a>';
+    }).join('');
+  }catch(e){ box.innerHTML='<div style="padding:24px;text-align:center;color:var(--mut)">Could not load tokens.</div>'; }
+}
+
+function fmtAmt(raw,dec){ try{ let s=String(raw); if(!dec) return Number(s).toLocaleString(); while(s.length<=dec)s='0'+s; const w=s.slice(0,s.length-dec); const f=s.slice(s.length-dec).replace(/0+$/,''); return Number(w).toLocaleString()+(f?'.'+f:''); }catch(e){ return String(raw); } }
+
+// ── Address copy ──
+$('addrBox').addEventListener('click', ()=>{ const a=$('addrText').textContent; if(a&&a!=='—'){ navigator.clipboard.writeText(a); toast('Address copied'); } });
+
+// ── Receive ──
+$('btnReceive').addEventListener('click', ()=>{
+  const a = window.WalletSession.address();
+  $('recvAddr').textContent = a;
+  const qb=$('qrBox'); qb.innerHTML='';
+  if(window.SPNQR && window.SPNQR.toCanvas){ const c=document.createElement('canvas'); qb.appendChild(c); window.SPNQR.toCanvas(c,a,180); }
+  else if(window.drawQR){ const c=document.createElement('canvas'); c.id='qrC'; qb.appendChild(c); window.drawQR('qrC',a,180); }
+  $('receiveModal').classList.add('show');
+});
+$('btnCopyRecv').addEventListener('click', ()=>{ navigator.clipboard.writeText($('recvAddr').textContent); toast('Address copied'); });
+
+// ── Send (real: select UTXOs, sign locally, submit signed tx) ──
+$('btnSend').addEventListener('click', ()=>{ $('sendMsg').textContent=''; $('sendTo').value=''; $('sendAmt').value=''; $('sendModal').classList.add('show'); });
+
+// Fee model mirrors the node (utxo.js): fee = bytes × 10 sat, min 1000 sat,
+// bytes ≈ inputs×148 + outputs×34 + 10.
+function estimateFee(nIn, nOut){
+  const bytes = nIn*148 + nOut*34 + 10;
+  return Math.max(1000, bytes*10); // satoshi
+}
+
+$('btnSendGo').addEventListener('click', async ()=>{
+  const to=($('sendTo').value||'').trim();
+  const amtSPN=parseFloat($('sendAmt').value);
+  const msg=$('sendMsg');
+  const from=window.WalletSession.address();
+  const priv=window.WalletSession.privateKey();
+
+  if(!/^SPN[t1][A-Za-z0-9]{25,50}$/.test(to)){ msg.style.color='var(--red)'; msg.textContent='Enter a valid SPN address.'; return; }
+  if(!(amtSPN>0)){ msg.style.color='var(--red)'; msg.textContent='Enter a valid amount.'; return; }
+  if(!priv || !from){ msg.style.color='var(--red)'; msg.textContent='Wallet is locked.'; return; }
+  if(!window.SPNSign || !window.SPNSign.buildSignedTx){ msg.style.color='var(--red)'; msg.textContent='Signing library not loaded.'; return; }
+
+  const btn=$('btnSendGo'); btn.disabled=true;
+  msg.style.color='var(--mut)'; msg.textContent='Preparing transaction…';
+
+  try{
+    const amount = Math.round(amtSPN*1e8); // satoshi
+
+    // 1) fetch UTXOs + chainId
+    const [addrRes, coinRes] = await Promise.all([
+      fetch(API+'/api/address/'+from).then(r=>r.json()),
+      fetch(API+'/api/coin-info').then(r=>r.json()).catch(()=>({})),
+    ]);
+    const chainId = coinRes.chainId != null ? coinRes.chainId : 3;
+    const utxos = (addrRes.utxos||[]).slice();
+    if(!utxos.length){ msg.style.color='var(--red)'; msg.textContent='No funds available.'; btn.disabled=false; return; }
+
+    // 2) select UTXOs (largest-first) to cover amount + fee
+    utxos.sort((a,b)=> Number(BigInt(b.amount||0) - BigInt(a.amount||0)));
+    let selected=[], total=0n;
+    const target=BigInt(amount);
+    for(const u of utxos){
+      selected.push(u); total += BigInt(u.amount||0);
+      const fee = BigInt(estimateFee(selected.length, 2));
+      if(total >= target + fee) break;
+    }
+    const fee = BigInt(estimateFee(selected.length, 2));
+    if(total < target + fee){ msg.style.color='var(--red)'; msg.textContent='Insufficient balance (need amount + fee).'; btn.disabled=false; return; }
+
+    // 3) build inputs + outputs (recipient + change)
+    const inputs = selected.map(u=>({ txid:u.txid, vout:u.vout, sequence:0xffffffff }));
+    const outputs = [{ address:to, amount:String(target) }];
+    const change = total - target - fee;
+    if(change > 0n) outputs.push({ address:from, amount:String(change) });
+
+    // 4) sign locally in the browser (key never leaves)
+    msg.textContent='Signing…';
+    const tx = await window.SPNSign.buildSignedTx({ inputs, outputs, data:null, chainId }, priv);
+
+    // 5) submit the signed tx
+    msg.textContent='Broadcasting…';
+    const r = await cfetch(API+'/api/tx/submit-signed',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tx})});
+    const d = await r.json();
+    if(!r.ok || d.error){ msg.style.color='var(--red)'; msg.textContent='Rejected: '+(d.error||'unknown'); btn.disabled=false; return; }
+
+    msg.style.color='var(--grn)'; msg.textContent='✓ Sent! txid '+String(d.txid).slice(0,16)+'…';
+    toast('Transaction sent');
+    setTimeout(()=>{ closeModal('sendModal'); loadBalance(from); loadTokens(from); }, 1800);
+  }catch(e){
+    msg.style.color='var(--red)'; msg.textContent='Send failed: '+e.message;
+  }finally{
+    btn.disabled=false;
+  }
+});
+
+// ── Lock ──
+// ── Reveal / export private key ──
+function derToRawHex(der){ var m=String(der||'').toLowerCase().match(/0201010420([0-9a-f]{64})/); return m?m[1]:null; }
+function hexToB64(hex){ var b=''; for(var i=0;i<hex.length;i+=2) b+=String.fromCharCode(parseInt(hex.substr(i,2),16)); try{ return btoa(b); }catch(e){ return '—'; } }
+$('btnRevealKey').addEventListener('click', ()=>{
+  if(!confirm('کلید خصوصی نمایش داده می‌شود. مطمئن شو کسی صفحه‌ات را نمی‌بیند و در جای امن نگه‌دار.')) return;
+  const der = window.WalletSession.privateKey();
+  if(!der){ toast('کیف‌پول قفل است'); return; }
+  $('privDer').textContent = der;
+  const raw = derToRawHex(der);
+  $('privB64').textContent = raw ? hexToB64(raw) : '—';
+  $('keyBox').classList.remove('hidden');
+});
+$('btnCopyDer').addEventListener('click', ()=>{ navigator.clipboard.writeText($('privDer').textContent); toast('کلید DER کپی شد'); });
+$('btnCopyB64').addEventListener('click', ()=>{ navigator.clipboard.writeText($('privB64').textContent); toast('Base64 کپی شد'); });
+$('btnHideKey').addEventListener('click', ()=>{ $('keyBox').classList.add('hidden'); $('privDer').textContent=''; $('privB64').textContent=''; });
+
+$('btnLock').addEventListener('click', ()=>{ window.WalletSession.lock(); syncSetupView(); show('setupView'); toast('Wallet locked'); });
+$('btnRefresh').addEventListener('click', ()=>{ const a=window.WalletSession.address(); if(a){ loadBalance(a); loadTokens(a); } });
+
+// ── On load: if a saved wallet exists on this browser, show the unlock card ──
+(function init(){
+  try {
+    if (window.SPNKeystore && window.SPNKeystore.has()) {
+      const m = window.SPNKeystore.meta() || {};
+      $('unlockCard').classList.remove('hidden');
+      // Hint which wallet this is (short address).
+      if (m.address) {
+        const hint = document.createElement('div');
+        hint.style.cssText = 'color:var(--mut);font-size:12px;margin-top:-4px;margin-bottom:8px;font-family:monospace';
+        hint.textContent = m.address.slice(0, 20) + '…';
+        $('unlockCard').querySelector('label[for="unlockPass"]').before(hint);
+      }
+    }
+  } catch (e) { /* no keystore — just show create/restore */ }
+  syncSetupView();
+  show('setupView');
+})();
+
+// Unlock a saved wallet with its password.
+$('btnUnlock').addEventListener('click', async ()=>{
+  const pw = $('unlockPass').value;
+  const err = $('unlockErr');
+  err.classList.add('hidden');
+  if (!pw) { err.textContent='Enter your password'; err.classList.remove('hidden'); return; }
+  try {
+    const priv = await window.SPNKeystore.unlock(pw);
+    const addr = (window.SPNKeystore.meta()||{}).address;
+    await window.WalletSession.unlock(priv, addr);
+    enterWallet(addr);
+  } catch (e) {
+    err.textContent = 'Wrong password. Try again.';
+    err.classList.remove('hidden');
+  }
+});
+$('unlockPass').addEventListener('keydown', e=>{ if(e.key==='Enter') $('btnUnlock').click(); });
+
+// Forget the saved wallet on this browser (does NOT delete the wallet itself —
+// you can still restore it with your recovery phrase).
+$('btnForget').addEventListener('click', ()=>{
+  if (!confirm('Remove the saved wallet from this browser? You can restore it again with your 12-word phrase.')) return;
+  try { window.SPNKeystore.remove(); } catch(e){}
+  $('unlockCard').classList.add('hidden');
+  syncSetupView();
+  toast('Saved wallet removed from this browser');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+# ─────────────────────────────────────────────────────────────
+#  © 2026 SPN Coin Project — production compose stack.
+#  SPN node behind a TLS-terminating reverse proxy, with a
+#  persistent volume for chain data. Adjust for your host.
+# ─────────────────────────────────────────────────────────────
+version: "3.9"
+
+services:
+  spn-node:
+    build: .
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HTTP_PORT: 8080
+      CHAIN_ID: "1"
+      TRUST_PROXY: "1"                 # behind the proxy; honor X-Forwarded-Proto
+      DDOS_GUARD: "1"
+      # DATABASE_URL: postgres://user:pass@db:5432/spn   # optional persistence
+      # PEERS: node2.example.com,node3.example.com
+    volumes:
+      - spn-data:/app/data
+      - spn-logs:/app/logs
+    expose:
+      - "8080"
+    networks: [spn]
+    # never run privileged; drop all extra capabilities
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+
+  # TLS termination + HTTP→HTTPS redirect. Caddy auto-provisions certs.
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on: [spn-node]
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks: [spn]
+
+volumes:
+  spn-data:
+  spn-logs:
+  caddy-data:
+  caddy-config:
+
+networks:
+  spn:

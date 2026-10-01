@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<!-- © 2026 SPN Coin Project — Contact page (Web3Forms via secure server proxy) -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="64x64" href="/sepanta-coin.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/sepanta-coin-32.png?v=5">
+  <link rel="shortcut icon" href="/sepanta-coin.ico?v=5">
+  <link rel="apple-touch-icon" sizes="180x180" href="/sepanta-coin-180.png?v=5">
+  <meta name="theme-color" content="#070a0e">
+  <meta name="description" content="Contact the SPN Coin project — questions, feedback, and security reports.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — Sepanta (SPN)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080b13;--bg2:#0c1120;--card:#0f1626;--bd:rgba(255,255,255,.08);
+  --txt:#eaf0fb;--sub:#8a97b8;--gold:#f5b301;--grn:#26d07c;--cyn:#25d0ee;--vio:#b06bf7;--red:#f2555a;--r:14px;
+  --glow-a:rgba(245,179,1,.22);--glow-b:rgba(34,211,238,.20);--grid:rgba(255,255,255,.035);--field:#0f1626;
+}
+:root[data-theme="light"]{
+  --bg:#f4f6fb;--bg2:#eaeef6;--card:#ffffff;--bd:rgba(10,20,40,.10);
+  --txt:#141b2e;--sub:#586084;--field:#f3f5fb;
+  --glow-a:rgba(240,165,0,.16);--glow-b:rgba(34,211,238,.14);--grid:rgba(10,20,40,.05);
+}
+body{background:var(--bg);color:var(--txt);font-family:'Sora',sans-serif;min-height:100vh;line-height:1.6;overflow-x:hidden}
+.bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bgfx .orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.9;animation:float 18s ease-in-out infinite}
+.bgfx .o1{width:400px;height:400px;background:radial-gradient(circle,var(--glow-a),transparent 70%);top:-120px;left:-100px}
+.bgfx .o2{width:360px;height:360px;background:radial-gradient(circle,var(--glow-b),transparent 70%);bottom:-120px;right:-100px;animation-delay:-8s}
+.bgfx .grid{position:absolute;inset:0;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,#000 30%,transparent 80%)}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(18px,-22px) scale(1.05)}}
+@media(prefers-reduced-motion:reduce){.bgfx .orb{animation:none}}
+.wrap{max-width:760px;margin:0 auto;padding:36px 20px 60px;position:relative;z-index:1}
+.hero{text-align:center;padding:16px 0 26px}
+.ai-badge{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.4px;
+  color:var(--cyn);background:linear-gradient(90deg,rgba(34,211,238,.12),rgba(167,139,250,.12));
+  border:1px solid rgba(34,211,238,.28);padding:7px 16px;border-radius:999px;margin-bottom:18px;font-family:'JetBrains Mono',monospace}
+.ai-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--cyn);box-shadow:0 0 10px var(--cyn);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.hero .ic-big{width:78px;height:78px;border-radius:22px;background:linear-gradient(135deg,var(--gold),#ffcf5c);
+  display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 18px;box-shadow:0 12px 40px rgba(240,165,0,.34);position:relative}
+.hero .ic-big::after{content:'';position:absolute;inset:-3px;border-radius:24px;background:conic-gradient(from 0deg,var(--gold),var(--cyn),var(--vio),var(--gold));z-index:-1;opacity:.5;filter:blur(9px);animation:spin 8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+h1{font-size:clamp(28px,6vw,38px);font-weight:800;margin-bottom:12px;letter-spacing:-.5px}
+h1 .g{background:linear-gradient(120deg,var(--gold),var(--cyn) 65%,var(--vio));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.lead{color:var(--sub);font-size:15.5px;max-width:500px;margin:0 auto}
+.channels{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:28px 0 20px}
+@media(max-width:560px){.channels{grid-template-columns:1fr}}
+.ch{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:16px 18px;display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit;transition:.16s}
+.ch:hover{border-color:rgba(34,211,238,.4);transform:translateY(-2px)}
+.ch .ic{font-size:22px;width:44px;height:44px;background:var(--bg2);border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ch .t{font-size:14px;font-weight:600}
+.ch .s{font-size:12px;color:var(--sub);font-family:'JetBrains Mono',monospace}
+.note{display:flex;align-items:center;gap:10px;background:linear-gradient(90deg,rgba(34,211,238,.08),rgba(34,211,238,.02));border:1px solid rgba(34,211,238,.24);border-radius:var(--r);padding:14px 18px;margin-bottom:20px;font-size:13.5px;color:var(--cyn)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:26px}
+.card h2{font-size:19px;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+label{display:block;font-size:12px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;font-weight:600}
+input,textarea{width:100%;background:var(--field);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;color:var(--txt);font-family:'Sora',sans-serif;font-size:14px;outline:none;margin-bottom:16px;resize:vertical;transition:.15s}
+input:focus,textarea:focus{border-color:rgba(240,165,0,.5);box-shadow:0 0 0 3px rgba(240,165,0,.12)}
+input::placeholder,textarea::placeholder{color:var(--sub);opacity:.7}
+.hp{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden}
+button{width:100%;background:linear-gradient(135deg,var(--gold),#ffbe2e);color:#1a1400;border:none;border-radius:10px;padding:14px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px}
+button:hover:not(:disabled){filter:brightness(1.06);transform:translateY(-1px)}
+button:disabled{opacity:.6;cursor:not-allowed}
+.spin{width:16px;height:16px;border:2px solid rgba(0,0,0,.3);border-top-color:#1a1400;border-radius:50%;animation:sp .7s linear infinite;display:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+#msg{margin-top:16px;padding:13px 15px;border-radius:10px;font-size:14px;display:none;line-height:1.5}
+#msg.ok{background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.32);color:var(--grn);display:block}
+#msg.err{background:rgba(255,84,112,.1);border:1px solid rgba(255,84,112,.32);color:var(--red);display:block}
+[dir="rtl"]{direction:rtl}
+[dir="rtl"] .hero,[dir="rtl"] .lead{text-align:center}
+[dir="rtl"] .ch,[dir="rtl"] label{text-align:right}
+</style>
+<script src="csrf-fetch.js?v=25"></script>
+  <script src="i18n.js?v=34" defer></script>
+  <script src="nav.js?v=40" defer></script><script src="/ai-bubble.js?v=5" defer></script>
+<script src="/anti-phishing.js?v=1" defer></script>
+<script src="ui-prefs.js?v=25" defer></script>
+  <script src="footer.js?v=35" defer></script>
+</head>
+<body>
+<div class="bgfx"><span class="orb o1"></span><span class="orb o2"></span><span class="grid"></span></div>
+<div class="wrap" id="content"></div>
+
+<script>
+/* The Web3Forms access key lives ONLY on the server (WEB3FORMS_ACCESS_KEY in
+ * .env.local). This page posts to the same-origin /api/contact route, which
+ * forwards the message to Web3Forms — no secret is ever exposed to the browser. */
+const LANG = (window.SPNLang && SPNLang.get()) || (localStorage.getItem('spn_lang')||'en');
+const C = {
+  en:{ badge:'AI-ASSISTED SUPPORT', title:['Contact ','Us'],
+    lead:'Questions, feedback, or want to use SPN Coin for teaching? Send us a message — we usually reply within a couple of days.',
+    gh:'GitHub', ghs:'report issues & contribute', em:'Email', ems:'hello@spnchain.com',
+    sec:'Security', secs:'report vulnerabilities', docs:'API Docs', docss:'interactive reference',
+    note:'💬 This is an educational project — feel free to ask anything about how it works.',
+    formT:'Send a message', name:'Your name', email:'Your email', subject:'Subject', message:'Message',
+    phName:'e.g. Amir', phEmail:'you@example.com', phSubject:'What is this about?', phMsg:'Write your message here…',
+    send:'Send message', sending:'Sending…',
+    ok:'✓ Thank you! Your message has been sent — we will get back to you soon.',
+    errFields:'Please fill in your name, email and message.',
+    errEmail:'Please enter a valid email address.',
+    errConfig:'⚠️ The contact form is not configured on the server yet.',
+    errRate:'You have sent several messages already. Please try again later.',
+    errSend:'Something went wrong while sending. Please try again, or email us directly.' },
+  fa:{ badge:'پشتیبانی مبتنی بر هوش مصنوعی', title:['تماس با ','ما'],
+    lead:'سوال، بازخورد، یا می‌خواهی از SPN Coin برای آموزش استفاده کنی؟ برای ما پیام بفرست — معمولاً ظرف چند روز پاسخ می‌دهیم.',
+    gh:'گیت‌هاب', ghs:'گزارش مشکل و مشارکت', em:'ایمیل', ems:'hello@spnchain.com',
+    sec:'امنیت', secs:'گزارش آسیب‌پذیری', docs:'مستندات API', docss:'مرجع تعاملی',
+    note:'💬 این یک پروژه‌ی آموزشی است — هر سوالی درباره‌ی نحوه‌ی کارش داری بپرس.',
+    formT:'ارسال پیام', name:'نام شما', email:'ایمیل شما', subject:'موضوع', message:'پیام',
+    phName:'مثلاً امیر', phEmail:'you@example.com', phSubject:'موضوع پیام چیست؟', phMsg:'پیام خود را اینجا بنویسید…',
+    send:'ارسال پیام', sending:'در حال ارسال…',
+    ok:'✓ ممنون! پیام شما ارسال شد — به‌زودی پاسخ می‌دهیم.',
+    errFields:'لطفاً نام، ایمیل و پیام خود را وارد کنید.',
+    errEmail:'لطفاً یک ایمیل معتبر وارد کنید.',
+    errConfig:'⚠️ فرم تماس هنوز روی سرور پیکربندی نشده است.',
+    errRate:'چند پیام پشت‌سرهم فرستادی. لطفاً کمی بعد دوباره تلاش کن.',
+    errSend:'هنگام ارسال مشکلی پیش آمد. لطفاً دوباره تلاش کنید یا مستقیم به ما ایمیل بزنید.' }
+};
+const d = C[LANG]||C.en;
+const rtl = LANG==='fa'?' dir="rtl"':'';
+document.getElementById('content').innerHTML = `
+  <div${rtl}>
+    <div class="hero">
+      <div class="ai-badge"><span class="dot"></span>${d.badge}</div>
+      <div class="ic-big">✉️</div>
+      <h1>${d.title[0]}<span class="g">${d.title[1]}</span></h1>
+      <div class="lead">${d.lead}</div>
+    </div>
+    <div class="channels">
+      <a class="ch" href="https://github.com" target="_blank" rel="noopener"><div class="ic">🐙</div><div><div class="t">${d.gh}</div><div class="s">${d.ghs}</div></div></a>
+      <a class="ch" href="mailto:${d.ems}"><div class="ic">✉️</div><div><div class="t">${d.em}</div><div class="s">${d.ems}</div></div></a>
+      <a class="ch" href="/.well-known/security.txt"><div class="ic">🛡️</div><div><div class="t">${d.sec}</div><div class="s">${d.secs}</div></div></a>
+      <a class="ch" href="/apidocs"><div class="ic">📖</div><div><div class="t">${d.docs}</div><div class="s">${d.docss}</div></div></a>
+    </div>
+    <div class="note">${d.note}</div>
+    <div class="card">
+      <h2>${d.formT}</h2>
+      <form id="cform" novalidate>
+        <input class="hp" type="text" name="botcheck" id="cbot" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <label>${d.name}</label><input id="cname" placeholder="${d.phName}" autocomplete="name" />
+        <label>${d.email}</label><input id="cemail" type="email" placeholder="${d.phEmail}" autocomplete="email" />
+        <label>${d.subject}</label><input id="csubject" placeholder="${d.phSubject}" />
+        <label>${d.message}</label><textarea id="cmsg" rows="5" placeholder="${d.phMsg}"></textarea>
+        <button type="submit" id="cbtn"><span class="spin" id="cspin"></span><span id="cbtntext">${d.send}</span></button>
+        <div id="msg"></div>
+      </form>
+    </div>
+  </div>`;
+
+const $ = id => document.getElementById(id);
+function show(t, x){ const b=$('msg'); b.className=t; b.textContent=x; }
+function validEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+let sending=false;
+
+$('cform').addEventListener('submit', async function(ev){
+  ev.preventDefault();
+  if(sending) return;                       // prevent double submit
+  const name=$('cname').value.trim(), email=$('cemail').value.trim(),
+        subject=$('csubject').value.trim(), message=$('cmsg').value.trim(),
+        botcheck=$('cbot').value;
+  if(!name||!email||!message){ show('err', d.errFields); return; }
+  if(!validEmail(email)){ show('err', d.errEmail); return; }
+
+  sending=true;
+  const btn=$('cbtn'), spin=$('cspin'), btntext=$('cbtntext');
+  btn.disabled=true; spin.style.display='inline-block'; btntext.textContent=d.sending; show('','');
+
+  try{
+    const res = await fetch('/api/contact', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Accept':'application/json' },
+      body: JSON.stringify({ name, email, subject, message, botcheck })
+    });
+    const out = await res.json().catch(()=>({}));
+    if(res.ok && out.success){ show('ok', d.ok); $('cform').reset(); }
+    else if(out.code==='NOT_CONFIGURED'){ show('err', d.errConfig); }
+    else if(out.code==='RATE_LIMITED'){ show('err', d.errRate); }
+    else if(out.code==='BAD_EMAIL'){ show('err', d.errEmail); }
+    else if(out.code==='MISSING_FIELDS'){ show('err', d.errFields); }
+    else { show('err', d.errSend); }
+  }catch(e){ show('err', d.errSend); }
+  finally{
+    sending=false; btn.disabled=false; spin.style.display='none'; btntext.textContent=d.send;
+  }
+});
+document.addEventListener('spn-lang-change', ()=>location.reload());
+</script>
+</body>
+</html>

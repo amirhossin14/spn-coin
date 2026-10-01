@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<!-- © 2026 Sepanta (SPN) — Terms & Conditions -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="64x64" href="/sepanta-coin.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/sepanta-coin-32.png?v=5">
+  <link rel="shortcut icon" href="/sepanta-coin.ico?v=5">
+  <link rel="apple-touch-icon" sizes="180x180" href="/sepanta-coin-180.png?v=5">
+  <meta name="theme-color" content="#070a0e">
+  <meta name="description" content="Terms & Conditions, copyright and intellectual property rights for Sepanta (SPN).">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms & Conditions — Sepanta (SPN)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080b13;--bg2:#0c1120;--card:#0f1626;--bd:rgba(255,255,255,.07);--txt:#eaf0fb;--sub:#b3bdd8;--gold:#f5b301;--grn:#26d07c;--cyn:#25d0ee;--r:12px}
+body{background:var(--bg);color:var(--txt);font-family:'Sora',sans-serif;min-height:100vh;line-height:1.8}
+.wrap{max-width:860px;margin:0 auto;padding:40px 20px 60px}
+.hero{text-align:center;padding:20px 0 28px}
+.hero .logo{width:76px;height:76px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 8px 32px rgba(240,165,0,.3))}
+.hero .logo img{display:block}
+h1{font-size:32px;font-weight:800;margin-bottom:10px}
+.lead{color:var(--sub);font-size:15px;max-width:560px;margin:0 auto}
+.updated{color:var(--sub);font-size:13px;margin-top:10px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:26px 28px;margin-bottom:18px}
+.card h2{font-size:19px;font-weight:700;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:9px}
+.card h2 .num{width:26px;height:26px;border-radius:7px;background:rgba(240,165,0,.14);color:var(--gold);font-size:14px;display:flex;align-items:center;justify-content:center;flex:none}
+.card p{color:var(--txt);font-size:15px;margin-bottom:10px}
+.card p:last-child{margin-bottom:0}
+.card ul{margin:8px 0 8px 22px;color:var(--txt);font-size:15px}
+.card li{margin-bottom:6px}
+.warn{background:rgba(255,85,102,.08);border:1px solid rgba(255,85,102,.3);border-radius:var(--r);padding:18px 20px;margin-bottom:18px}
+.warn strong{color:#ff6a85}
+.back{display:inline-flex;align-items:center;gap:7px;color:var(--sub);text-decoration:none;font-size:14px;margin-bottom:20px}
+.back:hover{color:var(--gold)}
+.langbar{text-align:center;margin-bottom:20px}
+.langbar button{background:var(--card);border:1px solid var(--bd);color:var(--sub);border-radius:8px;padding:7px 16px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;margin:0 4px}
+.langbar button.active{background:var(--gold);color:#000;border-color:var(--gold)}
+[dir="rtl"]{text-align:right}
+[dir="rtl"] .card ul{margin:8px 22px 8px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="explorer" class="back" id="backLink">← Back to home</a>
+
+  <div class="hero">
+    <div class="logo"><img src="/sepanta-coin.png?v=6" alt="Sepanta" width="76" height="76" style="border-radius:20px;image-rendering:auto"></div>
+    <h1 id="pageTitle">Terms &amp; Conditions</h1>
+    <p class="lead" id="pageLead">Please read these terms carefully before using Sepanta (SPN), its website, or its services.</p>
+    <p class="updated" id="pageUpdated">Last updated: 2026</p>
+  </div>
+
+  <div class="langbar">
+    <button onclick="setLang('en')" id="btnEn" class="active">English</button>
+    <button onclick="setLang('fa')" id="btnFa">فارسی</button>
+  </div>
+
+  <div id="content"></div>
+</div>
+
+<script src="/i18n.js?v=34" defer></script>
+<script src="/nav.js?v=40" defer></script>
+<script src="/ui-prefs.js?v=25" defer></script>
+<script src="/footer.js?v=35" defer></script>
+<script src="/ai-bubble.js?v=5" defer></script>
+<script src="/anti-phishing.js?v=1" defer></script>
+<script>
+const CONTENT = {
+  en: {
+    title: 'Terms & Conditions',
+    lead: 'Please read these terms carefully before using Sepanta (SPN), its website, or its services.',
+    updated: 'Last updated: 2026',
+    back: '← Back to Explorer',
+    ownerNotice: 'All material and intellectual property rights of this project belong to the project owner. Any copyright use requires the owner\'s explicit permission.',
+    sections: [
+      { n: '1', h: 'Intellectual Property & Ownership', p: [
+        'All material and moral (intellectual property) rights of the Sepanta (SPN) project — including but not limited to its source code, design, branding, logo, name, website content, documentation, and whitepaper — belong exclusively to the project owner.',
+        'No part of this project may be reproduced, distributed, modified, or used commercially without the prior explicit written permission of the owner.'
+      ]},
+      { n: '2', h: 'Copyright', p: [
+        'The content of this website and project is protected by copyright. Copying, reproducing, or republishing any part of it is permitted only with the owner\'s permission and with proper attribution to the source.',
+        'Using the project\'s content, code, or brand without permission and without citing the source is a violation of these terms and of applicable law.'
+      ]},
+      { n: '3', h: 'Prohibited Use', p: ['The following are strictly prohibited:'], ul: [
+        'Copying content from this website without permission and without citing the source.',
+        'Using others\' information, data, or intellectual property without authorization.',
+        'Republishing, reselling, or commercially exploiting the project or its content without the owner\'s consent.',
+        'Removing, altering, or hiding copyright notices or attribution.'
+      ]},
+      { n: '4', h: 'Legal Consequences', p: [
+        'Any unauthorized copying, reproduction without attribution, use of others\' information, or infringement of the intellectual property rights described here is subject to legal prosecution.',
+        'The owner reserves the right to pursue all available legal remedies against any violation.'
+      ]},
+      { n: '5', h: 'No Financial Advice / No Guarantees', p: [
+        'Sepanta (SPN) is a blockchain technology project. Nothing on this website constitutes financial, investment, or legal advice.',
+        'You are solely responsible for safeguarding your own wallet keys and recovery phrase. If you lose them, no one — including the project — can recover your wallet or funds.'
+      ]},
+      { n: '6', h: 'Changes to These Terms', p: [
+        'The owner may update these Terms & Conditions at any time. Continued use of the website or services after changes constitutes acceptance of the updated terms.'
+      ]},
+      { n: '7', h: 'Acceptance of Terms', p: [
+        'By accessing or using Sepanta (SPN), its website, wallet, or any related service, you acknowledge that you have read, understood, and agreed to be bound by these Terms & Conditions.',
+        'If you do not agree with any part of these terms, you must not use the project or its services.'
+      ]},
+      { n: '8', h: 'User Responsibilities', p: ['As a user, you agree to:'], ul: [
+        'Use the project and its services only for lawful purposes.',
+        'Take full responsibility for the security of your wallet keys, passwords, and recovery phrase.',
+        'Not attempt to attack, disrupt, overload, hack, or gain unauthorized access to the network, nodes, or any user\'s assets.',
+        'Not use the project for money laundering, fraud, financing illegal activities, or any activity prohibited by applicable law.',
+        'Comply with all laws and regulations that apply to you in your jurisdiction.'
+      ]},
+      { n: '9', h: 'Assumption of Risk', p: [
+        'Blockchain and cryptocurrency technologies involve significant risk. The value of digital assets can be volatile, and transactions on the blockchain are generally irreversible.',
+        'You understand and accept that you use the project entirely at your own risk, and that you are solely responsible for any decisions or losses that result from your use.'
+      ]},
+      { n: '10', h: 'No Warranty', p: [
+        'The project and its services are provided "as is" and "as available", without warranties of any kind, whether express or implied, including but not limited to merchantability, fitness for a particular purpose, or uninterrupted or error-free operation.',
+        'The owner does not guarantee that the service will always be available, secure, or free of errors or interruptions.'
+      ]},
+      { n: '11', h: 'Limitation of Liability', p: [
+        'To the maximum extent permitted by law, the project owner shall not be liable for any direct, indirect, incidental, consequential, or punitive damages — including loss of assets, data, profits, or opportunities — arising from your use of, or inability to use, the project or its services.'
+      ]},
+      { n: '12', h: 'Third-Party Links & Services', p: [
+        'The website may contain links to third-party websites or services that are not owned or controlled by the project. The owner is not responsible for the content, privacy policies, or practices of any third-party services, and you access them at your own risk.'
+      ]},
+      { n: '13', h: 'Privacy', p: [
+        'Because Sepanta (SPN) follows a key-based (self-custody) model, the project does not hold your account or your funds. You are responsible for safeguarding your own keys.',
+        'Blockchain transactions are public by nature: addresses, amounts, and transaction history recorded on-chain are visible to anyone. Do not publish information you wish to keep private.'
+      ]},
+      { n: '14', h: 'Termination', p: [
+        'The owner reserves the right to restrict, suspend, or terminate access to the website or services, in whole or in part, at any time and without prior notice, for any user who violates these terms or applicable law.'
+      ]},
+      { n: '15', h: 'Governing Law', p: [
+        'These Terms & Conditions are governed by and construed in accordance with the applicable laws of the owner\'s jurisdiction. Any dispute arising from these terms shall be subject to the competent courts of that jurisdiction.'
+      ]},
+      { n: '16', h: 'Open Access & Local Compliance', p: [
+        'Sepanta (SPN) is an open, permissionless blockchain project. It is available to everyone, everywhere — the project does not impose geographic restrictions and does not discriminate between users based on their location.',
+        'However, laws regarding blockchain and cryptocurrency differ from country to country. You are solely responsible for ensuring that your use of the project complies with the laws and regulations that apply to you in your own jurisdiction.'
+      ]},
+      { n: '17', h: 'Not a Security / Not Investment Advice', p: [
+        'SPN and any tokens created on it are technology utilities for use on the network. They are not offered as securities, shares, or regulated investment instruments.',
+        'Nothing in this project constitutes an offer, solicitation, or recommendation to buy, sell, or hold any asset. Any decision you make is your own.'
+      ]},
+      { n: '18', h: 'Irreversibility of Transactions', p: [
+        'Transactions confirmed on the blockchain are final and cannot be reversed, cancelled, or refunded by the project or anyone else.',
+        'Always double-check the recipient address and amount before sending. Funds sent to a wrong or invalid address may be permanently lost.'
+      ]},
+      { n: '19', h: 'Taxes', p: [
+        'You are solely responsible for determining, reporting, and paying any taxes that may apply to your use of the project or your holdings, under the laws of your jurisdiction. The project does not withhold or handle taxes on your behalf.'
+      ]},
+      { n: '20', h: 'Force Majeure', p: [
+        'The project is not liable for any failure, delay, or interruption caused by events beyond its reasonable control — including but not limited to natural disasters, war, network or internet outages, power failures, or actions of governments and regulators.'
+      ]},
+      { n: '21', h: 'Severability', p: [
+        'If any provision of these Terms is found to be invalid or unenforceable, that provision will be limited or removed to the minimum extent necessary, and the remaining provisions will stay in full force and effect.'
+      ]},
+      { n: '22', h: 'Wallet & Private Key Responsibility', p: [
+        'You are solely responsible for safeguarding your wallet, private key, and 12/24-word recovery phrase. They are never stored by the project and cannot be recovered by anyone.',
+        'If you lose your recovery phrase (or password), access to your wallet and any funds in it is permanently lost. Never share your private key or recovery phrase with anyone — no one from the project will ever ask for them.'
+      ]},
+      { n: '23', h: 'Irreversibility of Transactions', p: [
+        'All on-chain transactions are final and irreversible once confirmed. Sending funds to a wrong or mistyped address, or to an incompatible network, cannot be undone or refunded. Always verify the recipient address before sending.'
+      ]},
+      { n: '24', h: 'Not a Security · No Investment Guarantee', p: [
+        'SPN is a utility token on an educational, experimental blockchain. It is not a security, share, or investment instrument, and nothing in the project constitutes an offer to sell or a solicitation to buy any financial product.',
+        'No profit, return, price, value, or future utility is promised or guaranteed. Any value is speculative and may fall to zero. Do not acquire or use SPN with the expectation of financial gain.'
+      ]},
+      { n: '25', h: 'Test Network · No Monetary Value', p: [
+        'The network is currently under active testing and bug-fixing. During this phase it should be treated as a testnet: tokens and balances carry no monetary value, the chain may be reset or replaced, and data may be lost. Do not transact amounts you are not willing to lose entirely.'
+      ]},
+      { n: '26', h: 'Third-Party Services & Links', p: [
+        'The project may reference or link to third-party services, exchanges, wallets, or websites. These are provided for convenience only; the project does not control, endorse, or take responsibility for them, and your use of any third-party service is at your own risk and subject to that party’s own terms.'
+      ]},
+      { n: '27', h: 'Contact', p: [
+        'For permissions, licensing requests, or legal inquiries, contact the project owner at Info@sepantatoken.com.'
+      ]}
+    ]
+  },
+  fa: {
+    title: 'قوانین و مقررات',
+    lead: 'لطفاً پیش از استفاده از سِپَنتا (SPN)، وب‌سایت یا خدمات آن، این قوانین را با دقت مطالعه کنید.',
+    updated: 'آخرین به‌روزرسانی: ۲۰۲۶',
+    back: '← بازگشت به کاوشگر',
+    sections: [
+      { n: '۱', h: 'حقوق مالکیت مادی و معنوی', p: [
+        'تمام حقوق مادی و معنوی پروژه‌ی سِپَنتا (SPN) — شامل و نه محدود به کد منبع، طراحی، برند، لوگو، نام، محتوای وب‌سایت، مستندات و وایت‌پیپر — به‌طور انحصاری متعلق به مالک پروژه است.',
+        'هیچ بخشی از این پروژه بدون اجازه‌ی صریح و کتبی قبلی مالک قابل تکثیر، توزیع، تغییر یا استفاده‌ی تجاری نیست.'
+      ]},
+      { n: '۲', h: 'حق کپی‌رایت', p: [
+        'محتوای این وب‌سایت و پروژه تحت حمایت حق کپی‌رایت است. کپی‌برداری، تکثیر یا بازنشر هر بخشی از آن فقط با اجازه‌ی مالک و با ذکر منبع مجاز است.',
+        'استفاده از محتوا، کد یا برند پروژه بدون اجازه و بدون درج منبع، نقض این قوانین و قوانین جاری محسوب می‌شود.'
+      ]},
+      { n: '۳', h: 'استفاده‌ی ممنوع', p: ['موارد زیر اکیداً ممنوع است:'], ul: [
+        'کپی‌برداری از محتوای این سایت بدون اجازه و بدون ذکر منبع.',
+        'استفاده از اطلاعات، داده‌ها یا مالکیت معنوی دیگران بدون مجوز.',
+        'بازنشر، فروش مجدد یا بهره‌برداری تجاری از پروژه یا محتوای آن بدون رضایت مالک.',
+        'حذف، تغییر یا پنهان کردن اعلان‌های کپی‌رایت یا ذکر منبع.'
+      ]},
+      { n: '۴', h: 'پیگرد قانونی', p: [
+        'هرگونه کپی‌برداری غیرمجاز، درج بدون ذکر منبع، استفاده از اطلاعات دیگران یا نقض حقوق مالکیت معنوی که در اینجا توضیح داده شده، مشمول پیگرد قانونی است.',
+        'مالک حق دارد در برابر هرگونه تخلف، از تمام راهکارهای قانونی موجود استفاده کند.'
+      ]},
+      { n: '۵', h: 'عدم مشاوره‌ی مالی / بدون تضمین', p: [
+        'سِپَنتا (SPN) یک پروژه‌ی فناوری بلاکچین است. هیچ‌چیز در این وب‌سایت مشاوره‌ی مالی، سرمایه‌گذاری یا حقوقی محسوب نمی‌شود.',
+        'مسئولیت نگهداری کلید و عبارت بازیابی کیف پول کاملاً بر عهده‌ی شماست. اگر آن‌ها را گم کنید، هیچ‌کس — از جمله پروژه — نمی‌تواند کیف پول یا دارایی شما را بازیابی کند.'
+      ]},
+      { n: '۶', h: 'تغییر در این قوانین', p: [
+        'مالک می‌تواند این قوانین و مقررات را در هر زمان به‌روزرسانی کند. ادامه‌ی استفاده از وب‌سایت یا خدمات پس از تغییرات، به‌منزله‌ی پذیرش قوانین به‌روزشده است.'
+      ]},
+      { n: '۷', h: 'پذیرش قوانین', p: [
+        'با دسترسی یا استفاده از سِپَنتا (SPN)، وب‌سایت، کیف پول یا هر خدمت مرتبط، شما تأیید می‌کنید که این قوانین و مقررات را خوانده، درک کرده و پذیرفته‌اید.',
+        'اگر با هر بخشی از این قوانین موافق نیستید، نباید از پروژه یا خدمات آن استفاده کنید.'
+      ]},
+      { n: '۸', h: 'مسئولیت‌های کاربر', p: ['شما به‌عنوان کاربر موافقت می‌کنید که:'], ul: [
+        'از پروژه و خدمات آن فقط برای اهداف قانونی استفاده کنید.',
+        'مسئولیت کامل امنیت کلیدها، رمزها و عبارت بازیابی کیف پول خود را بر عهده بگیرید.',
+        'برای حمله، اختلال، بارگذاری بیش از حد، هک یا دسترسی غیرمجاز به شبکه، نودها یا دارایی کاربران دیگر تلاش نکنید.',
+        'از پروژه برای پول‌شویی، کلاهبرداری، تأمین مالی فعالیت‌های غیرقانونی یا هر فعالیت ممنوع طبق قانون استفاده نکنید.',
+        'از تمام قوانین و مقررات جاری در حوزه‌ی قضایی خود پیروی کنید.'
+      ]},
+      { n: '۹', h: 'پذیرش ریسک', p: [
+        'فناوری‌های بلاکچین و ارز دیجیتال ریسک قابل‌توجهی دارند. ارزش دارایی‌های دیجیتال می‌تواند بسیار نوسان‌دار باشد و تراکنش‌های روی بلاکچین معمولاً غیرقابل‌بازگشت هستند.',
+        'شما می‌پذیرید که استفاده از پروژه کاملاً بر مسئولیت خودتان است و مسئولیت هر تصمیم یا زیانی که از استفاده‌ی شما ناشی شود، تنها بر عهده‌ی شماست.'
+      ]},
+      { n: '۱۰', h: 'عدم ضمانت', p: [
+        'پروژه و خدمات آن «همان‌طور که هست» و «در صورت در دسترس بودن» ارائه می‌شوند، بدون هیچ‌گونه ضمانت صریح یا ضمنی، از جمله قابلیت فروش، تناسب برای هدفی خاص، یا عملکرد بدون وقفه و بدون خطا.',
+        'مالک تضمین نمی‌کند که خدمات همیشه در دسترس، امن یا عاری از خطا و وقفه باشند.'
+      ]},
+      { n: '۱۱', h: 'محدودیت مسئولیت', p: [
+        'تا حداکثری که قانون اجازه می‌دهد، مالک پروژه مسئول هیچ خسارت مستقیم، غیرمستقیم، اتفاقی، تبعی یا تنبیهی — از جمله از دست رفتن دارایی، داده، سود یا فرصت — که از استفاده یا ناتوانی در استفاده از پروژه ناشی شود، نخواهد بود.'
+      ]},
+      { n: '۱۲', h: 'لینک‌ها و خدمات شخص ثالث', p: [
+        'وب‌سایت ممکن است شامل لینک‌هایی به وب‌سایت‌ها یا خدمات شخص ثالث باشد که متعلق به پروژه نیستند و کنترلی بر آن‌ها وجود ندارد. مالک مسئول محتوا، سیاست‌های حریم خصوصی یا عملکرد هیچ خدمت شخص ثالثی نیست و شما با مسئولیت خود به آن‌ها دسترسی پیدا می‌کنید.'
+      ]},
+      { n: '۱۳', h: 'حریم خصوصی', p: [
+        'از آنجا که سِپَنتا (SPN) از مدل مبتنی بر کلید (خود-نگهدار) پیروی می‌کند، پروژه حساب یا دارایی شما را نگه نمی‌دارد. شما مسئول محافظت از کلیدهای خود هستید.',
+        'تراکنش‌های بلاکچین ذاتاً عمومی هستند: آدرس‌ها، مبالغ و تاریخچه‌ی تراکنش‌های ثبت‌شده روی زنجیره برای همه قابل مشاهده است. اطلاعاتی که می‌خواهید خصوصی بماند را منتشر نکنید.'
+      ]},
+      { n: '۱۴', h: 'خاتمه‌ی دسترسی', p: [
+        'مالک این حق را دارد که دسترسی به وب‌سایت یا خدمات را — به‌طور کامل یا جزئی — در هر زمان و بدون اطلاع قبلی، برای هر کاربری که این قوانین یا قانون جاری را نقض کند، محدود، معلق یا خاتمه دهد.'
+      ]},
+      { n: '۱۵', h: 'قانون حاکم', p: [
+        'این قوانین و مقررات تابع قوانین جاری در حوزه‌ی قضایی مالک است و بر اساس آن تفسیر می‌شود. هرگونه اختلاف ناشی از این قوانین، تابع دادگاه‌های صالح آن حوزه‌ی قضایی خواهد بود.'
+      ]},
+      { n: '۱۶', h: 'دسترسی آزاد و رعایت قوانین محلی', p: [
+        'سِپَنتا (SPN) یک پروژه‌ی بلاکچین باز و بدون‌مجوز (permissionless) است. برای همه، در همه‌جا در دسترس است — پروژه هیچ محدودیت جغرافیایی اعمال نمی‌کند و بین کاربران بر اساس موقعیت مکانی تبعیض قائل نمی‌شود.',
+        'با این حال، قوانین مربوط به بلاکچین و ارز دیجیتال در هر کشور متفاوت است. مسئولیت اطمینان از اینکه استفاده‌ی شما از پروژه با قوانین و مقررات جاری در حوزه‌ی قضایی خودتان مطابقت دارد، تنها بر عهده‌ی شماست.'
+      ]},
+      { n: '۱۷', h: 'اوراق بهادار نیست / مشاوره‌ی سرمایه‌گذاری نیست', p: [
+        'SPN و هر توکنی که روی آن ساخته شود، ابزارهای فناوری برای استفاده در شبکه هستند. آن‌ها به‌عنوان اوراق بهادار، سهام یا ابزار سرمایه‌گذاری تحت نظارت ارائه نمی‌شوند.',
+        'هیچ‌چیز در این پروژه پیشنهاد، ترغیب یا توصیه به خرید، فروش یا نگهداری هیچ دارایی محسوب نمی‌شود. هر تصمیمی که می‌گیرید، تصمیم خودتان است.'
+      ]},
+      { n: '۱۸', h: 'غیرقابل‌بازگشت بودن تراکنش‌ها', p: [
+        'تراکنش‌های تأییدشده روی بلاکچین نهایی هستند و توسط پروژه یا هیچ‌کس دیگری قابل بازگشت، لغو یا استرداد نیستند.',
+        'همیشه قبل از ارسال، آدرس گیرنده و مبلغ را دوباره بررسی کنید. وجوهی که به آدرس اشتباه یا نامعتبر ارسال شوند، ممکن است برای همیشه از دست بروند.'
+      ]},
+      { n: '۱۹', h: 'مالیات', p: [
+        'مسئولیت تعیین، گزارش و پرداخت هر مالیاتی که ممکن است به استفاده‌ی شما از پروژه یا دارایی‌هایتان تعلق بگیرد، طبق قوانین حوزه‌ی قضایی شما، تنها بر عهده‌ی خودتان است. پروژه مالیاتی را از طرف شما کسر یا مدیریت نمی‌کند.'
+      ]},
+      { n: '۲۰', h: 'فورس ماژور (قوه‌ی قاهره)', p: [
+        'پروژه مسئول هیچ نقص، تأخیر یا وقفه‌ای که ناشی از رویدادهای خارج از کنترل معقول آن باشد — از جمله بلایای طبیعی، جنگ، قطعی شبکه یا اینترنت، قطعی برق، یا تصمیمات دولت‌ها و نهادهای نظارتی — نخواهد بود.'
+      ]},
+      { n: '۲۱', h: 'تفکیک‌پذیری', p: [
+        'اگر هر بندی از این قوانین نامعتبر یا غیرقابل‌اجرا تشخیص داده شود، آن بند تا حداقل حد لازم محدود یا حذف می‌شود و بقیه‌ی بندها با اعتبار و قدرت کامل باقی می‌مانند.'
+      ]},
+      { n: '۲۲', h: 'مسئولیت کیف پول و کلید خصوصی', p: [
+        'مسئولیت نگه‌داری کیف پول، کلید خصوصی و عبارت بازیابی ۱۲/۲۴ کلمه‌ای کاملاً بر عهده‌ی خودِ شماست. این‌ها هرگز توسط پروژه ذخیره نمی‌شوند و توسط هیچ‌کس قابل بازیابی نیستند.',
+        'در صورت گم‌شدن عبارت بازیابی (یا رمز عبور)، دسترسی به کیف پول و هر دارایی درون آن برای همیشه از دست می‌رود. کلید خصوصی یا عبارت بازیابی خود را هرگز با کسی به اشتراک نگذارید — هیچ‌کس از طرف پروژه هرگز آن‌ها را از شما نخواهد خواست.'
+      ]},
+      { n: '۲۳', h: 'برگشت‌ناپذیری تراکنش‌ها', p: [
+        'همه‌ی تراکنش‌های روی زنجیره پس از تأیید، قطعی و غیرقابل‌بازگشت هستند. ارسال وجه به آدرس اشتباه یا اشتباه‌تایپ‌شده، یا به شبکه‌ی ناسازگار، قابل لغو یا بازپرداخت نیست. همیشه پیش از ارسال، آدرس گیرنده را بررسی کنید.'
+      ]},
+      { n: '۲۴', h: 'اوراق بهادار نیست · بدون تضمین سرمایه‌گذاری', p: [
+        'SPN یک توکن کاربردی روی یک بلاکچین آموزشی و آزمایشی است. اوراق بهادار، سهام یا ابزار سرمایه‌گذاری نیست و هیچ‌چیز در این پروژه به‌منزله‌ی پیشنهاد فروش یا دعوت به خرید یک محصول مالی نیست.',
+        'هیچ سود، بازده، قیمت، ارزش یا کاربردِ آینده‌ای وعده یا تضمین نمی‌شود. هر ارزشی سوداگرانه است و ممکن است به صفر برسد. SPN را با انتظار سود مالی به‌دست نیاورید یا استفاده نکنید.'
+      ]},
+      { n: '۲۵', h: 'شبکه‌ی آزمایشی · بدون ارزش مالی', p: [
+        'این شبکه در حال حاضر در مرحله‌ی تست و رفع باگ است. در این مرحله باید مانند یک شبکه‌ی آزمایشی (testnet) با آن رفتار شود: توکن‌ها و موجودی‌ها هیچ ارزش مالی ندارند، زنجیره ممکن است بازنشانی یا جایگزین شود و داده‌ها ممکن است از دست بروند. مبلغی را جابه‌جا نکنید که حاضر به از دست دادن کاملش نیستید.'
+      ]},
+      { n: '۲۶', h: 'خدمات و لینک‌های شخص ثالث', p: [
+        'پروژه ممکن است به خدمات، صرافی‌ها، کیف پول‌ها یا وب‌سایت‌های شخص ثالث اشاره یا لینک دهد. این‌ها صرفاً برای راحتی شما ارائه می‌شوند؛ پروژه بر آن‌ها کنترلی ندارد، آن‌ها را تأیید نمی‌کند و مسئولیتی در قبالشان نمی‌پذیرد. استفاده‌ی شما از هر سرویس شخص ثالث با مسئولیت خودتان و تابع قوانین همان سرویس است.'
+      ]},
+      { n: '۲۷', h: 'تماس', p: [
+        'برای درخواست مجوز، درخواست لایسنس یا سوالات حقوقی، با مالک پروژه از طریق Info@sepantatoken.com تماس بگیرید.'
+      ]}
+    ]
+  }
+};
+
+function render(lang) {
+  const c = CONTENT[lang];
+  const rtl = lang === 'fa';
+  document.documentElement.dir = rtl ? 'rtl' : 'ltr';
+  document.getElementById('pageTitle').textContent = c.title;
+  document.getElementById('pageLead').textContent = c.lead;
+  document.getElementById('pageUpdated').textContent = c.updated;
+  document.getElementById('backLink').textContent = c.back;
+
+  let html = '';
+  // Owner notice highlighted at top
+  html += '<div class="warn"><strong>⚠️ ' + (rtl ? 'اعلان مالکیت' : 'Ownership Notice') + '</strong><br>'
+    + (rtl
+        ? 'تمام حقوق مادی و معنوی این پروژه متعلق به مالک پروژه است و حق کپی‌رایت فقط با اجازه‌ی مالک و درج منبع مجاز است. کپی‌برداری از سایت یا استفاده از اطلاعات دیگران پیگرد قانونی دارد.'
+        : 'All material and intellectual property rights of this project belong to the project owner. Copyright use is permitted only with the owner\'s permission and with source attribution. Copying from the site or using others\' information is subject to legal prosecution.')
+    + '</div>';
+
+  for (const s of c.sections) {
+    html += '<div class="card"><h2><span class="num">' + s.n + '</span>' + esc(s.h) + '</h2>';
+    for (const p of (s.p || [])) html += '<p>' + esc(p) + '</p>';
+    if (s.ul) { html += '<ul>'; for (const li of s.ul) html += '<li>' + esc(li) + '</li>'; html += '</ul>'; }
+    html += '</div>';
+  }
+  document.getElementById('content').innerHTML = html;
+  document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+  document.getElementById('btnFa').classList.toggle('active', lang === 'fa');
+}
+
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function setLang(l){ try{ localStorage.setItem('spn_lang', l); }catch(e){} render(l); }
+
+// initial language: saved pref, else browser, else English
+let initial = 'en';
+try { initial = localStorage.getItem('spn_lang') || (navigator.language||'').startsWith('fa') ? 'fa' : 'en'; } catch(e){}
+if (initial !== 'fa') initial = 'en';
+render(initial);
+</script>
+</body>
+</html>

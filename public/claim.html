@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<!-- © 2026 SPN Coin Project — PROPRIETARY AND CONFIDENTIAL -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="64x64" href="/sepanta-coin.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/sepanta-coin-32.png?v=5">
+  <link rel="shortcut icon" href="/sepanta-coin.ico?v=5">
+  <link rel="apple-touch-icon" sizes="180x180" href="/sepanta-coin-180.png?v=5">
+  <meta name="theme-color" content="#070a0e">
+  <meta name="description" content="Claim airdropped SPN Coin to your wallet.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sepanta (SPN) — Claim Airdrop</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/token-sign.js?v=99"></script>
+<script src="csrf-fetch.js?v=25"></script>
+  <script src="i18n.js?v=34" defer></script>
+  <script src="nav.js?v=40" defer></script><script src="/ai-bubble.js?v=5" defer></script>
+<script src="/anti-phishing.js?v=1" defer></script>
+  <script src="footer.js?v=35" defer></script>
+  <script src="ui-prefs.js?v=25" defer></script>
+<style>
+:root{--bg:#080b13;--panel:#0c1120;--bd:rgba(148,163,208,.14);--grn:#26d07c;--cyan:#25d0ee;
+  --gold:#f5b301;--red:#f2555a;--txt:#eaf0fb;--muted:#8a97b8;--txt3:#5a6788;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:'Sora',system-ui,sans-serif;
+  background-image:radial-gradient(900px 400px at 80% -8%,rgba(0,255,136,.05),transparent 60%);}
+.wrap{max-width:640px;margin:0 auto;padding:24px 22px 60px}
+h1{font-size:22px;font-weight:800;margin-bottom:4px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:20px}
+.card{background:var(--panel);border:1px solid var(--bd);border-radius:14px;padding:20px;margin-bottom:16px}
+label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;margin:12px 0 5px}
+input{width:100%;background:#070a0e;border:1px solid var(--bd);border-radius:9px;color:var(--txt);
+  padding:11px 13px;font-size:13px;font-family:'JetBrains Mono',monospace;outline:none}
+input:focus{border-color:rgba(0,255,136,.4)}
+button{background:var(--grn);color:#04110a;border:0;border-radius:10px;padding:13px 22px;font-weight:700;
+  font-size:14px;cursor:pointer;margin-top:16px;width:100%;transition:.15s}
+button:hover{background:#33ffa0}button:disabled{opacity:.5;cursor:wait}
+button.secondary{background:transparent;border:1px solid var(--bd);color:var(--cyan)}
+button.secondary:hover{background:rgba(0,204,255,.08)}
+.warn{background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);border-radius:10px;
+  padding:11px 14px;font-size:12px;color:var(--muted);margin-top:8px}
+.result{margin-top:16px;padding:14px;border-radius:10px;font-size:13px;display:none;word-break:break-all}
+.result.show{display:block}
+.result.ok{background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.25)}
+.result.err{background:rgba(255,68,102,.08);border:1px solid rgba(255,68,102,.25);color:#ff8095}
+.result.info{background:rgba(0,204,255,.07);border:1px solid rgba(0,204,255,.22)}
+.eligible{margin-top:14px;padding:14px;border-radius:10px;background:rgba(0,255,136,.08);
+  border:1px solid rgba(0,255,136,.25);display:none}
+.eligible.show{display:block}
+.eligible .amt{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--grn)}
+.step{color:var(--txt3);font-size:11px;font-family:'JetBrains Mono',monospace;margin-bottom:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Claim Airdrop</h1>
+  <div class="sub">Check if you're eligible for a merkle airdrop and claim your tokens. Signed in your browser — your key never leaves this page.</div>
+
+  <div class="card">
+    <div class="step">STEP 1 — check eligibility</div>
+    <label for="airdropId">Airdrop ID</label>
+    <input id="airdropId" placeholder="the airdrop you want to claim from" />
+    <label for="address">Your address</label>
+    <input id="address" placeholder="SPN… address" />
+    <button class="secondary" id="check">Check eligibility</button>
+
+    <div class="eligible" id="eligible">
+      <div style="font-size:12px;color:var(--muted)">You are eligible to claim</div>
+      <div class="amt" id="amount">—</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px" id="tokenLine"></div>
+    </div>
+
+    <div class="result" id="checkResult"></div>
+  </div>
+
+  <div class="card" id="claimCard" style="display:none">
+    <div class="step">STEP 2 — claim</div>
+    <label for="pk">Your private key <span style="text-transform:none">(64-hex, signs locally)</span></label>
+    <input id="pk" type="password" placeholder="private key hex" autocomplete="off" />
+    <div class="warn">🔒 The key is used only in your browser to sign the claim. It is never sent to the server.</div>
+    <button id="claim">Sign &amp; claim</button>
+    <div class="result" id="claimResult"></div>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+let ELIGIBLE = null; // {airdropId, address, amount, proof, tokenId}
+
+async function getJSON(p){ const r=await fetch(p); return { code:r.status, body: await r.json().catch(()=>({})) }; }
+
+$('#check').addEventListener('click', async ()=>{
+  const airdropId=$('#airdropId').value.trim();
+  const address=$('#address').value.trim();
+  const out=$('#checkResult'); out.className='result';
+  $('#eligible').className='eligible'; $('#claimCard').style.display='none';
+  if(!airdropId||!address){ out.classList.add('show','err'); out.textContent='Enter the airdrop ID and your address.'; return; }
+
+  $('#check').disabled=true; $('#check').textContent='Checking…';
+  try{
+    // already claimed?
+    const claimed=await getJSON(`/api/airdrops/${airdropId}/claimed/${address}`);
+    if(claimed.body.claimed){ out.classList.add('show','info'); out.textContent='This address has already claimed from this airdrop.'; return; }
+    // fetch proof (requires the issuer to have published the list)
+    const proof=await getJSON(`/api/airdrops/${airdropId}/proof/${address}`);
+    if(proof.code!==200 || !proof.body.ok){
+      out.classList.add('show','err');
+      out.textContent = proof.body.error || 'You are not eligible, or the recipient list has not been published yet.';
+      return;
+    }
+    // airdrop info for token id
+    const info=await getJSON(`/api/airdrops/${airdropId}`);
+    ELIGIBLE = { airdropId, address, amount: proof.body.amount, proof: proof.body.proof,
+                 tokenId: info.body.tokenId };
+    $('#amount').textContent = proof.body.amount;
+    $('#tokenLine').textContent = 'token: '+(info.body.tokenId||'')+' · remaining in pool: '+(info.body.remaining||'?');
+    $('#eligible').classList.add('show');
+    $('#claimCard').style.display='block';
+    out.className='result';
+  }catch(e){ out.classList.add('show','err'); out.textContent='Error: '+e.message; }
+  $('#check').disabled=false; $('#check').textContent='Check eligibility';
+});
+
+$('#claim').addEventListener('click', async ()=>{
+  const privHex=$('#pk').value.trim();
+  const out=$('#claimResult'); out.className='result';
+  if(!ELIGIBLE){ out.classList.add('show','err'); out.textContent='Check eligibility first.'; return; }
+  if(!/^[0-9a-fA-F]{64}$/.test(privHex)){ out.classList.add('show','err'); out.textContent='Private key must be 64 hex characters.'; return; }
+
+  $('#claim').disabled=true; $('#claim').textContent='Signing locally…';
+  try{
+    // prepare a carrier tx to transport the claim op (fee funded by claimant)
+    const prep=await (await fetch('/api/tokens/prepare',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({address:ELIGIBLE.address,payIssuanceFee:false})})).json();
+    if(!prep.ok) throw new Error(prep.error||'prepare failed');
+
+    const op=await SPNSign.buildAirdropClaim({
+      tokenId:ELIGIBLE.tokenId, airdropId:ELIGIBLE.airdropId, amount:ELIGIBLE.amount,
+      proof:ELIGIBLE.proof, claimant:ELIGIBLE.address }, privHex, prep.chainId);
+
+    let sum=0n; const chosen=[]; const need=BigInt(prep.feeOut)+100000n;
+    for(const u of prep.utxos){ chosen.push(u); sum+=BigInt(u.amount); if(sum>=need) break; }
+    if(sum<need) throw new Error('insufficient SPN to fund the tx fee');
+    const feeOut=BigInt(prep.feeOut);
+    const est=BigInt(Math.ceil((11+chosen.length*68+2*31)*prep.feeRate));
+    const change=sum-feeOut-est;
+    const outputs=[{address:prep.treasury,amount:feeOut.toString()}];
+    if(change>546n) outputs.push({address:ELIGIBLE.address,amount:change.toString()});
+    const inputs=chosen.map(u=>({txid:u.txid,vout:u.vout,sequence:0xffffffff}));
+    const tx=await SPNSign.buildSignedTx({inputs,outputs,data:{tokenOps:[op]},chainId:prep.chainId}, privHex);
+
+    $('#claim').textContent='Submitting…';
+    const r=await fetch('/api/tokens/submit-signed',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tx})});
+    const d=await r.json();
+    if(r.ok && d.ok){
+      out.classList.add('show','ok');
+      out.innerHTML=`<b>✓ Claim submitted.</b><br>amount: ${ELIGIBLE.amount}<br>txid: ${d.txid}<br><span style="color:var(--muted)">${d.note||''}</span>`;
+      $('#pk').value='';
+    }else{ out.classList.add('show','err'); out.textContent='Failed: '+(d.error||'unknown error'); }
+  }catch(e){ out.classList.add('show','err'); out.textContent='Error: '+e.message; }
+  $('#claim').disabled=false; $('#claim').textContent='Sign & claim';
+});
+</script>
+</body>
+</html>

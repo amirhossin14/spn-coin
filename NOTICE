@@ -1,0 +1,100 @@
+SPN Coin — Sepanta Blockchain
+Copyright (C) 2026 SPN Coin Project
+
+This product is proprietary and confidential software. All rights reserved.
+See the LICENSE file for the full terms.
+
+The SPN Coin Project's own code is NOT open source. The notices below apply
+ONLY to the third-party open-source components bundled with this software,
+each of which remains under its own license.
+
+================================================================================
+THIRD-PARTY SOFTWARE NOTICES
+================================================================================
+
+This software includes the following third-party open-source packages.
+Each is the property of its respective authors and is used under its own
+license. We gratefully acknowledge their work.
+
+--------------------------------------------------------------------------------
+bip39  —  License: ISC
+  Mnemonic seed phrase generation (BIP-39).
+  https://github.com/bitcoinjs/bip39
+
+elliptic  —  License: MIT
+  Elliptic-curve cryptography (secp256k1 signatures).
+  https://github.com/indutny/elliptic
+
+express  —  License: MIT
+  Web application framework / HTTP server.
+  https://github.com/expressjs/express
+
+js-sha3  —  License: MIT
+  Keccak / SHA-3 hashing.
+  https://github.com/emn178/js-sha3
+
+jsonwebtoken  —  License: MIT
+  JSON Web Token (JWT) creation and verification.
+  https://github.com/auth0/node-jsonwebtoken
+
+pg  —  License: MIT
+  PostgreSQL client for Node.js.
+  https://github.com/brianc/node-postgres
+
+ws  —  License: MIT
+  WebSocket client and server.
+  https://github.com/websockets/ws
+
+jsdom  —  License: MIT
+  JavaScript implementation of web standards (used for testing).
+  https://github.com/jsdom/jsdom
+
+================================================================================
+LICENSE TEXTS
+================================================================================
+
+--------------------------------------------------------------------------------
+The MIT License (MIT)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+(Applies to: elliptic, express, js-sha3, jsonwebtoken, pg, ws, jsdom)
+
+--------------------------------------------------------------------------------
+The ISC License
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+
+(Applies to: bip39)
+
+================================================================================
+Note: package versions reflect those used at the time of writing. Run
+`npm ls --all` or check node_modules/<package>/LICENSE for the exact text
+shipped with your installed versions.
+================================================================================

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<!--
+  © 2026 SPN Coin Project — PROPRIETARY AND CONFIDENTIAL
+  All Rights Reserved. Unauthorized copying, modification,
+  distribution, or use of this file is strictly prohibited.
+-->
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard · SPN Coin Explorer</title>
+<meta name="description" content="Live SPN Coin blockchain explorer dashboard — blocks, transactions, supply, hashrate and network status.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#080b13; --panel:#0c1120; --card:#0f1626; --card2:#141d31;
+    --line:#1b2740; --line2:#26324f;
+    --txt:#eaf0fb; --mut:#8a97b8; --mut2:#5a6788;
+    --gold:#f5b301; --gold-dim:rgba(245,179,1,.12);
+    --indigo:#6d6bf5; --indigo2:#9a98ff;
+    --grn:#26d07c; --grn-dim:rgba(34,197,94,.13);
+    --red:#f2555a; --red-dim:rgba(239,68,68,.13);
+    --cyan:#25d0ee; --pur:#b06bf7;
+    --radius:16px; --radius-sm:11px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--txt);font-family:'Sora',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  code,.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-thumb{background:var(--line2);border-radius:6px}
+  ::-webkit-scrollbar-track{background:transparent}
+
+  /* hide the shared top nav on this page (we use a sidebar) */
+  #spn-topbar{display:none !important}
+
+  .layout{display:flex;min-height:100vh}
+
+  /* ── Sidebar ── */
+  .sidebar{width:250px;flex:0 0 250px;background:var(--panel);border-right:1px solid var(--line);
+    display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .brand{display:flex;align-items:center;gap:12px;padding:22px 20px 20px}
+  .brand .logo{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--gold),#c47f00);
+    display:grid;place-items:center;font-weight:900;color:#1a1200;font-size:19px;box-shadow:0 4px 14px rgba(240,165,0,.3)}
+  .brand .bt b{display:block;font-size:16px;font-weight:800;letter-spacing:.2px}
+  .brand .bt span{display:block;font-size:11.5px;color:var(--mut);font-weight:500;margin-top:1px}
+  .nav{padding:6px 12px;flex:1}
+  .nav .grp{font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--mut2);
+    padding:14px 12px 7px;font-weight:600}
+  .nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:var(--mut);
+    font-size:14px;font-weight:500;margin-bottom:2px;transition:.15s;position:relative}
+  .nav a svg{width:19px;height:19px;flex:0 0 19px;stroke:currentColor;fill:none;stroke-width:1.9}
+  .nav a:hover{background:var(--card2);color:var(--txt)}
+  .nav a.on{background:var(--gold-dim);color:var(--gold)}
+  .nav a.on::before{content:"";position:absolute;left:-12px;top:8px;bottom:8px;width:3px;border-radius:3px;background:var(--gold)}
+  .sb-foot{border-top:1px solid var(--line);padding:16px 20px;font-size:12px}
+  .sb-foot .row{display:flex;justify-content:space-between;align-items:center;margin:6px 0;color:var(--mut)}
+  .sb-foot .row b{color:var(--txt);font-weight:600}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--grn);
+    box-shadow:0 0 0 3px var(--grn-dim);margin-right:7px;vertical-align:middle}
+  .dot.off{background:var(--red);box-shadow:0 0 0 3px var(--red-dim)}
+
+  /* ── Main ── */
+  .main{flex:1;min-width:0;display:flex;flex-direction:column}
+  .topbar{display:flex;align-items:center;gap:18px;padding:20px 30px;border-bottom:1px solid var(--line);
+    position:sticky;top:0;background:rgba(10,14,23,.86);backdrop-filter:blur(12px);z-index:20}
+  .topbar h1{font-size:20px;font-weight:800;white-space:nowrap}
+  .search{flex:1;max-width:520px;position:relative}
+  .search input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:11px;
+    padding:11px 14px 11px 40px;color:var(--txt);font-size:13.5px;font-family:inherit;outline:none;transition:.15s}
+  .search input:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+  .search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:17px;height:17px;stroke:var(--mut);fill:none;stroke-width:2}
+  .badges{display:flex;gap:9px;margin-left:auto}
+  .badge{padding:7px 13px;border-radius:9px;font-size:12px;font-weight:600;border:1px solid var(--line);background:var(--card)}
+  .badge.net{color:var(--grn);border-color:rgba(34,197,94,.3);background:var(--grn-dim)}
+  .badge.ver{color:var(--mut)}
+
+  .content{padding:26px 30px 40px;max-width:1500px;width:100%}
+
+  /* stat cards */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:22px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+  .stat .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .stat .lbl{font-size:12.5px;color:var(--mut);font-weight:500}
+  .stat .ico{width:38px;height:38px;border-radius:11px;display:grid;place-items:center}
+  .stat .ico svg{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none}
+  .ico.g{background:var(--gold-dim);color:var(--gold)}
+  .ico.i{background:rgba(99,102,241,.14);color:var(--indigo2)}
+  .ico.c{background:rgba(34,211,238,.13);color:var(--cyan)}
+  .ico.p{background:rgba(168,85,247,.13);color:var(--pur)}
+  .stat .val{font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1.1}
+  .stat .val small{font-size:14px;color:var(--mut);font-weight:600}
+  .stat .sub{font-size:12px;color:var(--mut);margin-top:7px;display:flex;align-items:center;gap:6px}
+  .delta{font-weight:600;padding:2px 7px;border-radius:6px;font-size:11.5px}
+  .delta.up{color:var(--grn);background:var(--grn-dim)}
+  .delta.dn{color:var(--red);background:var(--red-dim)}
+
+  /* grid: chart + tx */
+  .grid{display:grid;grid-template-columns:1.65fr 1fr;gap:18px;margin-bottom:22px}
+  .panelbox{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  .ph{display:flex;align-items:center;justify-content:space-between;padding:17px 20px;border-bottom:1px solid var(--line)}
+  .ph h3{font-size:15px;font-weight:700}
+  .ph .link{font-size:12.5px;color:var(--indigo2);font-weight:600}
+  .chartwrap{padding:16px 12px 8px}
+  svg.chart{width:100%;height:210px;display:block}
+
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;padding:11px 20px;color:var(--mut2);font-size:11px;text-transform:uppercase;
+    letter-spacing:.6px;font-weight:600;border-bottom:1px solid var(--line)}
+  td{padding:12px 20px;border-bottom:1px solid var(--line);color:var(--txt)}
+  tr:last-child td{border-bottom:none}
+  tbody tr{transition:.12s}
+  tbody tr:hover{background:var(--card2)}
+  .hgt{color:var(--gold);font-weight:600}
+  .mono.sm{font-size:12px;color:var(--mut)}
+  .pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+  .pill.g{background:var(--grn-dim);color:var(--grn)}
+  .txlist{max-height:430px;overflow-y:auto}
+  .txrow{display:flex;align-items:center;gap:12px;padding:13px 20px;border-bottom:1px solid var(--line)}
+  .txrow:last-child{border-bottom:none}
+  .txrow:hover{background:var(--card2)}
+  .txav{width:34px;height:34px;border-radius:9px;background:rgba(99,102,241,.14);color:var(--indigo2);
+    display:grid;place-items:center;flex:0 0 34px}
+  .txav svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none}
+  .txmeta{flex:1;min-width:0}
+  .txmeta .h{font-size:12.5px;font-weight:600;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .txmeta .s{font-size:11.5px;color:var(--mut);margin-top:2px}
+  .txamt{text-align:right;font-weight:700;font-size:13px;white-space:nowrap}
+  .txamt small{display:block;font-weight:500;color:var(--mut);font-size:11px;margin-top:2px}
+
+  /* trio */
+  .trio{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .kv{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid var(--line);font-size:13px}
+  .kv:last-child{border-bottom:none}
+  .kv .k{color:var(--mut)}
+  .kv .v{font-weight:600}
+  .bar{height:7px;border-radius:6px;background:var(--line);overflow:hidden;margin-top:9px}
+  .bar > i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--gold),#c47f00)}
+  .poolwrap{padding:18px 20px}
+  .legend{display:flex;flex-direction:column;gap:11px;margin-top:14px}
+  .legrow{display:flex;align-items:center;gap:10px;font-size:12.5px}
+  .legrow .sw{width:11px;height:11px;border-radius:3px;flex:0 0 11px}
+  .legrow .nm{flex:1;color:var(--mut)}
+  .legrow .pc{font-weight:700}
+
+  .muted{color:var(--mut)}
+  .center{text-align:center}
+  .loading{padding:26px;text-align:center;color:var(--mut2);font-size:13px}
+
+  /* mobile */
+  .mtoggle{display:none;background:var(--card);border:1px solid var(--line);border-radius:10px;
+    width:40px;height:40px;place-items:center;cursor:pointer}
+  .mtoggle svg{width:20px;height:20px;stroke:var(--txt);fill:none;stroke-width:2}
+  .scrim{display:none}
+  @media(max-width:1150px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .grid{grid-template-columns:1fr}
+    .trio{grid-template-columns:1fr}
+  }
+  @media(max-width:900px){
+    .sidebar{position:fixed;left:0;top:0;z-index:60;transform:translateX(-100%);transition:.25s}
+    .sidebar.open{transform:none}
+    .mtoggle{display:grid}
+    .scrim.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:55}
+    .content{padding:20px 16px 40px}
+    .topbar{padding:16px}
+    .search{max-width:none}
+  }
+  @media(max-width:560px){
+    .stats{grid-template-columns:1fr}
+    .badges .badge.ver{display:none}
+    .topbar h1{font-size:17px}
+  }
+  /* slim in-dashboard footer */
+  .dashfoot{margin-top:auto;border-top:1px solid var(--line);padding:18px 26px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;color:var(--mut2);font-size:12px}
+  .dashfoot a{color:var(--mut);text-decoration:none;margin-right:14px}
+  .dashfoot a:hover{color:var(--gold)}
+  .dashfoot .df-note{opacity:.8}
+  @media(max-width:560px){.dashfoot{flex-direction:column;align-items:flex-start;gap:8px}}
+</style>
+</head>
+<body>
+<div class="layout">
+  <!-- ══ Sidebar ══ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">S</div>
+      <div class="bt"><b>SPN Coin</b><span>Explorer</span></div>
+    </div>
+    <nav class="nav">
+      <div class="grp">Overview</div>
+      <a class="on" href="/dashboard"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
+      <a href="/block"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7 12 12l8.7-5M12 22V12"/></svg>Blocks</a>
+      <a href="/tx"><svg viewBox="0 0 24 24"><path d="M7 10 3 6l4-4"/><path d="M3 6h13a4 4 0 0 1 4 4v0"/><path d="m17 14 4 4-4 4"/><path d="M21 18H8a4 4 0 0 1-4-4v0"/></svg>Transactions</a>
+      <a href="/explorer"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>Addresses</a>
+      <div class="grp">Network</div>
+      <a href="/network"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5 6 16.5M12 7.5l6 9M7.5 19h9"/></svg>Network</a>
+      <a href="/miner"><svg viewBox="0 0 24 24"><path d="m14 4 6 6M9 21l-6-6M4 15l11-11 5 5L9 20z"/></svg>Mining</a>
+      <a href="/run-node"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="8" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/><path d="M7 8h.01M7 17h.01"/></svg>Run a Node</a>
+      <a href="/analytics"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>Analytics</a>
+      <a href="/roadmap"><svg viewBox="0 0 24 24"><path d="M9 6 3 4v14l6 2 6-2 6 2V6l-6-2-6 2z"/><path d="M9 6v14M15 4v14"/></svg>Roadmap</a>
+      <div class="grp">Account</div>
+      <a href="/mywallet"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 14h2"/></svg>Wallet</a>
+    </nav>
+    <div class="sb-foot">
+      <div class="row"><span><span class="dot" id="sbDot"></span>Node</span><b id="sbStatus">Online</b></div>
+      <div class="row"><span>Height</span><b id="sbHeight">—</b></div>
+      <div class="row"><span>Peers</span><b id="sbPeers">—</b></div>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <!-- ══ Main ══ -->
+  <div class="main">
+    <div class="topbar">
+      <div class="mtoggle" id="mtoggle"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></div>
+      <h1>SPN Coin Explorer</h1>
+      <form class="search" id="searchForm">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="searchIn" placeholder="Search block height, tx hash, or address…" autocomplete="off">
+      </form>
+      <div class="badges">
+        <span class="badge net" id="bNet">● Mainnet</span>
+        <span class="badge ver" id="bVer">v—</span>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- stat cards -->
+      <div class="stats">
+        <div class="stat">
+          <div class="top"><span class="lbl">Latest Block</span>
+            <span class="ico g"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></span></div>
+          <div class="val">#<span id="sLatest">—</span></div>
+          <div class="sub"><span id="sLatestAgo">—</span></div>
+        </div>
+        <div class="stat">
+          <div class="top"><span class="lbl">Total Transactions</span>
+            <span class="ico i"><svg viewBox="0 0 24 24"><path d="M7 10 3 6l4-4M3 6h13a4 4 0 0 1 4 4M17 14l4 4-4 4M21 18H8a4 4 0 0 1-4-4"/></svg></span></div>
+          <div class="val" id="sTx">—</div>
+          <div class="sub"><span id="sMempool" class="muted">— pending</span></div>
+        </div>
+        <div class="stat">
+          <div class="top"><span class="lbl">Circulating Supply</span>
+            <span class="ico c"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.3c0-1.2 1.1-1.8 2.5-1.8s2.5.7 2.5 1.9c0 2.6-5 1.4-5 4 0 1.2 1.1 1.9 2.5 1.9s2.5-.6 2.5-1.8"/></svg></span></div>
+          <div class="val"><span id="sSupply">—</span> <small>SPN</small></div>
+          <div class="sub"><span id="sSupplyPct" class="muted">of 21,000,000 max</span></div>
+        </div>
+        <div class="stat">
+          <div class="top"><span class="lbl">Network Hashrate</span>
+            <span class="ico p"><svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg></span></div>
+          <div class="val" id="sHash">—</div>
+          <div class="sub"><span id="sDiff" class="muted">difficulty —</span></div>
+        </div>
+      </div>
+
+      <!-- chart + latest tx -->
+      <div class="grid">
+        <div class="panelbox">
+          <div class="ph"><h3>Network Hashrate</h3><a class="link" href="/analytics">View analytics →</a></div>
+          <div class="chartwrap"><svg class="chart" id="chart" preserveAspectRatio="none"></svg></div>
+        </div>
+        <div class="panelbox">
+          <div class="ph"><h3>Latest Transactions</h3><a class="link" href="/tx">All →</a></div>
+          <div class="txlist" id="txList"><div class="loading">Loading transactions…</div></div>
+        </div>
+      </div>
+
+      <!-- recent blocks -->
+      <div class="panelbox" style="margin-bottom:22px">
+        <div class="ph"><h3>Recent Blocks</h3><a class="link" href="/block">All blocks →</a></div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>Height</th><th>Hash</th><th>Txns</th><th>Size</th><th>Difficulty</th><th>Age</th></tr></thead>
+            <tbody id="blkBody"><tr><td colspan="6" class="loading">Loading blocks…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- trio -->
+      <div class="trio">
+        <div class="panelbox">
+          <div class="ph"><h3>Network Status</h3></div>
+          <div class="kv"><span class="k">Status</span><span class="v"><span class="dot" id="nsDot"></span><span id="nsStatus">Online</span></span></div>
+          <div class="kv"><span class="k">Network</span><span class="v" id="nsNet">—</span></div>
+          <div class="kv"><span class="k">Connected Peers</span><span class="v" id="nsPeers">—</span></div>
+          <div class="kv"><span class="k">Block Height</span><span class="v" id="nsHeight">—</span></div>
+          <div class="kv"><span class="k">Mempool Size</span><span class="v" id="nsMempool">—</span></div>
+          <div class="kv"><span class="k">PoW Algorithm</span><span class="v" id="nsPow">—</span></div>
+          <div class="kv"><span class="k">Uptime</span><span class="v" id="nsUptime">—</span></div>
+        </div>
+        <div class="panelbox">
+          <div class="ph"><h3>Recent Addresses</h3></div>
+          <div id="addrList"><div class="loading">Loading…</div></div>
+        </div>
+        <div class="panelbox">
+          <div class="ph"><h3>Mining Pool</h3></div>
+          <div class="poolwrap">
+            <div class="kv" style="padding:0 0 12px;border:none"><span class="k">Block Reward</span><span class="v" id="mpReward">—</span></div>
+            <div class="kv" style="padding:0 0 4px;border:none"><span class="k">Next Halving</span><span class="v" id="mpHalving">—</span></div>
+            <div class="bar"><i id="mpBar" style="width:0%"></i></div>
+            <div class="legend" id="mpLegend"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer class="dashfoot">
+      <div>
+        <a href="/explorer">Explorer</a><a href="/mywallet">Wallet</a><a href="/roadmap">Roadmap</a><a href="/run-node">Run a Node</a><a href="/api/health">API</a>
+      </div>
+      <div class="df-note">© 2026 SPN Coin · Educational Bitcoin-inspired blockchain · No monetary value</div>
+    </footer>
+  </div>
+</div>
+
+<script src="/nav.js?v=40" defer></script>
+<script>
+(function(){
+  var API = location.origin;
+  function j(p){ return fetch(API+p,{headers:{'Accept':'application/json'}}).then(function(r){ if(!r.ok) throw new Error(p+' '+r.status); return r.json(); }); }
+  var $ = function(id){ return document.getElementById(id); };
+
+  // ── helpers ──
+  function fmt(n){ if(n==null||isNaN(n)) return '—'; return Number(n).toLocaleString('en-US'); }
+  function short(h,a,b){ if(!h) return '—'; a=a||8; b=b||6; return h.length<=a+b+3 ? h : h.slice(0,a)+'…'+h.slice(-b); }
+  function spn(sat){ if(sat==null) return '0'; var v=Number(sat)/1e8; return v.toLocaleString('en-US',{maximumFractionDigits:8}); }
+  function ago(ts){ if(!ts||ts<1e12) return '—'; var s=Math.max(0,Math.floor((Date.now()-ts)/1000));
+    if(s<60) return s+'s ago'; if(s<3600) return Math.floor(s/60)+'m ago'; if(s<86400) return Math.floor(s/3600)+'h ago'; return Math.floor(s/86400)+'d ago'; }
+  function dur(sec){ if(sec==null) return '—'; sec=Math.floor(sec); var d=Math.floor(sec/86400),h=Math.floor(sec%86400/3600),m=Math.floor(sec%3600/60);
+    if(d) return d+'d '+h+'h'; if(h) return h+'h '+m+'m'; if(m) return m+'m'; return sec+'s'; }
+  function kb(bytes){ if(!bytes) return '—'; if(bytes<1024) return bytes+' B'; return (bytes/1024).toFixed(1)+' KB'; }
+  function hashUnit(hs){ if(!hs||hs<=0) return '0 H/s'; var u=['H/s','KH/s','MH/s','GH/s','TH/s','PH/s','EH/s'],i=0;
+    while(hs>=1000&&i<u.length-1){hs/=1000;i++;} return hs.toFixed(hs<10?2:1)+' '+u[i]; }
+  // estimate network hashrate from difficulty: work per block / target block time
+  function netHashrate(difficulty){ if(!difficulty) return 0; return (Math.pow(2,difficulty))/600; }
+  function txCount(b){ return (b.transactions||[]).length; }
+
+  var lastHeight=null;
+
+  function render(health, stats, supply, blocksResp){
+    var blocks = (blocksResp&&blocksResp.blocks)||[];
+    var net = (health&&health.network) || (stats&&stats.networkType) || 'testnet';
+
+    // ── sidebar + badges ──
+    var online = !!health;
+    $('sbDot').className = 'dot'+(online?'':' off');
+    $('nsDot').className = 'dot'+(online?'':' off');
+    $('sbStatus').textContent = online?'Online':'Offline';
+    $('nsStatus').textContent = online?'Online':'Offline';
+    $('sbHeight').textContent = fmt(health&&health.height);
+    $('sbPeers').textContent  = fmt(health&&health.peers);
+    $('bVer').textContent = 'v'+((health&&health.version)||(stats&&'—')||'—');
+    $('bNet').textContent = '● '+(net.charAt(0).toUpperCase()+net.slice(1));
+
+    // ── stat cards ──
+    var latest = blocks[0] || null;
+    $('sLatest').textContent = fmt(health&&health.height);
+    $('sLatestAgo').textContent = latest ? ('mined '+ago(latest.timestamp)) : '—';
+
+    var totalTx = 0; blocks.forEach(function(b){ totalTx+=txCount(b); });
+    // total tx across whole chain is not returned directly; approximate with UTXO/analytics later
+    $('sTx').textContent = stats&&stats.utxoCount!=null ? fmt(stats.utxoCount) : fmt(totalTx);
+    $('sMempool').textContent = fmt((health&&health.mempool)!=null?health.mempool:(stats&&stats.mempoolSize)) + ' pending';
+
+    var circ = supply && (supply.circulating!=null?supply.circulating:(supply.circulatingSat!=null?Number(supply.circulatingSat)/1e8:null));
+    var maxS = (supply&&supply.maxSupply)||21000000;
+    $('sSupply').textContent = circ!=null ? Number(circ).toLocaleString('en-US',{maximumFractionDigits:2}) : '—';
+    $('sSupplyPct').textContent = circ!=null ? ((circ/maxS*100).toFixed(4)+'% of '+fmt(maxS)+' max') : ('of '+fmt(maxS)+' max');
+
+    var diff = stats&&stats.difficulty;
+    var hr = netHashrate(diff);
+    $('sHash').textContent = hashUnit(hr);
+    $('sDiff').textContent = 'difficulty '+(diff!=null?Number(diff).toFixed(diff<100?4:0):'—');
+
+    // ── network status ──
+    $('nsNet').textContent = net.charAt(0).toUpperCase()+net.slice(1);
+    $('nsPeers').textContent = fmt(health&&health.peers);
+    $('nsHeight').textContent = fmt(health&&health.height);
+    $('nsMempool').textContent = fmt((health&&health.mempool)!=null?health.mempool:(stats&&stats.mempoolSize));
+    $('nsPow').textContent = (stats&&stats.powAlgorithm)||'sha256d';
+    $('nsUptime').textContent = dur(health&&health.uptime);
+
+    // ── recent blocks table ──
+    if(blocks.length){
+      $('blkBody').innerHTML = blocks.slice(0,10).map(function(b){
+        return '<tr>'+
+          '<td><a class="hgt" href="/block?ref='+b.height+'">#'+fmt(b.height)+'</a></td>'+
+          '<td class="mono sm">'+short(b.hash,10,8)+'</td>'+
+          '<td>'+fmt(txCount(b))+'</td>'+
+          '<td class="muted">'+kb(b.size)+'</td>'+
+          '<td class="mono sm">'+(b.difficulty!=null?Number(b.difficulty).toFixed(b.difficulty<100?3:0):'—')+'</td>'+
+          '<td class="muted">'+ago(b.timestamp)+'</td>'+
+        '</tr>';
+      }).join('');
+    } else {
+      $('blkBody').innerHTML = '<tr><td colspan="6" class="center muted">No blocks yet</td></tr>';
+    }
+
+    // ── latest transactions (from recent blocks) ──
+    var txs=[];
+    for(var i=0;i<blocks.length && txs.length<12;i++){
+      var b=blocks[i];
+      (b.transactions||[]).forEach(function(t){
+        if(txs.length>=12) return;
+        var out=0; (t.outputs||[]).forEach(function(o){ out+=Number(o.amount||0); });
+        txs.push({id:t.id,cb:!!t.isCoinbase,amt:out,ts:b.timestamp,h:b.height,to:(t.outputs&&t.outputs[0]&&t.outputs[0].address)||''});
+      });
+    }
+    if(txs.length){
+      $('txList').innerHTML = txs.map(function(t){
+        return '<div class="txrow">'+
+          '<div class="txav">'+(t.cb
+            ? '<svg viewBox="0 0 24 24"><path d="m14 4 6 6M9 21l-6-6M4 15l11-11 5 5L9 20z"/></svg>'
+            : '<svg viewBox="0 0 24 24"><path d="M7 10 3 6l4-4M3 6h13a4 4 0 0 1 4 4M17 14l4 4-4 4M21 18H8a4 4 0 0 1-4-4"/></svg>')+'</div>'+
+          '<div class="txmeta"><div class="h mono">'+short(t.id,10,6)+'</div>'+
+            '<div class="s">'+(t.cb?'Coinbase · block #'+fmt(t.h):'to '+short(t.to,8,6))+' · '+ago(t.ts)+'</div></div>'+
+          '<div class="txamt">'+spn(t.amt)+' <small>SPN</small></div>'+
+        '</div>';
+      }).join('');
+    } else {
+      $('txList').innerHTML = '<div class="loading">No transactions yet</div>';
+    }
+
+    // ── recent addresses (derived from recent block outputs) ──
+    var seen={}, addrs=[];
+    for(var k=0;k<blocks.length && addrs.length<6;k++){
+      (blocks[k].transactions||[]).forEach(function(t){
+        (t.outputs||[]).forEach(function(o){
+          if(o.address && !seen[o.address] && addrs.length<6){ seen[o.address]=1; addrs.push({a:o.address,amt:Number(o.amount||0)}); }
+        });
+      });
+    }
+    if(addrs.length){
+      $('addrList').innerHTML = addrs.map(function(x){
+        return '<div class="kv"><a class="k mono" style="color:var(--indigo2)" href="/explorer?q='+encodeURIComponent(x.a)+'">'+short(x.a,10,6)+'</a>'+
+          '<span class="v">'+spn(x.amt)+' <small class="muted" style="font-weight:500">SPN</small></span></div>';
+      }).join('');
+    } else {
+      $('addrList').innerHTML = '<div class="loading">No addresses yet</div>';
+    }
+
+    // ── mining pool / reward ──
+    if(stats){
+      $('mpReward').textContent = (stats.miningReward!=null? spn(stats.miningReward):'—')+' SPN';
+      $('mpHalving').textContent = stats.nextHalving!=null ? ('block #'+fmt(stats.nextHalving)) : '—';
+      if(stats.nextHalving && stats.height!=null){
+        var interval = stats.nextHalving - (stats.halvings||0)*(stats.nextHalving/((stats.halvings||0)+1)||stats.nextHalving);
+        var prevHalv = (stats.halvings||0) * (stats.nextHalving/(( stats.halvings||0)+1));
+        var span = stats.nextHalving - prevHalv;
+        var prog = span>0 ? ((stats.height - prevHalv)/span*100) : 0;
+        $('mpBar').style.width = Math.max(0,Math.min(100,prog)).toFixed(1)+'%';
+      }
+      // simple single-node "pool" legend
+      $('mpLegend').innerHTML =
+        '<div class="legrow"><span class="sw" style="background:var(--gold)"></span><span class="nm">SPN Core Node</span><span class="pc">100%</span></div>'+
+        '<div class="legrow"><span class="sw" style="background:var(--indigo)"></span><span class="nm">External miners</span><span class="pc">'+fmt((health&&health.miners)||0)+'</span></div>';
+    }
+
+    // ── chart: difficulty across recent blocks ──
+    drawChart(blocks.slice().reverse());
+    lastHeight = health&&health.height;
+  }
+
+  function drawChart(blocks){
+    var svg=$('chart'); if(!svg) return;
+    var W=svg.clientWidth||760, H=210, pad=8;
+    var vals=blocks.map(function(b){ return netHashrate(b.difficulty)||0; });
+    if(vals.length<2){ svg.innerHTML='<text x="50%" y="50%" fill="#5a6788" font-size="13" text-anchor="middle" font-family="Sora">Waiting for block data…</text>'; return; }
+    var min=Math.min.apply(null,vals), max=Math.max.apply(null,vals); if(max===min){max=min+1;}
+    var n=vals.length;
+    function X(i){ return pad + i*(W-2*pad)/(n-1); }
+    function Y(v){ return H-pad - (v-min)/(max-min)*(H-2*pad); }
+    var line='', area='M '+X(0)+' '+Y(vals[0]);
+    for(var i=0;i<n;i++){ var x=X(i),y=Y(vals[i]); line+=(i?' L ':'M ')+x.toFixed(1)+' '+y.toFixed(1); if(i) area+=' L '+x.toFixed(1)+' '+y.toFixed(1); }
+    area+=' L '+X(n-1)+' '+(H-pad)+' L '+X(0)+' '+(H-pad)+' Z';
+    svg.innerHTML=
+      '<defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="#6d6bf5" stop-opacity=".35"/><stop offset="1" stop-color="#6d6bf5" stop-opacity="0"/></linearGradient></defs>'+
+      '<path d="'+area+'" fill="url(#ag)"/>'+
+      '<path d="'+line+'" fill="none" stroke="#9a98ff" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>'+
+      '<circle cx="'+X(n-1).toFixed(1)+'" cy="'+Y(vals[n-1]).toFixed(1)+'" r="3.5" fill="#9a98ff"/>';
+  }
+
+  function refresh(){
+    Promise.all([
+      j('/api/health').catch(function(){return null;}),
+      j('/api/stats').catch(function(){return null;}),
+      j('/api/supply').catch(function(){return null;}),
+      j('/api/blocks?limit=15').catch(function(){return {blocks:[]};})
+    ]).then(function(r){ render(r[0],r[1],r[2],r[3]); })
+      .catch(function(e){ console.error('dashboard refresh failed',e); });
+  }
+
+  // ── search routing ──
+  $('searchForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var q=($('searchIn').value||'').trim(); if(!q) return;
+    if(/^\d{1,10}$/.test(q)) location.href='/block?ref='+q;
+    else if(/^[a-fA-F0-9]{64}$/.test(q)) location.href='/tx?ref='+q;   // 64-hex → try tx
+    else location.href='/explorer?q='+encodeURIComponent(q);
+  });
+
+  // ── mobile sidebar ──
+  var sb=$('sidebar'), scrim=$('scrim');
+  function closeSb(){ sb.classList.remove('open'); scrim.classList.remove('show'); }
+  $('mtoggle').addEventListener('click',function(){ sb.classList.toggle('open'); scrim.classList.toggle('show'); });
+  scrim.addEventListener('click',closeSb);
+
+  refresh();
+  setInterval(refresh,12000);
+  window.addEventListener('resize',function(){ /* redraw chart on resize */ refresh(); });
+})();
+</script>
+</body>
+</html>

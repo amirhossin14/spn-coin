@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<!--
+  © 2026 SPN Coin Project — PROPRIETARY AND CONFIDENTIAL
+  All Rights Reserved. See LICENSE for full terms.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="64x64" href="/sepanta-coin.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/sepanta-coin-32.png?v=5">
+  <link rel="shortcut icon" href="/sepanta-coin.ico?v=5">
+  <link rel="apple-touch-icon" sizes="180x180" href="/sepanta-coin-180.png?v=5">
+  <meta name="theme-color" content="#070a0e">
+  <meta name="description" content="Connect your miner to the SPN Coin Stratum pool — Antminer, Whatsminer, and more.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sepanta (SPN) Mining Pool — Stratum Connection</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080b13;--c1:#0c1120;--c2:#0f1626;--c3:#141d31;
+  --bd:rgba(240,165,0,.1);--bd2:rgba(240,165,0,.2);--bd3:rgba(240,165,0,.38);
+  --gold:#f5b301;--go2:#f7c948;--gold3:rgba(240,165,0,.08);--gold4:rgba(240,165,0,.16);
+  --grn:#26d07c;--grn2:rgba(0,255,136,.08);--grn3:rgba(0,255,136,.22);
+  --cyan:#25d0ee;--cyan2:rgba(0,204,255,.08);
+  --red:#f2555a;--red2:rgba(255,68,102,.1);
+  --pur:#b06bf7;--pur2:rgba(167,139,250,.1);
+  --txt:#eaf0fb;--txt2:#8a97b8;--txt3:#5a6788;--mut:#5a6788;
+  --r:10px;--r2:14px;
+}
+html{scroll-behavior:smooth}
+body{font-family:"Sora",sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;font-size:14px;line-height:1.5;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 65% 40% at 20% 0%,rgba(240,165,0,.06) 0%,transparent 55%),
+             radial-gradient(ellipse 50% 35% at 85% 100%,rgba(0,204,255,.04) 0%,transparent 55%)}
+
+/* TOPBAR */
+.topbar{background:rgba(6,10,14,.94);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:50;backdrop-filter:blur(14px)}
+.tb-in{max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:54px;gap:12px}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;flex-shrink:0}
+.logo-ic{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--go2));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#000;box-shadow:0 0 14px rgba(240,165,0,.28)}
+.logo-txt{font-size:15px;font-weight:900;color:var(--gold)}
+.tnav{display:flex;gap:2px}
+.tnav a{padding:6px 11px;border-radius:6px;font-size:13px;font-weight:500;color:var(--txt2);text-decoration:none;transition:all .15s}
+.tnav a:hover{background:var(--gold3);color:var(--txt)}
+.tnav a.on{color:var(--gold);font-weight:700;background:var(--gold3)}
+
+/* PAGE */
+.page{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:28px 20px 80px}
+
+/* HERO */
+.hero{margin-bottom:28px;animation:fu .38s ease both}
+@keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.hero-row{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.hero-l{flex:1;min-width:260px}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;letter-spacing:.6px;padding:3px 10px;border-radius:20px;background:var(--gold3);border:1px solid var(--bd2);color:var(--gold);margin-bottom:12px}
+.badge::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--gold);animation:pp 2s infinite}
+@keyframes pp{0%,100%{opacity:1}50%{opacity:.3}}
+.htitle{font-size:30px;font-weight:900;color:var(--txt);letter-spacing:-.5px;line-height:1.2;margin-bottom:8px}
+.htitle span{color:var(--gold)}
+.hsub{font-size:13.5px;color:var(--txt2);line-height:1.7;max-width:480px}
+
+/* LIVE STATUS PILL */
+.live-pill{display:flex;align-items:center;gap:12px;background:var(--c1);border:1px solid var(--bd);border-radius:var(--r2);padding:14px 18px;flex-wrap:wrap;margin-top:10px}
+.lp-item{display:flex;flex-direction:column;gap:2px;min-width:80px}
+.lp-val{font-family:"JetBrains Mono",monospace;font-size:18px;font-weight:700;color:var(--gold)}
+.lp-val.g{color:var(--grn)}
+.lp-val.c{color:var(--cyan)}
+.lp-val.p{color:var(--pur)}
+.lp-lbl{font-size:10px;color:var(--txt3);font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+.lp-div{width:1px;height:36px;background:var(--bd);flex-shrink:0}
+
+/* CONNECTION BOX */
+.conn-card{background:linear-gradient(135deg,rgba(240,165,0,.07),rgba(240,165,0,.03));border:1px solid var(--bd2);border-radius:var(--r2);padding:22px;margin-bottom:20px;animation:fu .38s .05s ease both}
+.conn-hd{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.conn-ic{width:36px;height:36px;border-radius:9px;background:var(--gold3);border:1px solid var(--bd2);display:flex;align-items:center;justify-content:center;font-size:16px}
+.conn-title{font-size:14px;font-weight:800;color:var(--txt)}
+.conn-sub{font-size:11px;color:var(--txt2)}
+.conn-field{background:var(--c2);border:1px solid var(--bd);border-radius:var(--r);padding:11px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;transition:all .15s}
+.conn-field:hover{border-color:var(--bd2);background:var(--c3)}
+.cf-label{font-size:10.5px;font-weight:700;color:var(--txt3);letter-spacing:.4px;text-transform:uppercase;margin-bottom:2px}
+.cf-val{font-family:"JetBrains Mono",monospace;font-size:13.5px;color:var(--gold);font-weight:600;overflow-wrap:anywhere;word-break:break-all;min-width:0}
+.conn-field > div{min-width:0}
+html,body{overflow-x:hidden;max-width:100%}
+.cf-val.big{font-size:18px;font-weight:800}
+.cp-btn{width:28px;height:28px;border-radius:7px;background:var(--gold3);border:1px solid var(--bd2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--gold);transition:all .15s}
+.cp-btn:hover{background:var(--gold4);border-color:var(--bd3)}
+.cp-btn.ok{background:var(--grn2);border-color:var(--grn3);color:var(--grn)}
+.worker-fmt{font-size:11px;color:var(--txt2);line-height:1.7;padding:10px 13px;background:var(--c2);border-radius:var(--r);border:1px solid var(--bd);margin-top:4px}
+.worker-fmt code{font-family:"JetBrains Mono",monospace;color:var(--gold);background:var(--gold3);padding:1px 6px;border-radius:4px;font-size:11px}
+
+/* GRID */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
+@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr}}
+
+/* CARDS */
+.card{background:var(--c1);border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden;animation:fu .38s ease both}
+.card:nth-child(2){animation-delay:.04s}
+.card:nth-child(3){animation-delay:.08s}
+.ch{padding:12px 17px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(90deg,rgba(240,165,0,.04),transparent)}
+.ct{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:800;color:var(--txt2);letter-spacing:.6px;text-transform:uppercase}
+.ctd{width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.ctd.g{background:var(--grn)}
+.ctd.c{background:var(--cyan)}
+.ctbtn{background:var(--gold3);color:var(--gold);border:1px solid var(--bd2);padding:5px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s}
+.ctbtn:hover{background:var(--gold4)}
+
+/* MINER TABLE */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{padding:9px 14px;text-align:left;font-size:10px;font-weight:800;color:var(--txt3);letter-spacing:.5px;text-transform:uppercase;background:rgba(0,0,0,.2);border-bottom:1px solid var(--bd)}
+.tbl td{padding:10px 14px;border-bottom:1px solid rgba(240,165,0,.04);font-size:12.5px}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(240,165,0,.02)}
+.mono{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--txt2)}
+.trunc{max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge-online{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:var(--grn2);color:var(--grn);border:1px solid var(--grn3)}
+.badge-online::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--grn);animation:pp 2s infinite}
+
+/* SETUP GUIDE TABS */
+.tabs{display:flex;border-bottom:1px solid var(--bd);padding:0 17px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:11px 14px;cursor:pointer;font-size:12.5px;font-weight:700;color:var(--txt2);border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;margin-bottom:-1px}
+.tab:hover{color:var(--txt)}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold)}
+.tpane{display:none;padding:18px}
+.tpane.on{display:block}
+
+/* Code blocks */
+.code-block{background:var(--c2);border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px;margin:10px 0;position:relative}
+.code-block pre{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--gold);line-height:1.7;white-space:pre-wrap;word-break:break-all}
+.code-block .cp{position:absolute;top:10px;right:10px;background:var(--gold3);border:1px solid var(--bd2);border-radius:6px;padding:4px 9px;font-size:10px;font-weight:700;color:var(--gold);cursor:pointer;transition:all .15s}
+.code-block .cp:hover{background:var(--gold4)}
+.step{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px}
+.step-num{width:24px;height:24px;border-radius:6px;background:var(--gold3);border:1px solid var(--bd2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--gold);flex-shrink:0}
+.step-txt{font-size:12.5px;color:var(--txt2);line-height:1.7}
+.step-txt strong{color:var(--txt)}
+.step-txt a{color:var(--gold);text-decoration:none}
+.step-txt a:hover{text-decoration:underline}
+
+/* Hashrate chart (simple bar) */
+.hbar-wrap{padding:14px 17px}
+.hbar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.hbar-lbl{font-size:11px;color:var(--txt2);width:100px;flex-shrink:0;font-family:"JetBrains Mono",monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hbar-track{flex:1;height:8px;border-radius:4px;background:var(--mut);overflow:hidden}
+.hbar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--go2));transition:width .8s ease}
+.hbar-val{font-size:11px;color:var(--gold);font-family:"JetBrains Mono",monospace;width:80px;text-align:right;flex-shrink:0}
+
+/* Stats row */
+.srow{display:flex;gap:5px;padding:10px 17px;border-bottom:1px solid rgba(240,165,0,.04);align-items:center;flex-wrap:wrap}
+.srow:last-child{border-bottom:none}
+.sk{font-size:12px;color:var(--txt2);font-weight:600;flex:1}
+.sv2{font-family:"JetBrains Mono",monospace;font-size:12.5px;font-weight:700}
+.sv2.g{color:var(--grn)}
+.sv2.gold{color:var(--gold)}
+.sv2.c{color:var(--cyan)}
+.sv2.r{color:var(--red)}
+
+/* LICENSE bar */
+.licbar{position:fixed;bottom:6px;left:12px;z-index:8999;font-size:9.5px;color:rgba(255,255,255,.18);font-family:"JetBrains Mono",monospace;display:flex;align-items:center;gap:5px}
+.licbar a{color:rgba(240,165,0,.35);text-decoration:none;transition:color .2s}
+.licbar a:hover{color:rgba(240,165,0,.8)}
+
+@media(max-width:680px){
+  .tnav a span{display:none}
+  .htitle{font-size:22px}
+  .hero-row{flex-direction:column}
+  .conn-field{flex-direction:column;align-items:flex-start}
+}
+
+/* ── Miner brand sections ── */
+.miner-section{background:var(--c2);border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px;margin-bottom:12px}
+.ms-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.ms-logo{width:34px;height:34px;border-radius:8px;border:1px solid;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0}
+.ms-name{font-size:13px;font-weight:800;color:var(--txt)}
+.ms-sub{font-size:11px;color:var(--txt2);margin-top:2px}
+/* ── Config cards ── */
+.conf-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.conf-card{background:var(--c2);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px}
+.conf-badge{font-size:10px;font-weight:800;letter-spacing:.4px;padding:3px 9px;border-radius:4px;border:1px solid;display:inline-block;margin-bottom:10px}
+.cf2-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(240,165,0,.05)}
+.cf2-row:last-child{border-bottom:none}
+.cf2-k{font-size:10.5px;font-weight:700;color:var(--txt3);width:90px;flex-shrink:0;letter-spacing:.3px}
+.cf2-v{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--gold);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cf2-v .hl{color:var(--grn);font-weight:700}
+.cpbtn{width:26px;height:26px;border-radius:6px;background:var(--gold3);border:1px solid var(--bd2);color:var(--gold);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.cpbtn:hover{background:var(--gold4);border-color:var(--bd3)}
+/* ── Info boxes ── */
+.info-box{background:rgba(59,130,246,.05);border:1px solid rgba(59,130,246,.15);border-radius:var(--r);padding:12px 14px;margin:12px 0}
+.ib-title{font-size:11.5px;font-weight:800;color:#93c5fd;margin-bottom:6px}
+.ib-body{font-size:11.5px;color:var(--txt2);line-height:1.8}
+.ib-body code{font-family:"JetBrains Mono",monospace;font-size:11px;background:rgba(59,130,246,.1);color:#93c5fd;padding:1px 6px;border-radius:4px}
+/* ── Model grid ── */
+.model-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-top:14px}
+.model-card{background:var(--c2);border:1px solid var(--bd);border-radius:8px;padding:10px 12px;transition:border-color .15s}
+.model-card:hover{border-color:var(--bd2)}
+.mc-name{font-size:12px;font-weight:800;color:var(--txt);margin-bottom:3px}
+.mc-hash{font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:700;color:var(--gold)}
+.mc-algo{font-size:10px;color:var(--txt3);margin-top:2px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+/* ── Code blocks ── */
+.code-block{background:var(--c2);border:1px solid var(--bd);border-radius:var(--r);padding:13px 15px;margin:10px 0;position:relative}
+.code-block pre{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--gold);line-height:1.7;white-space:pre-wrap;word-break:break-all}
+.code-block .cp{position:absolute;top:9px;right:9px;background:var(--gold3);border:1px solid var(--bd2);border-radius:5px;padding:3px 9px;font-size:10px;font-weight:700;color:var(--gold);cursor:pointer;transition:all .15s}
+.code-block .cp:hover{background:var(--gold4)}
+/* ── inline code ── */
+.ic{font-family:"JetBrains Mono",monospace;font-size:11px;background:var(--gold3);color:var(--gold);padding:1px 6px;border-radius:4px}
+@media(max-width:680px){.conf-grid{grid-template-columns:1fr}}
+
+</style>
+  <script src="csrf-fetch.js?v=25"></script>
+  <script src="i18n.js?v=34" defer></script>
+  <script src="nav.js?v=40" defer></script><script src="/ai-bubble.js?v=5" defer></script>
+<script src="/anti-phishing.js?v=1" defer></script>
+  <script src="footer.js?v=35" defer></script>
+  <script src="ui-prefs.js?v=25" defer></script>
+</head>
+<body>
+
+
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-row">
+      <div class="hero-l">
+        <div class="badge">SPN Coin Mining Pool</div>
+        <h1 class="htitle">Connect Your <span>Miner</span></h1>
+        <p class="hsub">Full Stratum v1 protocol support. Connect any compatible miner software — CGMiner, BFGMiner, XMRig, NiceHash, or any custom mining client.</p>
+      </div>
+    </div>
+
+    <!-- Live stats pill -->
+    <div class="live-pill" id="livePill">
+      <div class="lp-item">
+        <div class="lp-val" id="lpMiners">—</div>
+        <div class="lp-lbl">Active Miners</div>
+      </div>
+      <div class="lp-div"></div>
+      <div class="lp-item">
+        <div class="lp-val g" id="lpHash">—</div>
+        <div class="lp-lbl">Pool Hashrate</div>
+      </div>
+      <div class="lp-div"></div>
+      <div class="lp-item">
+        <div class="lp-val c" id="lpDiff">—</div>
+        <div class="lp-lbl">Network Diff</div>
+      </div>
+      <div class="lp-div"></div>
+      <div class="lp-item">
+        <div class="lp-val gold" id="lpReward">—</div>
+        <div class="lp-lbl">Block Reward</div>
+      </div>
+      <div class="lp-div"></div>
+      <div class="lp-item">
+        <div class="lp-val" id="lpHeight">—</div>
+        <div class="lp-lbl">Block Height</div>
+      </div>
+      <div class="lp-div"></div>
+      <div class="lp-item">
+        <div class="lp-val p" id="lpShares">—</div>
+        <div class="lp-lbl">Valid Shares</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONNECTION DETAILS -->
+  <div class="conn-card">
+    <div class="conn-hd">
+      <div class="conn-ic">🔌</div>
+      <div>
+        <div class="conn-title">Stratum Connection Details</div>
+        <div class="conn-sub">Copy and paste into your miner configuration</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <!-- Host -->
+      <div class="conn-field" onclick="cp(this, document.getElementById('cfHost').textContent)">
+        <div>
+          <div class="cf-label">Pool Host / IP</div>
+          <div class="cf-val big" id="cfHost">loading...</div>
+        </div>
+        <div class="cp-btn" id="cpHost">⎘</div>
+      </div>
+      <!-- Port -->
+      <div class="conn-field" onclick="cp(this, document.getElementById('cfPort').textContent)">
+        <div>
+          <div class="cf-label">Stratum Port (TCP)</div>
+          <div class="cf-val big" id="cfPort">3333</div>
+        </div>
+        <div class="cp-btn" id="cpPort">⎘</div>
+      </div>
+      <!-- Protocol -->
+      <div class="conn-field" style="cursor:default">
+        <div>
+          <div class="cf-label">Protocol</div>
+          <div class="cf-val big">ws:// / wss://</div>
+        </div>
+        <div style="font-size:18px">✅</div>
+      </div>
+    </div>
+
+    <!-- Full URL -->
+    <div class="conn-field" onclick="cp(this, document.getElementById('cfUrl').textContent)" style="margin-top:6px">
+      <div style="flex:1;min-width:0">
+        <div class="cf-label">Full Stratum URL</div>
+        <div class="cf-val" id="cfUrl" style="font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">loading...</div>
+      </div>
+      <div class="cp-btn" id="cpUrl">⎘</div>
+    </div>
+
+    <!-- Worker format -->
+    <div class="worker-fmt">
+      <strong style="color:var(--txt)">Worker name format:</strong>&nbsp;
+      <code>YOUR_SPN1_ADDRESS.worker_name</code>
+      &nbsp;|&nbsp; e.g. &nbsp;
+      <code id="exWorker">SPN1AbC...xyz.rig01</code>
+      <br>
+      <span style="font-size:10.5px;color:var(--txt3);margin-top:4px;display:block">
+        ⚡ Password can be anything — use <code>x</code> or leave blank.
+        &nbsp;|&nbsp; Address must start with <code>SPN1</code> (mainnet) or <code>SPNt</code> (testnet).
+      </span>
+    </div>
+  </div>
+
+  <!-- ACTIVE MINERS + POOL STATS -->
+  <div class="grid2">
+
+    <!-- Active Miners -->
+    <div class="card">
+      <div class="ch">
+        <div class="ct"><span class="ctd g"></span>Active Miners</div>
+        <button class="ctbtn" onclick="loadMiners()">🔄 Refresh</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr><th>Worker</th><th>Hashrate</th><th>Difficulty</th><th>Shares</th><th>Status</th></tr></thead>
+          <tbody id="minerTbl">
+            <tr><td colspan="5" style="text-align:center;padding:22px;color:var(--txt3)">Loading miners...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pool Statistics -->
+    <div class="card">
+      <div class="ch"><div class="ct"><span class="ctd"></span>Pool Statistics</div></div>
+      <div class="srow"><div class="sk">Pool Fee</div><div class="sv2 gold" id="psFee">1%</div></div>
+      <div class="srow"><div class="sk">Payout System</div><div class="sv2 gold">PPLNS</div></div>
+      <div class="srow"><div class="sk">Min Payout</div><div class="sv2 gold" id="psMin">0.001 SPN</div></div>
+      <div class="srow"><div class="sk">Valid Shares (1h)</div><div class="sv2 g" id="psValid">—</div></div>
+      <div class="srow"><div class="sk">Invalid Shares (1h)</div><div class="sv2 r" id="psInvalid">—</div></div>
+      <div class="srow"><div class="sk">Total Miners</div><div class="sv2 c" id="psTotal">—</div></div>
+      <div class="srow"><div class="sk">Banned IPs</div><div class="sv2 r" id="psBan">—</div></div>
+      <div class="srow"><div class="sk">Current Job ID</div><div class="sv2 mono" id="psJob">—</div></div>
+      <div class="srow"><div class="sk">Vardiff Range</div><div class="sv2 gold">1 – 32</div></div>
+      <div class="srow"><div class="sk">Share Target</div><div class="sv2 gold">15 sec / share</div></div>
+    </div>
+  </div>
+
+  <!-- HASHRATE PER MINER -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="ch"><div class="ct"><span class="ctd g"></span>Miner Hashrate Distribution</div></div>
+    <div class="hbar-wrap" id="hashBars">
+      <div style="padding:16px;text-align:center;color:var(--txt3)">Loading hashrate data...</div>
+    </div>
+  </div>
+
+  <!-- SETUP GUIDE -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="ch"><div class="ct"><span class="ctd c"></span>Miner Setup Guide</div></div>
+    <div class="tabs">
+      <div class="tab on"  onclick="showTab(this,'tAnt')">🔴 Antminer</div>
+      <div class="tab"     onclick="showTab(this,'tWhat')">🔵 Whatsminer</div>
+      <div class="tab"     onclick="showTab(this,'tAva')">🟢 Avalon</div>
+      <div class="tab"     onclick="showTab(this,'tIceA')">🟡 iBeLink</div>
+      <div class="tab"     onclick="showTab(this,'tInno')">🔷 Innosilicon</div>
+      <div class="tab"     onclick="showTab(this,'tGold')">🏅 Goldshell</div>
+      <div class="tab"     onclick="showTab(this,'tEbit')">⬛ Ebit Miner</div>
+      <div class="tab"     onclick="showTab(this,'tStrong')">💪 StrongU</div>
+      <div class="tab"     onclick="showTab(this,'tJas')">🔶 Jasminer</div>
+      <div class="tab"     onclick="showTab(this,'tVnish')">🛠️ Firmware</div>
+      <div class="tab"     onclick="showTab(this,'tGPU')">💻 GPU Mining</div>
+      <div class="tab"     onclick="showTab(this,'tNH')">⚡ NiceHash</div>
+      <div class="tab"     onclick="showTab(this,'tPY')">🐍 Python</div>
+      <div class="tab"     onclick="showTab(this,'tEnv')">⚙️ .env</div>
+    </div>
+
+    <!-- ═══ ANTMINER (BITMAIN) ═══ -->
+    <div class="tpane on" id="tAnt">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+        <div style="width:44px;height:44px;border-radius:10px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🔴</div>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:var(--txt)">Antminer — Bitmain</div>
+          <div style="font-size:11.5px;color:var(--txt2)">S19, S19 Pro, S19j, S19 XP, S21, T19, T21 and all SHA-256 models</div>
+        </div>
+      </div>
+
+      <div class="step"><div class="step-num">1</div><div class="step-txt">Connect the Antminer to your network. Open a browser and go to its IP address (default: <code class="ic">192.168.1.100</code> — check your router's DHCP table for the actual IP).</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-txt">Login with default credentials: Username <code class="ic">root</code> — Password <code class="ic">root</code></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-txt">Navigate to <strong>Miner Configuration → General Settings</strong> and enter:</div></div>
+
+      <div class="conf-grid">
+        <div class="conf-card">
+          <div class="conf-badge" style="background:rgba(239,68,68,.1);color:#f2555a;border-color:rgba(239,68,68,.25)">Pool 1 (Primary)</div>
+          <div class="cf2-row"><span class="cf2-k">URL</span><div class="cf2-v" id="ant_url">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('ant_url')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Worker</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.antminer01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+        <div class="conf-card">
+          <div class="conf-badge" style="background:rgba(240,165,0,.08);color:var(--gold);border-color:var(--bd2)">Pool 2 (Backup)</div>
+          <div class="cf2-row"><span class="cf2-k">URL</span><div class="cf2-v" id="ant_url2">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('ant_url2')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Worker</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.antminer01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+      </div>
+
+      <div class="step"><div class="step-num">4</div><div class="step-txt">Click <strong>Save & Apply</strong>. The miner will restart and begin hashing within 60–90 seconds.</div></div>
+
+      <div class="info-box">
+        <div class="ib-title">📋 Antminer SSH Access (advanced)</div>
+        <div class="ib-body">
+          SSH into the miner: <code class="ic">ssh root@MINER_IP</code><br>
+          View mining logs: <code class="ic">cat /var/log/log</code><br>
+          Restart mining process: <code class="ic">/etc/init.d/cgminer.sh restart</code>
+        </div>
+      </div>
+
+      <div class="model-grid">
+        <div class="model-card"><div class="mc-name">S21 Pro</div><div class="mc-hash">234 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">S19 XP</div><div class="mc-hash">140 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">S19j Pro</div><div class="mc-hash">104 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">S19 Pro</div><div class="mc-hash">110 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">T21</div><div class="mc-hash">190 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">T19</div><div class="mc-hash">84 TH/s</div><div class="mc-algo">SHA-256</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ WHATSMINER (MICROBT) ═══ -->
+    <div class="tpane" id="tWhat">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+        <div style="width:44px;height:44px;border-radius:10px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🔵</div>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:var(--txt)">Whatsminer — MicroBT</div>
+          <div style="font-size:11.5px;color:var(--txt2)">M50, M50S, M53, M56, M60 and all SHA-256 models</div>
+        </div>
+      </div>
+
+      <div class="step"><div class="step-num">1</div><div class="step-txt">Find the miner IP via your router's DHCP table or use the <strong>BTMiner</strong> tool from MicroBT's website.</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-txt">Login at <code class="ic">http://MINER_IP</code> — default credentials: <code class="ic">admin / admin</code></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-txt">Go to <strong>Configuration → Pool Settings</strong> and fill in:</div></div>
+
+      <div class="conf-grid">
+        <div class="conf-card">
+          <div class="conf-badge" style="background:rgba(59,130,246,.1);color:#6d6bf5;border-color:rgba(59,130,246,.25)">Pool 1 (Primary)</div>
+          <div class="cf2-row"><span class="cf2-k">Pool URL</span><div class="cf2-v" id="wm_url">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('wm_url')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Username</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.whatsminer01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+        <div class="conf-card">
+          <div class="conf-badge" style="background:rgba(240,165,0,.08);color:var(--gold);border-color:var(--bd2)">Pool 2 (Failover)</div>
+          <div class="cf2-row"><span class="cf2-k">Pool URL</span><div class="cf2-v" id="wm_url2">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('wm_url2')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Username</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.whatsminer01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+      </div>
+
+      <div class="step"><div class="step-num">4</div><div class="step-txt">Click <strong>Save</strong>. The miner restarts automatically.</div></div>
+
+      <div class="info-box">
+        <div class="ib-title">📋 Whatsminer API (JSON-RPC)</div>
+        <div class="ib-body">
+          Whatsminer exposes an API on port 4028. Check miner status:<br>
+          <code class="ic">echo '{"cmd":"summary"}' | nc MINER_IP 4028</code><br>
+          Check pool config:<br>
+          <code class="ic">echo '{"cmd":"pools"}' | nc MINER_IP 4028</code>
+        </div>
+      </div>
+
+      <div class="model-grid">
+        <div class="model-card"><div class="mc-name">M60S</div><div class="mc-hash">186 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">M56S++</div><div class="mc-hash">230 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">M53S++</div><div class="mc-hash">320 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">M50S++</div><div class="mc-hash">154 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">M30S++</div><div class="mc-hash">112 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">M20S</div><div class="mc-hash">68 TH/s</div><div class="mc-algo">SHA-256</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ AVALON (CANAAN) ═══ -->
+    <div class="tpane" id="tAva">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+        <div style="width:44px;height:44px;border-radius:10px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🟢</div>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:var(--txt)">Avalon — Canaan Creative</div>
+          <div style="font-size:11.5px;color:var(--txt2)">Avalon A12, A13, A14, A15 and all SHA-256 models. Uses a Controller (AUC3) + Miner configuration.</div>
+        </div>
+      </div>
+
+      <div class="step"><div class="step-num">1</div><div class="step-txt">Avalon miners use a <strong>Controller device</strong> (AUC3 or RPi-based). Connect the controller to your network and open <code class="ic">http://CONTROLLER_IP</code>.</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-txt">In the controller web UI, go to <strong>LuCI → System → Avalon Miner</strong>.</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-txt">Set the mining pool configuration:</div></div>
+
+      <div class="conf-grid">
+        <div class="conf-card">
+          <div class="conf-badge" style="background:rgba(34,197,94,.1);color:#26d07c;border-color:rgba(34,197,94,.25)">Pool 1 (Primary)</div>
+          <div class="cf2-row"><span class="cf2-k">Pool Host</span><div class="cf2-v" id="av_url">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('av_url')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Worker</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.avalon01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+        <div class="conf-card">
+          <div class="conf-badge" style="background:rgba(240,165,0,.08);color:var(--gold);border-color:var(--bd2)">Pool 2 (Backup)</div>
+          <div class="cf2-row"><span class="cf2-k">Pool Host</span><div class="cf2-v" id="av_url2">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('av_url2')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Worker</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.avalon01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+      </div>
+
+      <div class="step"><div class="step-num">4</div><div class="step-txt">Click <strong>Save &amp; Apply</strong> in LuCI. Wait 2 minutes for the miner to establish connection.</div></div>
+
+      <div class="info-box">
+        <div class="ib-title">📋 Avalon cgminer command (via SSH on controller)</div>
+        <div class="ib-body">
+          <code class="ic">cgminer -o stratum+tcp://YOUR_NODE_IP:3333 -u SPN1YourAddress.avalon01 -p x</code>
+        </div>
+      </div>
+
+      <div class="model-grid">
+        <div class="model-card"><div class="mc-name">A15</div><div class="mc-hash">185 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">A14</div><div class="mc-hash">120 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">A1346</div><div class="mc-hash">110 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">A1266</div><div class="mc-hash">90 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">A12</div><div class="mc-hash">53 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">A1166 Pro</div><div class="mc-hash">75 TH/s</div><div class="mc-algo">SHA-256</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ iBELINK ═══ -->
+    <div class="tpane" id="tIceA">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+        <div style="width:44px;height:44px;border-radius:10px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#f5c518;flex-shrink:0">iB</div>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:var(--txt)">iBeLink — BM-K3 / BM-S1</div>
+          <div style="font-size:11.5px;color:var(--txt2)">SHA-256 ASIC miners. Web UI at <code class="ic">http://MINER_IP</code> — default: <code class="ic">admin / admin</code></div>
+        </div>
+      </div>
+      <div class="step"><div class="step-num">1</div><div class="step-txt">Open browser → <code class="ic">http://MINER_IP</code> → Login → <strong>Pool Setting</strong></div></div>
+      <div class="conf-grid">
+        <div class="conf-card">
+          <div class="conf-badge" style="background:rgba(251,191,36,.1);color:#f5c518;border-color:rgba(251,191,36,.3)">Pool 1 — Primary</div>
+          <div class="cf2-row"><span class="cf2-k">Pool URL</span><div class="cf2-v" id="ib_url">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('ib_url')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Username</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.ibelink01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+        <div class="conf-card">
+          <div class="conf-badge" style="background:var(--gold3);color:var(--gold);border-color:var(--bd2)">Pool 2 — Backup</div>
+          <div class="cf2-row"><span class="cf2-k">Pool URL</span><div class="cf2-v" id="ib_url2">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('ib_url2')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Username</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.ibelink01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+      </div>
+      <div class="step"><div class="step-num">2</div><div class="step-txt">Click <strong>Save</strong>. The miner reboots and connects within 90 seconds.</div></div>
+      <div class="model-grid">
+        <div class="model-card"><div class="mc-name">BM-K3</div><div class="mc-hash">70 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">BM-S1 Max</div><div class="mc-hash">60 TH/s</div><div class="mc-algo">SHA-256</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ INNOSILICON ═══ -->
+    <div class="tpane" id="tInno">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+        <div style="width:44px;height:44px;border-radius:10px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#9a98ff;flex-shrink:0">IN</div>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:var(--txt)">Innosilicon — T3+ / A10 / A11</div>
+          <div style="font-size:11.5px;color:var(--txt2)">SHA-256 and ETHash ASICs. Web UI at <code class="ic">http://MINER_IP</code> — default: <code class="ic">admin / admin</code></div>
+        </div>
+      </div>
+      <div class="step"><div class="step-num">1</div><div class="step-txt">Navigate to <code class="ic">http://MINER_IP</code> → <strong>Pool Configuration</strong></div></div>
+      <div class="conf-grid">
+        <div class="conf-card">
+          <div class="conf-badge" style="background:rgba(99,102,241,.1);color:#9a98ff;border-color:rgba(99,102,241,.3)">Pool 1 — Primary</div>
+          <div class="cf2-row"><span class="cf2-k">Pool Address</span><div class="cf2-v" id="in_url">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('in_url')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Miner Name</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.inno01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+        <div class="conf-card">
+          <div class="conf-badge" style="background:var(--gold3);color:var(--gold);border-color:var(--bd2)">Pool 2 — Backup</div>
+          <div class="cf2-row"><span class="cf2-k">Pool Address</span><div class="cf2-v" id="in_url2">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('in_url2')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Miner Name</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.inno01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+      </div>
+      <div class="info-box">
+        <div class="ib-title">📋 Innosilicon SSH Access</div>
+        <div class="ib-body">
+          <code class="ic">ssh admin@MINER_IP</code> (password: <code class="ic">admin</code>)<br>
+          Check status: <code class="ic">cat /tmp/miner.log | tail -20</code><br>
+          Restart miner: <code class="ic">/etc/init.d/miner restart</code>
+        </div>
+      </div>
+      <div class="model-grid">
+        <div class="model-card"><div class="mc-name">T3+ Pro</div><div class="mc-hash">67 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">A10 Pro+</div><div class="mc-hash">750 MH/s</div><div class="mc-algo">EtHash</div></div>
+        <div class="model-card"><div class="mc-name">A11 Pro</div><div class="mc-hash">2000 MH/s</div><div class="mc-algo">EtHash</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ GOLDSHELL ═══ -->
+    <div class="tpane" id="tGold">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+        <div style="width:44px;height:44px;border-radius:10px;background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.3);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--gold);flex-shrink:0">GS</div>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:var(--txt)">Goldshell — KD / HS / BOX Series</div>
+          <div style="font-size:11.5px;color:var(--txt2)">Compact home ASICs. Use Goldshell app or <code class="ic">http://MINER_IP</code> — default: <code class="ic">admin / 123456789</code></div>
+        </div>
+      </div>
+      <div class="step"><div class="step-num">1</div><div class="step-txt">Open the <strong>Goldshell app</strong> on your phone OR browser → <code class="ic">http://MINER_IP</code> → <strong>Settings → Mining Pool</strong></div></div>
+      <div class="conf-grid">
+        <div class="conf-card">
+          <div class="conf-badge" style="background:rgba(240,165,0,.1);color:var(--gold);border-color:var(--gold3)">Pool 1 — Primary</div>
+          <div class="cf2-row"><span class="cf2-k">Pool URL</span><div class="cf2-v" id="gs_url">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('gs_url')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Username</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.goldshell01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+        <div class="conf-card">
+          <div class="conf-badge" style="background:var(--c2);color:var(--txt2);border-color:var(--bd)">Pool 2 — Backup</div>
+          <div class="cf2-row"><span class="cf2-k">Pool URL</span><div class="cf2-v" id="gs_url2">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('gs_url2')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Username</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.goldshell01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+      </div>
+      <div class="model-grid">
+        <div class="model-card"><div class="mc-name">KD6</div><div class="mc-hash">29.2 TH/s</div><div class="mc-algo">KDA</div></div>
+        <div class="model-card"><div class="mc-name">KD Max</div><div class="mc-hash">40.2 TH/s</div><div class="mc-algo">KDA</div></div>
+        <div class="model-card"><div class="mc-name">HS6</div><div class="mc-hash">4.3 TH/s</div><div class="mc-algo">HNS</div></div>
+        <div class="model-card"><div class="mc-name">MiniDOGE</div><div class="mc-hash">185 MH/s</div><div class="mc-algo">Scrypt</div></div>
+        <div class="model-card"><div class="mc-name">LT6</div><div class="mc-hash">3.35 GH/s</div><div class="mc-algo">Litecoin</div></div>
+        <div class="model-card"><div class="mc-name">CK6</div><div class="mc-hash">19.3 TH/s</div><div class="mc-algo">CKB</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ EBIT MINER (E11 / E12) ═══ -->
+    <div class="tpane" id="tEbit">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+        <div style="width:44px;height:44px;border-radius:10px;background:rgba(30,30,30,.8);border:1px solid rgba(200,200,200,.15);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#ddd;flex-shrink:0">EB</div>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:var(--txt)">Ebit Miner — E11 / E12 / E11++</div>
+          <div style="font-size:11.5px;color:var(--txt2)">SHA-256 ASICs by Ebang. Web UI via browser — default login: <code class="ic">root / root</code></div>
+        </div>
+      </div>
+      <div class="step"><div class="step-num">1</div><div class="step-txt">Find the miner IP from your router's ARP table. Open <code class="ic">http://MINER_IP</code></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-txt">Login: <code class="ic">root / root</code> → Navigate to <strong>Pool Management</strong></div></div>
+      <div class="conf-grid">
+        <div class="conf-card">
+          <div class="conf-badge" style="background:rgba(200,200,200,.05);color:#ccc;border-color:rgba(200,200,200,.15)">Pool 1 — Primary</div>
+          <div class="cf2-row"><span class="cf2-k">Stratum URL</span><div class="cf2-v" id="eb_url">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('eb_url')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Worker</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.ebit01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+        <div class="conf-card">
+          <div class="conf-badge" style="background:var(--gold3);color:var(--gold);border-color:var(--bd2)">Pool 2 — Backup</div>
+          <div class="cf2-row"><span class="cf2-k">Stratum URL</span><div class="cf2-v" id="eb_url2">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('eb_url2')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Worker</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.ebit01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+      </div>
+      <div class="step"><div class="step-num">3</div><div class="step-txt">Click <strong>Confirm</strong>. The miner will reconnect within 2 minutes.</div></div>
+      <div class="model-grid">
+        <div class="model-card"><div class="mc-name">E12</div><div class="mc-hash">44 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">E11++</div><div class="mc-hash">37 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">E11+</div><div class="mc-hash">37 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">E11</div><div class="mc-hash">30 TH/s</div><div class="mc-algo">SHA-256</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ STRONGU ═══ -->
+    <div class="tpane" id="tStrong">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+        <div style="width:44px;height:44px;border-radius:10px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#f2555a;flex-shrink:0">SU</div>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:var(--txt)">StrongU — STU-U6 / STU-U8</div>
+          <div style="font-size:11.5px;color:var(--txt2)">SHA-256 ASICs. Web UI at <code class="ic">http://MINER_IP</code> — default: <code class="ic">admin / admin</code></div>
+        </div>
+      </div>
+      <div class="step"><div class="step-num">1</div><div class="step-txt">Open <code class="ic">http://MINER_IP</code> → Login → <strong>Miner → Pool</strong></div></div>
+      <div class="conf-grid">
+        <div class="conf-card">
+          <div class="conf-badge" style="background:rgba(239,68,68,.1);color:#f2555a;border-color:rgba(239,68,68,.25)">Pool 1 — Primary</div>
+          <div class="cf2-row"><span class="cf2-k">Pool URL</span><div class="cf2-v" id="su_url">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('su_url')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Username</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.strongu01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+        <div class="conf-card">
+          <div class="conf-badge" style="background:var(--gold3);color:var(--gold);border-color:var(--bd2)">Pool 2 — Backup</div>
+          <div class="cf2-row"><span class="cf2-k">Pool URL</span><div class="cf2-v" id="su_url2">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('su_url2')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Username</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.strongu01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+      </div>
+      <div class="model-grid">
+        <div class="model-card"><div class="mc-name">STU-U8H</div><div class="mc-hash">62 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">STU-U8</div><div class="mc-hash">46 TH/s</div><div class="mc-algo">SHA-256</div></div>
+        <div class="model-card"><div class="mc-name">STU-U6</div><div class="mc-hash">38 TH/s</div><div class="mc-algo">SHA-256</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ JASMINER ═══ -->
+    <div class="tpane" id="tJas">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+        <div style="width:44px;height:44px;border-radius:10px;background:rgba(0,204,255,.08);border:1px solid rgba(0,204,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--cyan);flex-shrink:0">JM</div>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:var(--txt)">Jasminer — X4 / X16 / X16Q</div>
+          <div style="font-size:11.5px;color:var(--txt2)">High-efficiency EtHash ASICs. Web UI at <code class="ic">http://MINER_IP</code> — default: <code class="ic">admin / admin</code></div>
+        </div>
+      </div>
+      <div class="step"><div class="step-num">1</div><div class="step-txt">Open <code class="ic">http://MINER_IP</code> → Login → <strong>Settings → Pool</strong></div></div>
+      <div class="conf-grid">
+        <div class="conf-card">
+          <div class="conf-badge" style="background:rgba(0,204,255,.08);color:var(--cyan);border-color:rgba(0,204,255,.2)">Pool 1 — Primary</div>
+          <div class="cf2-row"><span class="cf2-k">Pool URL</span><div class="cf2-v" id="jm_url">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('jm_url')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Username</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.jasminer01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+        <div class="conf-card">
+          <div class="conf-badge" style="background:var(--gold3);color:var(--gold);border-color:var(--bd2)">Pool 2 — Backup</div>
+          <div class="cf2-row"><span class="cf2-k">Pool URL</span><div class="cf2-v" id="jm_url2">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('jm_url2')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Username</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.jasminer01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+      </div>
+      <div class="model-grid">
+        <div class="model-card"><div class="mc-name">X16Q</div><div class="mc-hash">1950 MH/s</div><div class="mc-algo">EtHash</div></div>
+        <div class="model-card"><div class="mc-name">X16</div><div class="mc-hash">1800 MH/s</div><div class="mc-algo">EtHash</div></div>
+        <div class="model-card"><div class="mc-name">X4-Q</div><div class="mc-hash">1040 MH/s</div><div class="mc-algo">EtHash</div></div>
+        <div class="model-card"><div class="mc-name">X4</div><div class="mc-hash">520 MH/s</div><div class="mc-algo">EtHash</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ THIRD-PARTY FIRMWARE (VNISH / BRAIINS / LUX) ═══ -->
+    <div class="tpane" id="tVnish">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:18px">
+        <div style="width:44px;height:44px;border-radius:10px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🛠️</div>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:var(--txt)">Custom Firmware — Vnish / Braiins OS / LuxOS</div>
+          <div style="font-size:11.5px;color:var(--txt2)">Third-party firmware for Antminer/Whatsminer with advanced pool management</div>
+        </div>
+      </div>
+
+      <!-- Vnish -->
+      <div class="miner-section">
+        <div class="ms-header">
+          <span class="ms-logo" style="background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.3);color:#b06bf7">VN</span>
+          <div><div class="ms-name">Vnish Firmware</div><div class="ms-sub">For Antminer S19 / S19 Pro / S19j / T19 — enables overclocking &amp; custom pool config</div></div>
+        </div>
+        <div class="step"><div class="step-num">1</div><div class="step-txt">Flash Vnish firmware via the miner's stock web UI (Upload Firmware). Reboot.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-txt">After reboot, open <code class="ic">http://MINER_IP</code> → Vnish UI → <strong>Pools</strong></div></div>
+        <div class="conf-card" style="margin:10px 0 14px">
+          <div class="cf2-row"><span class="cf2-k">Pool 1 URL</span><div class="cf2-v" id="vn_url">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('vn_url')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Worker</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.vnish01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+        <div class="info-box">
+          <div class="ib-title">⚡ Vnish SSH Pool Change</div>
+          <div class="ib-body">
+            <code class="ic">ssh root@MINER_IP</code> (password: <code class="ic">admin</code>)<br>
+            Edit pool config: <code class="ic">vi /config/cgminer.conf</code><br>
+            Set pool1: <code class="ic">"url": "stratum+tcp://YOUR_NODE_IP:3333"</code><br>
+            Restart: <code class="ic">/etc/init.d/cgminer restart</code>
+          </div>
+        </div>
+      </div>
+
+      <!-- Braiins OS -->
+      <div class="miner-section">
+        <div class="ms-header">
+          <span class="ms-logo" style="background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.25);color:#6d6bf5">BR</span>
+          <div><div class="ms-name">Braiins OS+</div><div class="ms-sub">Advanced open-source firmware for Antminer S9 / S19 with auto-tuning</div></div>
+        </div>
+        <div class="step"><div class="step-num">1</div><div class="step-txt">Install Braiins OS via <code class="ic">bos toolbox</code> or web UI.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-txt">Edit <code class="ic">/etc/bosminer.toml</code> to add your pool:</div></div>
+        <div class="code-block">
+          <pre id="braiinsConf">[[mining_groups]]
+name = "SPN Coin"
+
+[[mining_groups.pools]]
+enabled = true
+url = "stratum+tcp://YOUR_NODE_IP:3333"
+user = "SPN1YourAddress.braiins01"
+password = "x"</pre>
+          <span class="cp" onclick="cpCode('braiinsConf')">Copy</span>
+        </div>
+        <div class="step"><div class="step-num">3</div><div class="step-txt">Restart: <code class="ic">bosminer restart</code></div></div>
+      </div>
+
+      <!-- LuxOS -->
+      <div class="miner-section">
+        <div class="ms-header">
+          <span class="ms-logo" style="background:rgba(240,165,0,.1);border-color:rgba(240,165,0,.3);color:var(--gold)">LX</span>
+          <div><div class="ms-name">LuxOS</div><div class="ms-sub">Firmware for Antminer S19 series — focus on performance and reliability</div></div>
+        </div>
+        <div class="step"><div class="step-num">1</div><div class="step-txt">Flash LuxOS via stock web UI → <strong>Upgrade</strong> tab.</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-txt">SSH into miner and edit pool config:</div></div>
+        <div class="code-block">
+          <pre id="luxConf">luxos -a setpoolgroup   --session USER=root PASSWD=admin IPADDRESS=MINER_IP   --params pool1=stratum+tcp://YOUR_NODE_IP:3333            worker=SPN1YourAddress.luxos01            password=x</pre>
+          <span class="cp" onclick="cpCode('luxConf')">Copy</span>
+        </div>
+      </div>
+    </div>
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:18px">
+        <div style="width:44px;height:44px;border-radius:10px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🟡</div>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:var(--txt)">Other ASIC Miners</div>
+          <div style="font-size:11.5px;color:var(--txt2)">iBeLink, Innosilicon, Jasminer, Goldshell, StrongU and others</div>
+        </div>
+      </div>
+
+      <!-- iBeLink -->
+      <div class="miner-section">
+        <div class="ms-header"><span class="ms-logo" style="background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.25)">iB</span><div><div class="ms-name">iBeLink</div><div class="ms-sub">BM-K3 and other SHA-256 models</div></div></div>
+        <div class="conf-card" style="margin:10px 0">
+          <div class="cf2-row"><span class="cf2-k">Pool URL</span><div class="cf2-v" id="ib_url">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('ib_url')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Username</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.ibelink01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+        <div class="step-txt" style="font-size:11.5px;color:var(--txt2);margin-bottom:12px">Access web UI at <code class="ic">http://MINER_IP</code> → <strong>Pool Setting</strong>. Default login: <code class="ic">admin / admin</code></div>
+      </div>
+
+      <!-- Innosilicon -->
+      <div class="miner-section">
+        <div class="ms-header"><span class="ms-logo" style="background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.25)">IN</span><div><div class="ms-name">Innosilicon</div><div class="ms-sub">T3+, A10 Pro and SHA-256/ETHash models</div></div></div>
+        <div class="conf-card" style="margin:10px 0">
+          <div class="cf2-row"><span class="cf2-k">Pool Address</span><div class="cf2-v" id="in_url">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('in_url')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Miner Name</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.inno01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+        <div class="step-txt" style="font-size:11.5px;color:var(--txt2);margin-bottom:12px">Go to <code class="ic">http://MINER_IP</code> → <strong>Pool Configuration</strong>. Default: <code class="ic">admin / admin</code></div>
+      </div>
+
+      <!-- Goldshell -->
+      <div class="miner-section">
+        <div class="ms-header"><span class="ms-logo" style="background:rgba(240,165,0,.1);border-color:rgba(240,165,0,.25);color:var(--gold)">GS</span><div><div class="ms-name">Goldshell</div><div class="ms-sub">KD6, HS6, MiniDOGE and compact ASIC models</div></div></div>
+        <div class="conf-card" style="margin:10px 0">
+          <div class="cf2-row"><span class="cf2-k">Pool URL</span><div class="cf2-v" id="gs_url">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('gs_url')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Username</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.goldshell01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+        <div class="step-txt" style="font-size:11.5px;color:var(--txt2);margin-bottom:12px">Open Goldshell mobile app or <code class="ic">http://MINER_IP</code>. Default: <code class="ic">admin / 123456789</code></div>
+      </div>
+
+      <!-- StrongU -->
+      <div class="miner-section">
+        <div class="ms-header"><span class="ms-logo" style="background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.25);color:#f2555a">SU</span><div><div class="ms-name">StrongU</div><div class="ms-sub">STU-U6, STU-U8 and SHA-256 models</div></div></div>
+        <div class="conf-card" style="margin:10px 0">
+          <div class="cf2-row"><span class="cf2-k">Pool URL</span><div class="cf2-v" id="su_url">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('su_url')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Username</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.strongu01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+      </div>
+
+      <!-- Jasminer -->
+      <div class="miner-section">
+        <div class="ms-header"><span class="ms-logo" style="background:rgba(0,204,255,.08);border-color:rgba(0,204,255,.2);color:var(--cyan)">JM</span><div><div class="ms-name">Jasminer</div><div class="ms-sub">X4, X16 EtHash / SHA-256 models</div></div></div>
+        <div class="conf-card" style="margin:10px 0">
+          <div class="cf2-row"><span class="cf2-k">Pool URL</span><div class="cf2-v" id="jm_url">stratum+tcp://YOUR_NODE_IP:3333</div><button onclick="cpEl('jm_url')" class="cpbtn">⎘</button></div>
+          <div class="cf2-row"><span class="cf2-k">Username</span><div class="cf2-v"><span class="hl">SPN1YourAddress</span>.jasminer01</div></div>
+          <div class="cf2-row"><span class="cf2-k">Password</span><div class="cf2-v">x</div></div>
+        </div>
+        <div class="step-txt" style="font-size:11.5px;color:var(--txt2)">Web UI at <code class="ic">http://MINER_IP</code> → <strong>Settings → Pool</strong>. Default: <code class="ic">admin / admin</code></div>
+      </div>
+    </div>
+
+    <!-- ═══ GPU MINERS ═══ -->
+    <div class="tpane" id="tGPU">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+        <div style="width:44px;height:44px;border-radius:10px;background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">💻</div>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:var(--txt)">GPU Miners — CGMiner / BFGMiner</div>
+          <div style="font-size:11.5px;color:var(--txt2)">NVIDIA & AMD GPUs using CPU/GPU SHA-256 mining software</div>
+        </div>
+      </div>
+
+      <div class="step"><div class="step-num">1</div><div class="step-txt">Download <strong>CGMiner</strong> or <strong>BFGMiner</strong>:</div></div>
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <a href="https://github.com/ckolivas/cgminer/releases" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--gold3);border:1px solid var(--bd2);border-radius:8px;color:var(--gold);font-size:12px;font-weight:700;text-decoration:none">CGMiner Releases ↗</a>
+        <a href="https://github.com/luke-jr/bfgminer/releases" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--gold3);border:1px solid var(--bd2);border-radius:8px;color:var(--gold);font-size:12px;font-weight:700;text-decoration:none">BFGMiner Releases ↗</a>
+      </div>
+
+      <div class="step"><div class="step-num">2</div><div class="step-txt"><strong>CGMiner</strong> command:</div></div>
+      <div class="code-block">
+        <pre id="cgCmd">cgminer -o stratum+tcp://YOUR_NODE_IP:3333   -u SPN1YourAddress.rig01   -p x   --thread-concurrency 8192</pre>
+        <span class="cp" onclick="cpCode('cgCmd')">Copy</span>
+      </div>
+
+      <div class="step"><div class="step-num">3</div><div class="step-txt"><strong>BFGMiner</strong> command:</div></div>
+      <div class="code-block">
+        <pre id="bfgCmd">bfgminer -o stratum+tcp://YOUR_NODE_IP:3333   -u SPN1YourAddress.rig01   -p x</pre>
+        <span class="cp" onclick="cpCode('bfgCmd')">Copy</span>
+      </div>
+
+      <div class="step"><div class="step-num">4</div><div class="step-txt"><strong>CPU mining</strong> (for testing only):</div></div>
+      <div class="code-block">
+        <pre id="cpuCmd">cgminer -o stratum+tcp://YOUR_NODE_IP:3333   -u SPN1YourAddress.cpu01   -p x   --no-gpu   -t 4</pre>
+        <span class="cp" onclick="cpCode('cpuCmd')">Copy</span>
+      </div>
+    </div>
+
+    <!-- ═══ NICEHASH ═══ -->
+    <div class="tpane" id="tNH">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+        <div style="width:44px;height:44px;border-radius:10px;background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚡</div>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:var(--txt)">NiceHash — Custom Pool</div>
+          <div style="font-size:11.5px;color:var(--txt2)">Point NiceHash Excavator or QuickMiner to your SPN Coin node</div>
+        </div>
+      </div>
+      <div class="step"><div class="step-num">1</div><div class="step-txt">Open NiceHash QuickMiner or Excavator. Add a new custom pool entry:</div></div>
+      <div class="code-block">
+        <pre id="nhCfg">{
+  "algorithm": "sha256",
+  "stratumUrl": "stratum+tcp://YOUR_NODE_IP:3333",
+  "username": "SPN1YourAddress.rig01",
+  "password": "x"
+}</pre>
+        <span class="cp" onclick="cpCode('nhCfg')">Copy</span>
+      </div>
+      <div class="step"><div class="step-num">2</div><div class="step-txt">In Excavator's <code class="ic">algorithm.json</code>, add this as a new pool and select SHA-256 algorithm.</div></div>
+    </div>
+
+    <!-- ═══ PYTHON CLIENT ═══ -->
+    <div class="tpane" id="tPY">
+      <div class="step"><div class="step-num">1</div><div class="step-txt">Minimal Python Stratum client for testing and development:</div></div>
+      <div class="code-block">
+        <pre id="pyCode">import socket, json, hashlib
+
+HOST    = 'YOUR_NODE_IP'
+PORT    = 3333
+ADDRESS = 'SPN1YourAddress'
+WORKER  = 'python01'
+
+def sha256d(data):
+    b = bytes.fromhex(data) if isinstance(data, str) else data
+    return hashlib.sha256(hashlib.sha256(b).digest()).hexdigest()
+
+sock = socket.socket()
+sock.connect((HOST, PORT))
+
+def send(msg):
+    sock.sendall((json.dumps(msg) + '\n').encode())
+
+def recv():
+    buf = b''
+    while b'\n' not in buf:
+        buf += sock.recv(4096)
+    return json.loads(buf.split(b'\n')[0])
+
+# Step 1: Subscribe
+send({"id": 1, "method": "mining.subscribe", "params": ["python-miner/1.0"]})
+sub    = recv()
+extra1 = sub['result'][1]
+extra2_sz = sub['result'][2]
+print(f"Subscribed — ExtraNonce1: {extra1}, ExtraNonce2 size: {extra2_sz}")
+
+# Step 2: Authorize (format: ADDRESS.WORKERNAME)
+send({"id": 2, "method": "mining.authorize", "params": [f"{ADDRESS}.{WORKER}", "x"]})
+auth = recv()
+print(f"Authorization: {'OK' if auth['result'] else 'FAILED — check address format'}")
+
+# Step 3: Receive jobs and submit shares
+while True:
+    msg = recv()
+    if msg.get('method') == 'mining.set_difficulty':
+        print(f"Difficulty set to: {msg['params'][0]}")
+    elif msg.get('method') == 'mining.notify':
+        job_id, prev, cb1, cb2, branches, ver, bits, ntime, clean = msg['params']
+        extra2 = '00' * extra2_sz
+        cb_hash = sha256d(cb1 + extra1 + extra2 + cb2)
+        print(f"New job: {job_id} | prev: {prev[:16]}...")
+        # Submit share (replace nonce with actual PoW result)
+        send({"id": 3, "method": "mining.submit",
+              "params": [f"{ADDRESS}.{WORKER}", job_id, extra2, ntime, "00000000"]})
+        result = recv()
+        print(f"Share result: {result.get('result')}")</pre>
+        <span class="cp" onclick="cpCode('pyCode')">Copy</span>
+      </div>
+    </div>
+
+    <!-- ═══ ENV CONFIG ═══ -->
+    <div class="tpane" id="tEnv">
+      <div class="step"><div class="step-num">1</div><div class="step-txt">Add these to your <code class="ic">.env</code> file on the SPN Coin node server:</div></div>
+      <div class="code-block">
+        <pre id="envCfg"># ── Stratum Pool ────────────────────────────────
+STRATUM_PORT=3333
+POOL_ADDRESS=SPN1YourPoolWalletAddress
+POOL_FEE=0.01              # 1% fee
+
+# ── Variable Difficulty (Vardiff) ───────────────
+VARDIFF_MIN=1
+VARDIFF_MAX=32
+VARDIFF_TARGET_MS=15000    # 1 share per 15 seconds
+
+# ── Connection Security ──────────────────────────
+BAN_INVALID=10             # Ban after 10 invalid shares
+BAN_DURATION=600000        # Ban: 10 minutes
+MAX_MINERS=1000
+MINER_TIMEOUT_MS=300000    # Disconnect idle: 5 minutes
+
+# ── PPLNS Payout ─────────────────────────────────
+PPLNS_WINDOW=100000</pre>
+        <span class="cp" onclick="cpCode('envCfg')">Copy</span>
+      </div>
+    </div>
+    </div>
+
+  <!-- BANNED MINERS -->
+  <div class="card">
+    <div class="ch">
+      <div class="ct"><span class="ctd" style="background:var(--red)"></span>Banned IPs</div>
+      <button class="ctbtn" onclick="loadBans()">🔄 Refresh</button>
+    </div>
+    <div id="banList" style="padding:16px;color:var(--txt3);font-size:13px;text-align:center">Loading...</div>
+  </div>
+
+</div><!-- .page -->
+
+<!-- LICENSE badge -->
+<div class="licbar">
+  <a href="/LICENSE" target="_blank">© 2026 SPN Coin Project</a>
+  <span style="opacity:.4">·</span><span style="opacity:.4">PROPRIETARY</span>
+</div>
+
+<script>
+const API = window.SPN_COIN_API || (location.hostname==='localhost'||location.hostname==='127.0.0.1'?'http://localhost:3000':location.origin);
+const tok  = () => sessionStorage.getItem('adm_tok')||sessionStorage.getItem('w_tok')||localStorage.getItem('mc_token')||localStorage.getItem('myc_token')||'';
+
+/* ── Set connection info ── */
+(async () => {
+  try {
+    const ci = await fetch(API+'/api/coin-info').then(r=>r.json()).catch(()=>({}));
+    const host = location.hostname === 'localhost' ? 'localhost' : location.hostname;
+    const port = '3333';
+    document.getElementById('cfHost').textContent = host;
+    // Update ALL stratum URL fields in the page
+    document.querySelectorAll('.cf2-v[id$="_url"], .cf2-v[id$="_url2"]').forEach(el => {
+      el.textContent = el.textContent.replace(/YOUR_NODE_IP/g, host).replace(/localhost/g, host);
+    });
+    // Update WS URL
+    const wsEl = document.getElementById('wsUrl');
+    if (wsEl) wsEl.textContent = `wss://${host}/stratum`;
+    // Update code blocks
+    document.querySelectorAll('.code-block pre').forEach(pre => {
+      pre.textContent = pre.textContent.replace(/YOUR_NODE_IP/g, host).replace(/localhost/g, host);
+    });
+    document.getElementById('cfPort').textContent = '(HTTP port)/stratum';
+    document.getElementById('cfUrl').textContent  = `ws://${host}/stratum  (or wss://${host}/stratum for TLS)`;
+    document.getElementById('exWorker').textContent = `SPN1AbCdEfGhIjKlMnOpQrStUvWx.rig01`;
+
+    // Update code examples with real host
+    ['cgCmd','bfgCmd','nhCfg','pyCode'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = el.textContent.replace(/localhost/g, host).replace(/3333/g, port);
+    });
+  } catch {}
+
+  loadStats();
+  loadMiners();
+  loadBans();
+  setInterval(() => { loadStats(); loadMiners(); }, 10_000);
+})();
+
+async function loadStats() {
+  try {
+    const [st, si] = await Promise.all([
+      fetch(API+'/api/stats').then(r=>r.json()).catch(()=>({})),
+      authFetch('/api/stratum/stats').catch(()=>({})),
+    ]);
+    document.getElementById('lpMiners').textContent  = si.authorized ?? si.connected ?? '—';
+    document.getElementById('lpHash').textContent    = fmtHash(si.hashrate);
+    document.getElementById('lpDiff').textContent    = st.difficulty ?? '—';
+    document.getElementById('lpReward').textContent  = st.miningReward ? fmtMYC(st.miningReward) + ' SPN' : '—';
+    document.getElementById('lpHeight').textContent  = st.height?.toLocaleString('en') ?? '—';
+    document.getElementById('lpShares').textContent  = si.validShares?.toLocaleString('en') ?? '—';
+    document.getElementById('psValid').textContent   = si.validShares?.toLocaleString('en')   ?? '—';
+    document.getElementById('psInvalid').textContent = si.invalidShares?.toLocaleString('en') ?? '—';
+    document.getElementById('psTotal').textContent   = si.connected ?? '—';
+    document.getElementById('psBan').textContent     = si.bannedIPs ?? '—';
+    document.getElementById('psJob').textContent     = si.currentJob ? si.currentJob.slice(0,12)+'...' : '—';
+  } catch {}
+}
+
+async function loadMiners() {
+  try {
+    const d = await authFetch('/api/stratum/stats');
+    const miners = d.miners || [];
+    const tbody  = document.getElementById('minerTbl');
+    if (!miners.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:22px;color:var(--txt3)">No miners currently connected</td></tr>';
+      document.getElementById('hashBars').innerHTML = '<div style="padding:16px;text-align:center;color:var(--txt3)">No active miners</div>';
+      return;
+    }
+    tbody.innerHTML = miners.map(m => {
+      const addr = m.workerId?.split('.')[0] || '—';
+      const name = m.workerId?.split('.').slice(1).join('.') || 'default';
+      return `<tr>
+        <td>
+          <div style="font-size:12px;font-weight:700;color:var(--txt)">${name}</div>
+          <div class="mono trunc" title="${addr}">${addr.slice(0,18)}...</div>
+        </td>
+        <td style="color:var(--gold);font-family:'JetBrains Mono',monospace">${fmtHash(m.hashrate)}</td>
+        <td class="mono">${m.difficulty ?? '—'}</td>
+        <td>
+          <span style="color:var(--grn)">${m.valid ?? 0}</span>
+          <span style="color:var(--txt3)"> / </span>
+          <span style="color:var(--red)">${m.invalid ?? 0}</span>
+        </td>
+        <td><span class="badge-online">Online</span></td>
+      </tr>`;
+    }).join('');
+
+    // Hashrate bars
+    const maxHash = Math.max(...miners.map(m => m.hashrate || 0), 1);
+    document.getElementById('hashBars').innerHTML = miners.map(m => {
+      const pct = Math.round((m.hashrate || 0) / maxHash * 100);
+      const name = m.workerId || '—';
+      return `<div class="hbar-row">
+        <div class="hbar-lbl" title="${name}">${name.slice(0,16)}</div>
+        <div class="hbar-track"><div class="hbar-fill" style="width:${pct}%"></div></div>
+        <div class="hbar-val">${fmtHash(m.hashrate)}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    document.getElementById('minerTbl').innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--txt3);padding:20px">Sign in as admin to view connected miners</td></tr>`;
+    document.getElementById('hashBars').innerHTML = `<div style="padding:16px;text-align:center;color:var(--txt3)"><a href="admin" style="color:var(--gold)">Sign in as admin</a> to view miner details</div>`;
+  }
+}
+
+async function loadBans() {
+  try {
+    const d = await authFetch('/api/stratum/banlist');
+    const bans = Array.isArray(d) ? d : [];
+    if (!bans.length) {
+      document.getElementById('banList').innerHTML = '<div style="color:var(--grn);font-size:12px;text-align:center">✅ No banned IPs</div>';
+      return;
+    }
+    document.getElementById('banList').innerHTML = bans.map(b =>
+      `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bd)">
+        <span style="font-family:'JetBrains Mono',monospace;color:var(--red);font-size:12px">${b.ip}</span>
+        <span style="font-size:10.5px;color:var(--txt3)">Until: ${new Date(b.until).toLocaleString('en-US')}</span>
+      </div>`
+    ).join('');
+  } catch {
+    document.getElementById('banList').innerHTML = '<div style="text-align:center;color:var(--txt3);font-size:12px">Sign in as admin to view ban list</div>';
+  }
+}
+
+/* ── Tabs ── */
+function showTab(el, id) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.tpane').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById(id).classList.add('on');
+}
+
+/* ── Copy helpers ── */
+function cpEl(id) {
+  const el  = document.getElementById(id);
+  const txt = el ? el.textContent.trim() : '';
+  navigator.clipboard.writeText(txt).catch(()=>{});
+  toast('Copied: ' + txt.slice(0, 30) + (txt.length > 30 ? '...' : ''));
+}
+
+function cp(el, text) {
+  navigator.clipboard.writeText(text || '').catch(()=>{});
+  const btn = el.querySelector('.cp-btn');
+  if (btn) { const prev=btn.textContent; btn.textContent='✓'; btn.classList.add('ok'); setTimeout(()=>{btn.textContent=prev;btn.classList.remove('ok')},1500); }
+  toast('Copied!');
+}
+function cpCode(id) {
+  const text = document.getElementById(id)?.textContent || '';
+  navigator.clipboard.writeText(text).catch(()=>{});
+  toast('Copied to clipboard!');
+}
+
+/* ── Formatters ── */
+function fmtHash(h) {
+  if (!h || h === 0) return '0 H/s';
+  if (h >= 1e12) return (h/1e12).toFixed(2) + ' TH/s';
+  if (h >= 1e9)  return (h/1e9).toFixed(2)  + ' GH/s';
+  if (h >= 1e6)  return (h/1e6).toFixed(2)  + ' MH/s';
+  if (h >= 1e3)  return (h/1e3).toFixed(1)  + ' KH/s';
+  return h + ' H/s';
+}
+function fmtMYC(raw) {
+  const n = typeof raw === 'string' ? (raw.length > 8 ? Number(raw)/1e8 : Number(raw)) : Number(raw);
+  return isNaN(n) ? '0' : n.toFixed(n < 1 ? 4 : 2);
+}
+
+async function authFetch(path) {
+  const t = tok();
+  const r = await fetch(API+path, t ? { headers:{'Authorization':'Bearer '+t} } : {});
+  if (!r.ok) throw new Error(r.status.toString());
+  return r.json();
+}
+
+/* ── Toast ── */
+let _tt;
+const toastEl = document.createElement('div');
+toastEl.style.cssText = 'position:fixed;bottom:22px;right:22px;z-index:9999;background:#0f1626;border:1px solid rgba(240,165,0,.35);color:#f5b301;font-size:12px;font-weight:700;padding:9px 17px;border-radius:8px;opacity:0;transform:translateY(8px);transition:all .22s;pointer-events:none';
+document.body.appendChild(toastEl);
+function toast(msg) {
+  toastEl.textContent = msg; toastEl.style.opacity='1'; toastEl.style.transform='translateY(0)';
+  clearTimeout(_tt); _tt = setTimeout(()=>{ toastEl.style.opacity='0'; toastEl.style.transform='translateY(8px)'; }, 2200);
+}
+</script>
+</body>
+</html>

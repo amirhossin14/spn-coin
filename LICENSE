@@ -1,0 +1,90 @@
+SPN COIN — SOURCE-AVAILABLE LICENSE
+Version 1.0 — 2026
+Copyright (c) 2026 SPN Coin Project. All Rights Reserved.
+
+================================================================================
+                     SOURCE-AVAILABLE — NOT OPEN SOURCE
+================================================================================
+
+This source code is made publicly VISIBLE so that anyone can read, study, and
+audit it, and so that users, miners, and exchanges can verify how the SPN Coin
+software works. Publishing the source does NOT place it in the public domain and
+does NOT grant open-source rights. The SPN Coin Project (the "Owner") retains all
+copyright and all rights not expressly granted below.
+
+This is a "source-available" license. It is deliberately NOT an OSI-approved
+open-source license, because it restricts one specific thing: using this code to
+launch a competing blockchain or token.
+
+
+1. DEFINITIONS
+   "Software" means this source code, its documentation, and all associated
+   files in this repository.
+   "Official Network" means the canonical SPN Coin blockchain network operated
+   and recognized by the Owner.
+   "You" means any person or entity that accesses the Software.
+
+
+2. RIGHTS GRANTED (what you MAY do)
+   The Owner grants You a worldwide, royalty-free, non-exclusive license to:
+     (a) view, read, study, and audit the Software's source code;
+     (b) download and run the Software to operate a node on, mine on, or
+         otherwise participate in the Official Network;
+     (c) use the Software for personal, educational, testing, and
+         security-research purposes;
+     (d) submit fixes or contributions back to the Owner's official repository.
+
+
+3. RESTRICTIONS (what you MAY NOT do)
+   Except with the Owner's prior explicit written permission, You may NOT:
+     (a) use the Software, in whole or in part, modified or unmodified, to
+         create, launch, operate, host, or promote any separate, alternative,
+         forked, derivative, or competing blockchain, cryptocurrency, coin,
+         token, or network distinct from the Official Network;
+     (b) redistribute, publish, sublicense, sell, rent, lease, or offer the
+         Software (or any derivative of it) to third parties for the purpose
+         described in (a);
+     (c) remove, alter, or obscure any copyright, trademark, license, or
+         proprietary notice contained in the Software;
+     (d) use the names "SPN Coin", "Sepanta", any associated logo, or any
+         confusingly similar mark to identify a product not authorized by the
+         Owner (trademark rights are reserved separately from this license).
+
+
+4. CONTRIBUTIONS
+   By submitting a contribution to the Owner's official repository, You grant the
+   Owner a perpetual, worldwide, royalty-free license to use, modify, and
+   distribute that contribution as part of the Software.
+
+
+5. NO WARRANTY
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. THE SOFTWARE IS
+   EXPERIMENTAL. SPN COIN HAS NO GUARANTEED MONETARY VALUE AND IS NOT AN
+   INVESTMENT PRODUCT.
+
+
+6. LIMITATION OF LIABILITY
+   IN NO EVENT SHALL THE OWNER BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING
+   FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+   IN THE SOFTWARE.
+
+
+7. TERMINATION
+   Any breach of Section 3 automatically terminates the rights granted to You
+   under Section 2. Upon termination You must cease all use of the Software.
+
+
+8. THIRD-PARTY COMPONENTS
+   The Software bundles third-party open-source packages, each under its own
+   license. See the NOTICE file. This license applies only to the Owner's own
+   code, not to those third-party components, which keep their original licenses.
+
+
+================================================================================
+For permissions beyond this license (including any commercial or competing use),
+contact the SPN Coin Project. This document is provided for practical clarity and
+is not legal advice; the Owner should have counsel review it before relying on it.
+================================================================================

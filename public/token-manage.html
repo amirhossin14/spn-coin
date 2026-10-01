@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+  <link rel="icon" type="image/png" sizes="64x64" href="/sepanta-coin.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/sepanta-coin-32.png?v=5">
+  <link rel="shortcut icon" href="/sepanta-coin.ico?v=5">
+  <link rel="apple-touch-icon" sizes="180x180" href="/sepanta-coin-180.png?v=5">
+  <meta name="theme-color" content="#070a0e">
+  <meta name="description" content="Manage your SPN Coin tokens — mint, burn, freeze, and transfer ownership.">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Manage · Your coins & tokens on Sepanta (SPN)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@200;300;400;600;700;900&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    /* palette matched to the node dashboard */
+    --ink:#080b13; --ink-2:#0f1626; --ink-3:#141d31; --line:#1b2740;
+    --brass:#f5b301; --brass-2:#f7c948; --gold2:#c98a00; --patina:#26d07c; --rust:#f2555a;
+    --paper:#eaf0fb; --muted:#8a97b8;
+    --serif:"Vazirmatn",system-ui,sans-serif; --ui:"Vazirmatn",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--paper);font-family:var(--ui);line-height:1.5;
+    background-image:radial-gradient(ellipse 70% 50% at 50% -10%, rgba(240,165,0,.07) 0%, transparent 60%),radial-gradient(ellipse 40% 30% at 90% 80%, rgba(41,121,255,.06) 0%, transparent 60%);background-attachment:fixed;}
+  .wrap{max-width:900px;margin:0 auto;padding:0 22px}
+  a{color:var(--brass-2);text-decoration:none}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(12,26,32,.86);backdrop-filter:blur(8px);z-index:5}
+  .bar{display:flex;align-items:center;gap:12px;height:64px}
+  .brand{font-family:var(--serif);font-weight:900;font-size:22px;letter-spacing:.5px}
+  .brand span{color:var(--brass);font-style:italic;font-weight:600;font-size:13px}
+  .nav{margin-left:auto;display:flex;gap:18px;font-size:14px}
+  h1{font-family:var(--serif);font-weight:900;font-size:34px;margin:36px 0 6px}
+  .sub{color:var(--muted);max-width:62ch;margin:0 0 24px}
+  .card{background:var(--ink-2);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px}
+  label{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:12px 0 6px}
+  input{width:100%;background:var(--ink);border:1px solid var(--line);color:var(--paper);font-family:var(--mono);
+    font-size:14px;padding:11px 13px;border-radius:9px;outline:none}
+  input:focus{border-color:var(--brass);box-shadow:0 0 0 3px rgba(240,165,0,.18)}
+  input:disabled{opacity:.75;cursor:not-allowed;color:var(--muted)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .btn{margin-top:14px;border:0;background:linear-gradient(135deg,var(--brass),var(--gold2));color:#000;font-weight:700;font-size:14px;
+    padding:11px 16px;border-radius:9px;cursor:pointer;font-family:var(--ui)}
+  .btn:hover{background:linear-gradient(135deg,var(--brass-2),var(--brass));box-shadow:0 0 20px rgba(240,165,0,.28)} .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--paper)}
+  .lock{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--brass);border:1px solid var(--line);border-radius:6px;padding:2px 7px;margin-left:8px}
+  .asset{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+  .asset h3{font-family:var(--serif);margin:0 0 4px;font-size:20px}
+  .badge{font-family:var(--mono);font-size:11px;background:var(--ink-3);color:var(--brass-2);border-radius:6px;padding:2px 8px;font-weight:700}
+  .meta{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:12px 0}
+  .meta .c{background:var(--ink-2);padding:11px 13px}
+  .meta .k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .meta .v{font-family:var(--mono);font-weight:700;margin-top:3px;word-break:break-all}
+  .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+  .panel{margin-top:12px;padding:14px;border:1px dashed var(--line);border-radius:10px;display:none}
+  .panel.show{display:block}
+  .result{margin-top:10px;font-family:var(--mono);font-size:13px}
+  .result.ok{color:var(--patina)} .result.err{color:var(--rust)}
+  .warn{border:1px solid var(--rust);background:rgba(255,23,68,.07);border-radius:10px;padding:11px 13px;font-size:12.5px;color:#ff8aa3;margin-top:10px}
+  .empty{color:var(--muted);font-size:14px}
+  footer{border-top:1px solid var(--line);color:var(--muted);font-size:12px;padding:22px 0 40px;margin-top:20px;font-family:var(--mono)}
+  @media(max-width:720px){.meta{grid-template-columns:1fr}.row{grid-template-columns:1fr}}
+  :focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+</style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="token-sign.js?v=99"></script>
+  <script src="csrf-fetch.js?v=25"></script>
+  <script src="i18n.js?v=34" defer></script>
+  <script src="nav.js?v=40" defer></script><script src="/ai-bubble.js?v=5" defer></script>
+<script src="/anti-phishing.js?v=1" defer></script>
+  <script src="footer.js?v=35" defer></script>
+  <script src="ui-prefs.js?v=25" defer></script>
+</head>
+<body>
+
+<main class="wrap">
+  <h1>Manage your coins &amp; tokens</h1>
+  <p class="sub">Enter your address to load the assets you issued and hold. The identity of every asset — <b>name</b>, <b>symbol</b> and <b>supply</b> — is locked on chain and can never be changed. You can still move balances and, for mintable tokens, add supply.</p>
+
+  <div class="card">
+    <label for="addr">Your address</label>
+    <div class="row" style="grid-template-columns:1fr auto">
+      <input id="addr" placeholder="SPN1..." />
+      <button class="btn" id="load" style="margin-top:0">Load</button>
+    </div>
+  </div>
+
+  <div id="assets"></div>
+  <footer>Viewing is public and key-free. Your private key is only requested when you sign a transfer or mint, and only sent to this node.</footer>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmt = n => new Intl.NumberFormat('en-US').format(n);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function get(p){const r=await fetch(p);return r.json();}
+async function post(p,b){const r=await fetch(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});return {status:r.status, body:await r.json()};}
+
+async function load(){
+  const addr=$('addr').value.trim();
+  if(!addr){ $('assets').innerHTML='<div class="card empty">Enter your address first.</div>'; return; }
+  $('assets').innerHTML='<div class="card empty">Loading…</div>';
+  try{
+    const [all, mine] = await Promise.all([ get('/api/tokens'), get('/api/address/'+encodeURIComponent(addr)+'/tokens') ]);
+    const balances={}; (mine.tokens||[]).forEach(t=>balances[t.tokenId]=t.amount);
+    // assets I issued OR hold
+    const issued=(all.tokens||[]).filter(t=>t.issuer===addr);
+    const heldOnly=(all.tokens||[]).filter(t=>t.issuer!==addr && balances[t.tokenId]);
+    const list=[...issued, ...heldOnly];
+    if(!list.length){ $('assets').innerHTML='<div class="card empty">No assets found for this address. Create one on the <a href="token-factory">Create</a> page.</div>'; return; }
+    $('assets').innerHTML=list.map(t=>renderAsset(t, addr, balances[t.tokenId]||'0', t.issuer===addr)).join('');
+  }catch(e){ $('assets').innerHTML='<div class="card empty">Could not load assets.</div>'; }
+}
+
+function renderAsset(t, addr, myBal, isIssuer){
+  const canMint = isIssuer && t.mintable;
+  return `<div class="card"><div class="asset">
+    <h3>${esc(t.name)} <span class="badge">${esc(t.symbol)}</span> <span class="badge" style="background:transparent;border:1px solid var(--line)">${esc(t.kind||'token')}${t.mintable?' · mintable':''}</span></h3>
+    <div style="font-family:var(--mono);font-size:12px;color:var(--muted)">${esc(t.tokenId)}</div>
+
+    <!-- LOCKED identity: name / symbol / supply are immutable -->
+    <div class="meta">
+      <div class="c"><div class="k">Name <span class="lock">🔒 locked</span></div><div class="v">${esc(t.name)}</div></div>
+      <div class="c"><div class="k">Symbol <span class="lock">🔒 locked</span></div><div class="v">${esc(t.symbol)}</div></div>
+      <div class="c"><div class="k">Supply <span class="lock">🔒 locked</span></div><div class="v">${fmt(t.supply)}</div></div>
+    </div>
+    <div style="font-family:var(--mono);font-size:13px;color:var(--muted)">your balance: <b style="color:var(--paper)">${fmt(myBal)}</b> · ${t.holders} holders${isIssuer?' · <b style="color:var(--brass-2)">you are the issuer</b>':''}</div>
+
+    <div class="actions">
+      <button class="btn ghost" onclick="toggle('${t.tokenId}','xfer')">Transfer</button>
+      ${canMint?`<button class="btn ghost" onclick="toggle('${t.tokenId}','mint')">Mint more</button>`:''}
+      <button class="btn ghost" onclick="toggle('${t.tokenId}','burn')">🔥 Burn</button>
+      ${isIssuer?`<button class="btn ghost" onclick="toggle('${t.tokenId}','freeze')">🧊 Freeze</button>`:''}
+      ${isIssuer?`<button class="btn ghost" onclick="toggle('${t.tokenId}','meta')">📝 Metadata</button>`:''}
+      ${isIssuer?`<button class="btn ghost" onclick="toggle('${t.tokenId}','owner')">👑 Owner</button>`:''}
+    </div>
+
+    <div class="panel" id="xfer-${t.tokenId}">
+      <label>Send to address</label><input id="to-${t.tokenId}" placeholder="SPN1..." />
+      <div class="row"><div><label>Amount</label><input id="amt-${t.tokenId}" type="number" min="1" /></div>
+      <div><label>Your private key</label><input id="pk-${t.tokenId}" type="password" autocomplete="off" placeholder="signs the transfer" /></div></div>
+      <div class="warn">🔐 Your key is used only in your browser to sign — it never leaves your device.</div>
+      <button class="btn" onclick="doSend('${t.tokenId}','${addr}')">Sign &amp; send</button>
+      <div class="result" id="r-${t.tokenId}"></div>
+    </div>
+
+    <!-- 🔥 BURN — any holder can destroy their own tokens -->
+    <div class="panel" id="burn-${t.tokenId}">
+      <div class="row"><div><label>Amount to burn</label><input id="bamt-${t.tokenId}" type="number" min="1" /></div>
+      <div><label>Your private key</label><input id="bpk-${t.tokenId}" type="password" autocomplete="off" /></div></div>
+      <div class="warn">🔥 Burning permanently destroys these tokens and reduces total supply. This cannot be undone.</div>
+      <button class="btn" onclick="doBurn('${t.tokenId}','${addr}')">Sign &amp; burn</button>
+      <div class="result" id="br-${t.tokenId}"></div>
+    </div>
+
+    ${isIssuer?`<!-- 🧊 FREEZE / UNFREEZE — issuer only -->
+    <div class="panel" id="freeze-${t.tokenId}">
+      <label>Target address</label><input id="faddr-${t.tokenId}" placeholder="SPN1... address to freeze/unfreeze" />
+      <div class="row"><div><label>Action</label>
+        <select id="fact-${t.tokenId}" style="width:100%;padding:10px;background:var(--bg1,#12141f);border:1px solid var(--line,#333);border-radius:8px;color:inherit">
+          <option value="freeze">🧊 Freeze (block transfers)</option>
+          <option value="unfreeze">☀️ Unfreeze (restore)</option>
+        </select></div>
+      <div><label>Issuer private key</label><input id="fpk-${t.tokenId}" type="password" autocomplete="off" /></div></div>
+      <div class="warn">🧊 A frozen address cannot send or receive this token until unfrozen.</div>
+      <button class="btn" onclick="doFreeze('${t.tokenId}','${addr}')">Sign &amp; apply</button>
+      <div class="result" id="fr-${t.tokenId}"></div>
+    </div>
+
+    <!-- 📝 METADATA — issuer only -->
+    <div class="panel" id="meta-${t.tokenId}">
+      <label>Description</label><input id="mdesc-${t.tokenId}" maxlength="500" placeholder="What is this token for?" />
+      <label>Logo URL</label><input id="mlogo-${t.tokenId}" maxlength="256" placeholder="https://.../logo.png" />
+      <label>Website</label><input id="mweb-${t.tokenId}" maxlength="256" placeholder="https://..." />
+      <div class="row"><div><label>Twitter</label><input id="mtw-${t.tokenId}" maxlength="100" placeholder="@handle" /></div>
+      <div><label>Telegram</label><input id="mtg-${t.tokenId}" maxlength="100" placeholder="t.me/..." /></div></div>
+      <label>Issuer private key</label><input id="mpk2-${t.tokenId}" type="password" autocomplete="off" />
+      <div class="warn">📝 Metadata is public and stored on-chain. Name, symbol and supply stay locked.</div>
+      <button class="btn" onclick="doMeta('${t.tokenId}','${addr}')">Sign &amp; save</button>
+      <div class="result" id="metar-${t.tokenId}"></div>
+    </div>
+
+    <!-- 👑 TRANSFER OWNER — issuer only -->
+    <div class="panel" id="owner-${t.tokenId}">
+      <label>New issuer address</label><input id="noaddr-${t.tokenId}" placeholder="SPN1... new owner" />
+      <label>Current issuer private key</label><input id="opk-${t.tokenId}" type="password" autocomplete="off" />
+      <div class="warn">👑 This hands ALL issuer rights (mint, freeze, metadata) to the new address. You will lose control. Irreversible.</div>
+      <button class="btn" onclick="doOwner('${t.tokenId}','${addr}')">Sign &amp; transfer ownership</button>
+      <div class="result" id="or-${t.tokenId}"></div>
+    </div>`:''}
+
+    ${canMint?`<div class="panel" id="mint-${t.tokenId}">
+      <div class="row"><div><label>Amount to mint</label><input id="mamt-${t.tokenId}" type="number" min="1" /></div>
+      <div><label>Your private key (issuer)</label><input id="mpk-${t.tokenId}" type="password" autocomplete="off" /></div></div>
+      <div class="warn">Minting increases the circulating supply of this token. (Coins can never be minted.)</div>
+      <button class="btn" onclick="doMint('${t.tokenId}','${addr}')">Sign &amp; mint</button>
+      <div class="result" id="mr-${t.tokenId}"></div>
+    </div>`:''}
+  </div></div>`;
+}
+
+function toggle(id, which){
+  const panels = ['xfer','mint','burn','freeze','meta','owner'];
+  panels.forEach(p=>{
+    const el=$(p+'-'+id);
+    if(!el) return;
+    if(p===which) el.classList.toggle('show');
+    else el.classList.remove('show');
+  });
+}
+
+// ── Shared: build a signed op, wrap it in a carrier tx, submit it ──
+async function submitTokenOp(kind, fields, addr, privateKey, resultEl){
+  if(!window.SPNSign){ resultEl.className='result err'; resultEl.textContent='Signing library not loaded.'; return; }
+  const privHex = privateKey.trim();
+  if(!privHex){ resultEl.className='result err'; resultEl.textContent='Enter your private key.'; return; }
+  resultEl.className='result'; resultEl.textContent='Signing locally…';
+  try{
+    // 1) ask node for coins to fund the tiny carrier-tx fee (no key sent)
+    const prep=await (await fetch('/api/tokens/prepare',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({address:addr, payIssuanceFee:false})})).json();
+    if(!prep.ok) throw new Error(prep.error||'prepare failed');
+
+    // 2) build + sign the op locally
+    const op=await SPNSign.buildSignedOp(kind, fields, privHex, prep.chainId);
+
+    // 3) select coins + build the carrier tx
+    let sum=0n; const chosen=[]; const need=BigInt(prep.feeOut)+100000n;
+    for(const u of prep.utxos){ chosen.push(u); sum+=BigInt(u.amount); if(sum>=need) break; }
+    if(sum<need) throw new Error('insufficient coins to fund the fee');
+    const feeOut=BigInt(prep.feeOut);
+    const est=BigInt(Math.ceil((11+chosen.length*68+2*31)*prep.feeRate));
+    const change=sum-feeOut-est;
+    const outputs=[{address:prep.treasury,amount:feeOut.toString()}];
+    if(change>546n) outputs.push({address:addr,amount:change.toString()});
+    const inputs=chosen.map(u=>({txid:u.txid,vout:u.vout,sequence:0xffffffff}));
+    const tx=await SPNSign.buildSignedTx({inputs,outputs,data:{tokenOps:[op]},chainId:prep.chainId}, privHex);
+
+    // 4) submit fully-signed tx
+    resultEl.textContent='Submitting…';
+    const r=await fetch('/api/tokens/submit-signed',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tx})});
+    const d=await r.json();
+    if(r.ok && d.ok){ resultEl.className='result ok'; resultEl.textContent='✓ submitted — txid '+d.txid.slice(0,16)+'… ('+(d.note||'pending')+')'; setTimeout(load,1800); return true; }
+    else throw new Error(d.error||'submit failed');
+  }catch(e){ resultEl.className='result err'; resultEl.textContent='Failed: '+e.message; return false; }
+}
+
+async function doSend(id, addr){
+  const to=$('to-'+id).value.trim(), amount=$('amt-'+id).value.trim(), pk=$('pk-'+id).value;
+  const r=$('r-'+id);
+  if(!to||!amount){ r.className='result err'; r.textContent='Fill recipient and amount.'; return; }
+  const ok=await submitTokenOp('transfer',{tokenId:id,from:addr,to,amount},addr,pk,r);
+  if(ok) $('pk-'+id).value='';
+}
+async function doMint(id, addr){
+  const amount=$('mamt-'+id).value.trim(), pk=$('mpk-'+id).value;
+  const r=$('mr-'+id);
+  if(!amount){ r.className='result err'; r.textContent='Enter amount.'; return; }
+  const ok=await submitTokenOp('mint',{tokenId:id,amount,issuer:addr},addr,pk,r);
+  if(ok) $('mpk-'+id).value='';
+}
+async function doBurn(id, addr){
+  const amount=$('bamt-'+id).value.trim(), pk=$('bpk-'+id).value;
+  const r=$('br-'+id);
+  if(!amount){ r.className='result err'; r.textContent='Enter amount to burn.'; return; }
+  const ok=await submitTokenOp('burn',{tokenId:id,amount,holder:addr},addr,pk,r);
+  if(ok) $('bpk-'+id).value='';
+}
+async function doFreeze(id, addr){
+  const target=$('faddr-'+id).value.trim(), action=$('fact-'+id).value, pk=$('fpk-'+id).value;
+  const r=$('fr-'+id);
+  if(!target){ r.className='result err'; r.textContent='Enter target address.'; return; }
+  const ok=await submitTokenOp(action,{tokenId:id,target,issuer:addr},addr,pk,r);
+  if(ok) $('fpk-'+id).value='';
+}
+async function doMeta(id, addr){
+  const meta={
+    description:$('mdesc-'+id).value, logo:$('mlogo-'+id).value,
+    website:$('mweb-'+id).value, twitter:$('mtw-'+id).value, telegram:$('mtg-'+id).value,
+  };
+  const pk=$('mpk2-'+id).value;
+  const r=$('metar-'+id);
+  const ok=await submitTokenOp('set-meta',{tokenId:id,meta,issuer:addr},addr,pk,r);
+  if(ok) $('mpk2-'+id).value='';
+}
+async function doOwner(id, addr){
+  const newIssuer=$('noaddr-'+id).value.trim(), pk=$('opk-'+id).value;
+  const r=$('or-'+id);
+  if(!newIssuer){ r.className='result err'; r.textContent='Enter new issuer address.'; return; }
+  if(!confirm('Transfer ownership to '+newIssuer+'? You will permanently lose issuer control.')) return;
+  const ok=await submitTokenOp('transfer-owner',{tokenId:id,newIssuer,issuer:addr},addr,pk,r);
+  if(ok) $('opk-'+id).value='';
+}
+
+$('load').addEventListener('click', load);
+$('addr').addEventListener('keydown', e=>{ if(e.key==='Enter') load(); });
+</script>
+</body>
+</html>

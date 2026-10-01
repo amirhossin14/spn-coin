@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  test:
+    name: Test (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [ '20', '22' ]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Generate dev TLS cert (for TLS tests)
+        run: |
+          mkdir -p certs
+          openssl req -x509 -newkey rsa:2048 -keyout certs/dev-key.pem \
+            -out certs/dev-cert.pem -days 365 -nodes -subj "/CN=localhost"
+
+      - name: Run test suite
+        run: npm test
+        env:
+          CHAIN_ID: '3'
+          JWT_SECRET: ci-test-secret
+          JWT_REFRESH_SECRET: ci-test-refresh-secret
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci || npm install
+      - name: Run ESLint
+        run: npm run lint
+        continue-on-error: true
+
+  security:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci || npm install
+      - name: Audit production dependencies (fail on high/critical)
+        run: npm audit --omit=dev --audit-level=high
+      - name: Full audit report (informational)
+        run: npm audit || true
+        continue-on-error: true
+
+  smoke:
+    name: Boot smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci || npm install
+      - name: Start node and probe endpoints
+        run: |
+          CHAIN_ID=3 PORT=3000 JWT_SECRET=ci JWT_REFRESH_SECRET=ci node server.js &
+          SERVER_PID=$!
+          sleep 5
+          echo "Probing /api/health..."
+          curl -fsS http://localhost:3000/api/health || (kill $SERVER_PID; exit 1)
+          echo "Probing /api/stats..."
+          curl -fsS http://localhost:3000/api/stats || (kill $SERVER_PID; exit 1)
+          echo "Probing /api/analytics..."
+          curl -fsS "http://localhost:3000/api/analytics?window=10" || (kill $SERVER_PID; exit 1)
+          echo "Probing /block.html..."
+          curl -fsS http://localhost:3000/block.html > /dev/null || (kill $SERVER_PID; exit 1)
+          kill $SERVER_PID
+          echo "✅ All endpoints responded"

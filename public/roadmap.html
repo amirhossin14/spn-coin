@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<!--
+  © 2026 SPN Coin Project — PROPRIETARY AND CONFIDENTIAL
+  All Rights Reserved.
+-->
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roadmap · SPN Coin Explorer</title>
+<meta name="description" content="SPN Coin project roadmap — completed milestones and plans for the next 1 and 5 years. Transparent and honest.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#080b13; --panel:#0c1120; --card:#0f1626; --card2:#141d31;
+    --line:#1b2740; --line2:#26324f;
+    --txt:#eaf0fb; --mut:#8a97b8; --mut2:#5a6788;
+    --gold:#f5b301; --gold-dim:rgba(245,179,1,.12);
+    --indigo:#6d6bf5; --indigo2:#9a98ff;
+    --grn:#26d07c; --grn-dim:rgba(34,197,94,.13);
+    --red:#f2555a; --red-dim:rgba(239,68,68,.13);
+    --cyan:#25d0ee; --pur:#b06bf7;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--txt);font-family:'Sora',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  code,.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-thumb{background:var(--line2);border-radius:6px}
+  #spn-topbar{display:none !important}
+
+  .layout{display:flex;min-height:100vh}
+  .sidebar{width:250px;flex:0 0 250px;background:var(--panel);border-right:1px solid var(--line);
+    display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .brand{display:flex;align-items:center;gap:12px;padding:22px 20px 20px}
+  .brand .logo{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--gold),#c47f00);
+    display:grid;place-items:center;font-weight:900;color:#1a1200;font-size:19px;box-shadow:0 4px 14px rgba(240,165,0,.3)}
+  .brand .bt b{display:block;font-size:16px;font-weight:800}
+  .brand .bt span{display:block;font-size:11.5px;color:var(--mut);font-weight:500;margin-top:1px}
+  .nav{padding:6px 12px;flex:1}
+  .nav .grp{font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--mut2);padding:14px 12px 7px;font-weight:600}
+  .nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:var(--mut);font-size:14px;font-weight:500;margin-bottom:2px;transition:.15s;position:relative}
+  .nav a svg{width:19px;height:19px;flex:0 0 19px;stroke:currentColor;fill:none;stroke-width:1.9}
+  .nav a:hover{background:var(--card2);color:var(--txt)}
+  .nav a.on{background:var(--gold-dim);color:var(--gold)}
+  .nav a.on::before{content:"";position:absolute;left:-12px;top:8px;bottom:8px;width:3px;border-radius:3px;background:var(--gold)}
+  .sb-foot{border-top:1px solid var(--line);padding:16px 20px;font-size:12px}
+  .sb-foot .row{display:flex;justify-content:space-between;align-items:center;margin:6px 0;color:var(--mut)}
+  .sb-foot .row b{color:var(--txt);font-weight:600}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--grn);box-shadow:0 0 0 3px var(--grn-dim);margin-right:7px;vertical-align:middle}
+  .dot.off{background:var(--red);box-shadow:0 0 0 3px var(--red-dim)}
+
+  .main{flex:1;min-width:0;display:flex;flex-direction:column}
+  .topbar{display:flex;align-items:center;gap:18px;padding:20px 30px;border-bottom:1px solid var(--line);
+    position:sticky;top:0;background:rgba(10,14,23,.86);backdrop-filter:blur(12px);z-index:20}
+  .topbar h1{font-size:20px;font-weight:800;white-space:nowrap}
+  .badges{display:flex;gap:9px;margin-left:auto}
+  .badge{padding:7px 13px;border-radius:9px;font-size:12px;font-weight:600;border:1px solid var(--line);background:var(--card)}
+  .badge.net{color:var(--grn);border-color:rgba(34,197,94,.3);background:var(--grn-dim)}
+  .badge.ver{color:var(--mut)}
+  .mtoggle{display:none;background:var(--card);border:1px solid var(--line);border-radius:10px;width:40px;height:40px;place-items:center;cursor:pointer}
+  .mtoggle svg{width:20px;height:20px;stroke:var(--txt);fill:none;stroke-width:2}
+  .scrim{display:none}
+
+  .content{padding:26px 30px 50px;max-width:1080px;width:100%}
+
+  .notice{background:var(--gold-dim);border:1px solid rgba(240,165,0,.3);border-radius:14px;padding:16px 20px;margin-bottom:26px;font-size:13.5px;line-height:1.7;color:#f5d78a}
+  .notice b{color:var(--gold)}
+
+  .lead{font-size:15px;color:var(--mut);line-height:1.8;margin-bottom:8px}
+  .lead b{color:var(--txt)}
+
+  /* phase blocks */
+  .phase{margin-top:34px}
+  .phase-head{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+  .phase-head .tl{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;flex:0 0 44px;font-weight:800;font-size:15px}
+  .tl.done{background:var(--grn-dim);color:var(--grn)}
+  .tl.now{background:rgba(99,102,241,.16);color:var(--indigo2)}
+  .tl.y1{background:var(--gold-dim);color:var(--gold)}
+  .tl.y5{background:rgba(168,85,247,.14);color:var(--pur)}
+  .phase-head h2{font-size:18px;font-weight:800}
+  .phase-head .when{font-size:12.5px;color:var(--mut2);font-weight:600;margin-top:2px}
+  .phase-body{border-left:2px solid var(--line);margin-left:22px;padding:14px 0 4px 32px}
+
+  .item{display:flex;gap:12px;padding:11px 0;align-items:flex-start}
+  .item .ic{width:22px;height:22px;border-radius:7px;flex:0 0 22px;display:grid;place-items:center;font-size:12px;font-weight:700;margin-top:1px}
+  .ic.c{background:var(--grn-dim);color:var(--grn)}
+  .ic.p{background:rgba(99,102,241,.16);color:var(--indigo2)}
+  .ic.o{background:var(--card2);color:var(--mut2);border:1px dashed var(--line2)}
+  .item .tx{flex:1}
+  .item .tx b{font-size:14px;font-weight:600;color:var(--txt)}
+  .item .tx p{font-size:12.8px;color:var(--mut);margin-top:2px;line-height:1.6}
+
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin:8px 0 4px;font-size:12.5px;color:var(--mut)}
+  .legend span{display:flex;align-items:center;gap:7px}
+  .lg{width:16px;height:16px;border-radius:5px;display:grid;place-items:center;font-size:10px;font-weight:700}
+
+  .sec{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-top:34px}
+  .sec h3{font-size:16px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:10px}
+  .sec h3 svg{width:20px;height:20px;stroke:var(--gold);fill:none;stroke-width:2}
+  .sec p{font-size:13.5px;color:var(--mut);line-height:1.8;margin:7px 0}
+  .sec p b{color:var(--txt)}
+  .chk{color:var(--grn);font-weight:700}
+  .amb{color:var(--gold);font-weight:700}
+
+  .foot{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);font-size:11.5px;color:var(--mut2);line-height:1.7}
+
+  @media(max-width:900px){
+    .sidebar{position:fixed;left:0;top:0;z-index:60;transform:translateX(-100%);transition:.25s}
+    .sidebar.open{transform:none}
+    .mtoggle{display:grid}
+    .scrim.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:55}
+    .content{padding:20px 16px 44px}
+    .topbar{padding:16px}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">S</div>
+      <div class="bt"><b>SPN Coin</b><span>Explorer</span></div>
+    </div>
+    <nav class="nav">
+      <div class="grp">Overview</div>
+      <a href="/dashboard"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
+      <a href="/block"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7 12 12l8.7-5M12 22V12"/></svg>Blocks</a>
+      <a href="/tx"><svg viewBox="0 0 24 24"><path d="M7 10 3 6l4-4"/><path d="M3 6h13a4 4 0 0 1 4 4v0"/><path d="m17 14 4 4-4 4"/><path d="M21 18H8a4 4 0 0 1-4-4v0"/></svg>Transactions</a>
+      <a href="/explorer"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>Addresses</a>
+      <div class="grp">Network</div>
+      <a href="/network"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5 6 16.5M12 7.5l6 9M7.5 19h9"/></svg>Network</a>
+      <a href="/miner"><svg viewBox="0 0 24 24"><path d="m14 4 6 6M9 21l-6-6M4 15l11-11 5 5L9 20z"/></svg>Mining</a>
+      <a href="/run-node"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="8" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/><path d="M7 8h.01M7 17h.01"/></svg>Run a Node</a>
+      <a href="/analytics"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>Analytics</a>
+      <a class="on" href="/roadmap"><svg viewBox="0 0 24 24"><path d="M9 6 3 4v14l6 2 6-2 6 2V6l-6-2-6 2z"/><path d="M9 6v14M15 4v14"/></svg>Roadmap</a>
+      <div class="grp">Account</div>
+      <a href="/mywallet"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 14h2"/></svg>Wallet</a>
+    </nav>
+    <div class="sb-foot">
+      <div class="row"><span><span class="dot" id="sbDot"></span>Node</span><b id="sbStatus">Online</b></div>
+      <div class="row"><span>Height</span><b id="sbHeight">—</b></div>
+      <div class="row"><span>Peers</span><b id="sbPeers">—</b></div>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="mtoggle" id="mtoggle"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></div>
+      <h1>Project Roadmap</h1>
+      <div class="badges">
+        <a class="badge" href="/SPN_Coin_Whitepaper.pdf" target="_blank" style="color:var(--gold);border-color:rgba(240,165,0,.35);display:inline-flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg>Whitepaper</a>
+        <span class="badge net">● Mainnet</span>
+        <span class="badge ver" id="bVer">v—</span>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="notice">
+        <b>An honest note.</b> SPN Coin is an educational, Bitcoin-inspired blockchain built from scratch. It currently has <b>no monetary value</b>, is <b>not</b> a security or investment, and makes <b>no promise of profit or returns</b>. This roadmap describes engineering milestones and goals — dates are targets, not guarantees.
+      </div>
+
+      <p class="lead">SPN Coin is a full proof-of-work, UTXO blockchain (SHA-256d, 10-minute blocks, 21,000,000 fixed supply, halving every 210,000 blocks). The goal of this roadmap is total transparency: what has been built, what we are doing now, and where the project is headed over the next <b>one year</b> and <b>five years</b>.</p>
+
+      <div class="legend">
+        <span><span class="lg c">✓</span> Completed</span>
+        <span><span class="lg p">•</span> In progress</span>
+        <span><span class="lg o">○</span> Planned</span>
+      </div>
+
+      <!-- ===== PHASE: Foundation (done) ===== -->
+      <div class="phase">
+        <div class="phase-head">
+          <div class="tl done">✓</div>
+          <div><h2>Phase 0 — Foundation</h2><div class="when">Completed · the core chain</div></div>
+        </div>
+        <div class="phase-body">
+          <div class="item"><div class="ic c">✓</div><div class="tx"><b>Real proof-of-work consensus</b><p>Full 256-bit integer targets (not a "count the zeros" shortcut), cumulative-work fork choice, Median-Time-Past (BIP-113), and difficulty retargeting.</p></div></div>
+          <div class="item"><div class="ic c">✓</div><div class="tx"><b>UTXO ledger + script engine</b><p>Bitcoin-style UTXO model with apply/undo, Merkle trees and proofs, and a script engine supporting P2PKH, multisig and timelocks.</p></div></div>
+          <div class="item"><div class="ic c">✓</div><div class="tx"><b>Halving economics</b><p>Fixed 21,000,000 SPN maximum supply, 50 SPN initial block reward, halving every 210,000 blocks — no hidden minting.</p></div></div>
+          <div class="item"><div class="ic c">✓</div><div class="tx"><b>P2P networking + mining pool</b><p>Peer-to-peer gossip layer (raw socket + HTTP), a Stratum mining pool, and a token layer for issuing assets on the base chain.</p></div></div>
+          <div class="item"><div class="ic c">✓</div><div class="tx"><b>Web ecosystem &amp; tooling</b><p>Block explorer, dashboard, HD wallet (BIP39), CLI wallet, threat radar, and a full test suite with CI/CD.</p></div></div>
+        </div>
+      </div>
+
+      <!-- ===== PHASE: Recent hardening (done) ===== -->
+      <div class="phase">
+        <div class="phase-head">
+          <div class="tl done">✓</div>
+          <div><h2>Phase 1 — Security &amp; Network Hardening</h2><div class="when">Recently completed</div></div>
+        </div>
+        <div class="phase-body">
+          <div class="item"><div class="ic c">✓</div><div class="tx"><b>Client-side wallet signing (critical fix)</b><p>The most important security change: private keys and the 12-word phrase are now generated and signed entirely in the browser and never sent to the server. This closed the single critical flaw that previously existed.</p></div></div>
+          <div class="item"><div class="ic c">✓</div><div class="tx"><b>Advanced peer discovery &amp; anti-eclipse</b><p>Bitcoin-inspired address manager (tried/new tables, /16 network-group spread), exponential backoff, and persistence across restarts.</p></div></div>
+          <div class="item"><div class="ic c">✓</div><div class="tx"><b>DoS protection &amp; ban scoring</b><p>Per-peer token-bucket rate limiting per message type, misbehavior scoring with 24-hour bans, and graceful score decay.</p></div></div>
+          <div class="item"><div class="ic c">✓</div><div class="tx"><b>Headers-first fast sync + pruning</b><p>Header chain downloaded and validated first, then block bodies fetched in parallel; optional pruning with an 80-byte compact header codec.</p></div></div>
+          <div class="item"><div class="ic c">✓</div><div class="tx"><b>Server &amp; app hardening</b><p>SSH key-only login (password login disabled), IDS/IPS, rate limiting, role-based access control, SSRF guards, JWT + 2FA (TOTP), and a redesigned public explorer.</p></div></div>
+        </div>
+      </div>
+
+      <!-- ===== PHASE: Now ===== -->
+      <div class="phase">
+        <div class="phase-head">
+          <div class="tl now">◆</div>
+          <div><h2>Phase 2 — Where we are now</h2><div class="when">In progress</div></div>
+        </div>
+        <div class="phase-body">
+          <div class="item"><div class="ic p">•</div><div class="tx"><b>From one node to many</b><p>Today the network runs primarily on one node (peers = 0). Bringing up additional independent nodes is the current focus so the chain becomes genuinely distributed.</p></div></div>
+          <div class="item"><div class="ic p">•</div><div class="tx"><b>Stable public testnet + faucet</b><p>Standing up a durable public testnet so anyone can connect a node, mine, and transact — the real field test for the new networking modules.</p></div></div>
+          <div class="item"><div class="ic p">•</div><div class="tx"><b>Complete independent header validation</b><p>Finishing <code>validateHeader</code> so every node fully verifies the header chain on its own.</p></div></div>
+        </div>
+      </div>
+
+      <!-- ===== PHASE: 1 year ===== -->
+      <div class="phase">
+        <div class="phase-head">
+          <div class="tl y1">1y</div>
+          <div><h2>The next 1 year</h2><div class="when">~2026 → 2027 · maturity &amp; trust</div></div>
+        </div>
+        <div class="phase-body">
+          <div class="item"><div class="ic o">○</div><div class="tx"><b>Real decentralization</b><p>Dozens of independent nodes across different networks, automatic DNS-seed discovery, and long field testing of the P2P layer at scale.</p></div></div>
+          <div class="item"><div class="ic o">○</div><div class="tx"><b>Independent security audit</b><p>A professional third-party audit of the node and, if a token is issued, the smart contract — a prerequisite before anything holds real value.</p></div></div>
+          <div class="item"><div class="ic o">○</div><div class="tx"><b>Bug bounty program</b><p>A public bounty (e.g. on Immunefi) inviting researchers to find issues, plus static analysis (Slither) and fuzzing.</p></div></div>
+          <div class="item"><div class="ic o">○</div><div class="tx"><b>Wallets for everyone</b><p>Browser-extension and mobile (iOS/Android) wallets in addition to the current web and CLI wallets.</p></div></div>
+          <div class="item"><div class="ic o">○</div><div class="tx"><b>Listing readiness</b><p>Published audited source, verified contracts, and applications to data/price services (e.g. CoinGecko) following their rules — only after decentralization and audit are real.</p></div></div>
+        </div>
+      </div>
+
+      <!-- ===== PHASE: 5 years ===== -->
+      <div class="phase">
+        <div class="phase-head">
+          <div class="tl y5">5y</div>
+          <div><h2>The next 5 years</h2><div class="when">~2027 → 2031 · ecosystem &amp; adoption</div></div>
+        </div>
+        <div class="phase-body">
+          <div class="item"><div class="ic o">○</div><div class="tx"><b>A resilient, distributed network</b><p>A large set of geographically diverse nodes and miners, snapshot-based fast sync, and efficient explorer indexing at scale.</p></div></div>
+          <div class="item"><div class="ic o">○</div><div class="tx"><b>Developer ecosystem</b><p>A stable SDK, complete developer documentation, and third-party apps and services building on SPN.</p></div></div>
+          <div class="item"><div class="ic o">○</div><div class="tx"><b>Advanced protocol features</b><p>Optional, carefully evaluated upgrades such as SegWit-style witness separation and Schnorr/Taproot — only if they add real value without weakening security.</p></div></div>
+          <div class="item"><div class="ic o">○</div><div class="tx"><b>Token &amp; asset layer maturity</b><p>A well-tested, audited asset layer with transparent fixed supply, multisig-held treasury, and public vesting for any team allocations.</p></div></div>
+          <div class="item"><div class="ic o">○</div><div class="tx"><b>Community &amp; governance</b><p>An open contributor community and a transparent process for proposing and reviewing protocol changes.</p></div></div>
+        </div>
+      </div>
+
+      <!-- ===== Security answer ===== -->
+      <div class="sec">
+        <h3><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z"/><path d="m9 12 2 2 4-4"/></svg>Is publishing this roadmap safe?</h3>
+        <p><span class="chk">Yes — technically.</span> This page shows only public information (project plans and milestones). It exposes no keys, passwords, or user data, and needs no login. Publishing a transparent roadmap is normal and actually <b>builds trust</b> with users and exchanges.</p>
+        <p><span class="amb">One thing to keep right:</span> a roadmap must never turn into a <b>financial promise</b>. This page deliberately avoids any mention of price, profit, guaranteed returns, or "invest now" language — because those claims can create real legal risk (securities law) and mislead people. Keeping the roadmap about <b>technology and milestones</b>, with the honest notice at the top, is both the safest and the most credible approach.</p>
+        <p>In short: transparency about <b>what you build</b> is good and safe; promises about <b>what people will earn</b> are not. This roadmap stays firmly on the safe side.</p>
+      </div>
+
+      <div class="foot">
+        © 2026 SPN Coin Project. This roadmap describes the project's status and goals at the time of writing. Dates are targets and may change. SPN Coin has no monetary value and is not an investment product.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/nav.js?v=40" defer></script>
+<script>
+(function(){
+  var API=location.origin;
+  function j(p){return fetch(API+p,{headers:{'Accept':'application/json'}}).then(function(r){return r.ok?r.json():null;});}
+  var $=function(id){return document.getElementById(id);};
+  function fmt(n){return n==null||isNaN(n)?'—':Number(n).toLocaleString('en-US');}
+  j('/api/health').then(function(h){
+    if(!h)return;
+    var on=h.status==='ok';
+    $('sbDot').className='dot'+(on?'':' off');
+    $('sbStatus').textContent=on?'Online':'Offline';
+    $('sbHeight').textContent=fmt(h.height);
+    $('sbPeers').textContent=fmt(h.peers);
+    $('bVer').textContent='v'+(h.version||'—');
+  }).catch(function(){});
+  var sb=$('sidebar'),scrim=$('scrim');
+  $('mtoggle').addEventListener('click',function(){sb.classList.toggle('open');scrim.classList.toggle('show');});
+  scrim.addEventListener('click',function(){sb.classList.remove('open');scrim.classList.remove('show');});
+})();
+</script>
+</body>
+</html>

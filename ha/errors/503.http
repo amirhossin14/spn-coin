@@ -1,0 +1,12 @@
+HTTP/1.1 503 Service Unavailable
+Cache-Control: no-cache
+Content-Type: text/html; charset=utf-8
+
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Sepanta — Temporarily Unavailable</title>
+<style>body{background:#0d0f18;color:#e8f0f8;font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;text-align:center}
+.box{max-width:420px;padding:40px}h1{color:#f0a500}p{color:#8fa9c4;line-height:1.6}</style></head>
+<body><div class="box"><h1>🪙 Sepanta</h1>
+<h2>We'll be right back</h2>
+<p>The network is briefly unavailable while nodes recover. Your funds and the blockchain are safe. Please try again in a moment.</p>
+</div></body></html>

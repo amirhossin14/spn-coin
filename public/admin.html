@@ -1,0 +1,1929 @@
+<!DOCTYPE html>
+<!--
+  © 2026 SPN Coin Project — PROPRIETARY AND CONFIDENTIAL
+  All Rights Reserved. Unauthorized copying, modification,
+  distribution, or use of this file is strictly prohibited.
+  See LICENSE file in the project root for full details.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="64x64" href="/sepanta-coin.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/sepanta-coin-32.png?v=5">
+  <link rel="shortcut icon" href="/sepanta-coin.ico?v=5">
+  <link rel="apple-touch-icon" sizes="180x180" href="/sepanta-coin-180.png?v=5">
+  <meta name="theme-color" content="#070a0e">
+  <meta name="description" content="SPN Coin admin panel — manage nodes, users, and network settings.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sepanta (SPN) — Admin Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#05070d;--base:#080b13;--panel:#0c1120;--surface:#0f1626;--raised:#141d31;
+  --bd:rgba(148,163,208,.14);--bd2:rgba(148,163,208,.14);--bd3:rgba(148,163,208,.14);
+  --grn:#26d07c;--grn2:#1fae66;--grn3:rgba(0,255,136,.08);--grn4:rgba(0,255,136,.16);
+  --gold:#f5b301;--gold2:rgba(240,165,0,.12);--gold3:rgba(240,165,0,.26);
+  --red:#f2555a;--red2:rgba(255,68,102,.12);
+  --cyan:#25d0ee;--cyan2:rgba(0,204,255,.10);
+  --pur:#b06bf7;--pur2:rgba(167,139,250,.10);
+  --txt:#eaf0fb;--txt2:#8a97b8;--txt3:#5a6788;--muted:#1b2740;
+  --r:8px;--r2:12px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Sora',sans-serif;background:var(--void);color:var(--txt);min-height:100vh;font-size:14px;line-height:1.5;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.04) 2px,rgba(0,0,0,.04) 4px)}
+body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 70% 50% at 15% -10%,rgba(0,255,136,.04) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 90% 110%,rgba(0,204,255,.03) 0%,transparent 55%)}
+
+/* ── Screens ── */
+.screen{display:none;position:relative;z-index:1}
+.screen.on{display:flex}
+
+/* ══ LOGIN ══ */
+#sLogin{min-height:100vh;align-items:center;justify-content:center;flex-direction:column;padding:20px}
+.lbox{position:relative;width:100%;max-width:430px;background:var(--panel);border:1px solid var(--bd2);border-radius:var(--r2);overflow:hidden;box-shadow:0 0 0 1px rgba(0,255,136,.05),0 24px 64px rgba(0,0,0,.6),0 0 80px rgba(0,255,136,.05);animation:boxIn .5s cubic-bezier(.22,1,.36,1) both}
+.lbox::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#f5b301,#f7c948,#f5b301);z-index:2}
+@keyframes boxIn{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:none}}
+.lhead{padding:26px 26px 18px;border-bottom:1px solid var(--bd);background:linear-gradient(135deg,rgba(0,255,136,.04),transparent)}
+.llogo{display:flex;align-items:center;gap:12px}
+.lic{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--gold),#f7c948);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#000;box-shadow:0 0 20px rgba(240,165,0,.3)}
+.lname{font-size:18px;font-weight:900;color:var(--txt)}
+.lsub{font-size:11px;color:var(--txt3);margin-top:2px;letter-spacing:.3px}
+.lbadge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;letter-spacing:.8px;color:var(--grn);background:var(--grn3);border:1px solid var(--bd2);border-radius:4px;padding:3px 8px;margin-top:10px}
+.lbadge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--grn);animation:pp 1.8s infinite}
+@keyframes pp{0%,100%{opacity:1}50%{opacity:.3}}
+.lbody{padding:24px 26px}
+.lstep{animation:sIn .3s ease both}
+@keyframes sIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:none}}
+.lbl{font-size:11px;font-weight:700;color:var(--txt2);letter-spacing:.4px;margin-bottom:6px;display:block}
+.inp{width:100%;padding:11px 14px;background:var(--surface);border:1px solid var(--bd);border-radius:var(--r);color:var(--txt);font-family:'Sora',sans-serif;font-size:13.5px;outline:none;transition:all .2s}
+.inp:focus{border-color:var(--bd3);background:var(--raised);box-shadow:0 0 0 3px rgba(0,255,136,.06)}
+.inp::placeholder{color:var(--txt3)}
+.frow{margin-bottom:14px}
+.pwd-wrap{position:relative}
+.eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--txt3);cursor:pointer;font-size:14px;padding:0}
+.btn-p{width:100%;padding:12px;background:linear-gradient(135deg,#f5b301,#c98a00);border:none;border-radius:var(--r);color:#1a1200;font-family:'Sora',sans-serif;font-size:14px;font-weight:900;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(245,179,1,.28)}
+.btn-p:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(0,255,136,.35)}
+.btn-p:active{transform:none}
+.btn-p:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.errmsg{background:var(--red2);border:1px solid rgba(255,68,102,.3);color:var(--red);border-radius:var(--r);padding:10px 14px;font-size:12.5px;font-weight:600;margin-bottom:14px;display:none}
+.errmsg.on{display:block;animation:shake .3s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.otp-row{display:flex;gap:8px;justify-content:center;margin:6px 0 18px}
+.oi{width:48px;height:56px;text-align:center;background:var(--surface);border:1px solid var(--bd);border-radius:var(--r);color:var(--grn);font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;outline:none;transition:all .2s}
+.oi:focus{border-color:var(--bd3);background:var(--raised);box-shadow:0 0 0 3px rgba(0,255,136,.08)}
+.oi.f{border-color:var(--bd2)}
+.back{text-align:center;margin-top:12px;font-size:12px;color:var(--txt3);cursor:pointer;transition:color .15s}
+.back:hover{color:var(--txt2)}
+.back span{color:var(--grn);font-weight:700}
+.qrbox{background:var(--surface);border:1px solid var(--bd);border-radius:var(--r);padding:14px;text-align:center;margin-bottom:14px}
+.scbox{background:var(--raised);border:1px solid var(--bd2);border-radius:6px;padding:8px 12px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold);letter-spacing:2px;text-align:center;margin:8px 0;word-break:break-all;cursor:pointer;transition:all .15s}
+.scbox:hover{background:rgba(240,165,0,.07)}
+.hint-box{margin-top:14px;padding:10px 12px;background:var(--surface);border:1px solid var(--bd);border-radius:var(--r);font-size:11px;color:var(--txt3);line-height:1.8}
+.lfoot{padding:10px 26px;border-top:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.lf1{font-size:10.5px;color:var(--txt3);font-family:'JetBrains Mono',monospace}
+.lf2{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--grn2)}
+.lf2::before{content:'🔒';font-size:10px}
+
+/* ══ ADMIN LAYOUT ══ */
+#sAdmin{min-height:100vh;flex-direction:row}
+.sb{width:220px;min-height:100vh;flex-shrink:0;background:var(--panel);border-right:1px solid var(--bd);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sb-hd{padding:18px 16px 12px;border-bottom:1px solid var(--bd)}
+.sb-logo{display:flex;align-items:center;gap:10px}
+.sb-ic{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#f7c948);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#000;box-shadow:0 0 12px rgba(240,165,0,.22)}
+.sb-ttl{font-size:14px;font-weight:900;color:var(--txt)}
+.sb-ver{font-size:9px;color:var(--txt3);font-family:'JetBrains Mono',monospace}
+.sb-usr{padding:10px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px}
+.sb-av{width:30px;height:30px;border-radius:7px;background:var(--grn3);border:1px solid var(--bd2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--grn);flex-shrink:0}
+.sb-un{font-size:12px;font-weight:700;color:var(--txt)}
+.sb-rl{font-size:9.5px;font-weight:700;letter-spacing:.5px;color:#000;background:var(--gold);border-radius:3px;padding:1px 5px;display:inline-block;margin-top:1px}
+.sb-sec{padding:8px 16px 3px;font-size:9px;font-weight:800;color:var(--txt3);letter-spacing:1px;text-transform:uppercase}
+.sb-nav{padding:3px 8px;flex:1}
+.sbl{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600;color:var(--txt2);transition:all .15s;margin-bottom:2px;border:1px solid transparent}
+.sbl:hover{background:var(--grn3);color:var(--txt)}
+.sbl.on{background:var(--grn3);color:var(--grn);border-color:var(--bd2)}
+.sbl .ico{font-size:15px;width:18px;text-align:center;flex-shrink:0}
+.sbbdg{margin-left:auto;font-size:9.5px;font-weight:800;background:var(--red2);color:var(--red);border-radius:3px;padding:1px 5px}
+.sbbdg.ok{background:var(--grn3);color:var(--grn)}
+.sb-ft{padding:12px 16px;border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:5px}
+.sb-out{display:flex;align-items:center;gap:7px;padding:8px 9px;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--red);transition:all .15s}
+.sb-out:hover{background:var(--red2)}
+.stdot{width:6px;height:6px;border-radius:50%;background:var(--grn);animation:pp 2s infinite}
+
+/* ── Main content ── */
+.main{flex:1;min-height:100vh;overflow:auto;display:flex;flex-direction:column}
+.tpbar{padding:0 22px;height:50px;flex-shrink:0;background:rgba(8,11,15,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
+.pt{font-size:14px;font-weight:700;color:var(--txt)}
+.tbr{display:flex;align-items:center;gap:10px}
+.tbtm{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--txt3)}
+.tbnet{font-size:9.5px;font-weight:800;letter-spacing:.5px;padding:3px 9px;border-radius:4px;background:var(--grn3);border:1px solid var(--bd2);color:var(--grn)}
+.cnt{flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:16px}
+.tp{display:none}
+.tp.on{display:contents}
+
+/* ── Cards ── */
+.card{background:var(--panel);border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden;animation:pIn .3s ease both}
+@keyframes pIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.ch{padding:12px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(90deg,rgba(0,255,136,.03),transparent)}
+.ct{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:800;color:var(--txt2);letter-spacing:.6px;text-transform:uppercase}
+.ctd{width:6px;height:6px;border-radius:50%;background:var(--grn)}
+.ca{display:flex;gap:7px}
+
+/* ── Stats ── */
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.sc{background:var(--panel);border:1px solid var(--bd);border-radius:var(--r2);padding:15px 17px;display:flex;flex-direction:column;gap:5px;transition:border-color .2s;animation:pIn .3s ease both}
+.sc:hover{border-color:var(--bd2)}
+.sv{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--grn);letter-spacing:-.5px}
+.sv.g{color:var(--gold)}
+.sv.c{color:var(--cyan)}
+.sv.p{color:var(--pur)}
+.sl{font-size:11px;color:var(--txt2);font-weight:600}
+.ss{font-size:10px;color:var(--txt3)}
+
+/* ── Tables ── */
+.tw{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{padding:9px 13px;text-align:left;font-size:10px;font-weight:800;color:var(--txt3);letter-spacing:.5px;text-transform:uppercase;background:rgba(0,0,0,.2);border-bottom:1px solid var(--bd);white-space:nowrap}
+.tbl td{padding:10px 13px;border-bottom:1px solid rgba(0,255,136,.04);font-size:12.5px}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(0,255,136,.02)}
+.mono{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--txt2)}
+.trunc{max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rb{display:inline-flex;align-items:center;font-size:10px;font-weight:800;border-radius:4px;padding:2px 7px;letter-spacing:.3px}
+.rb-admin{background:rgba(240,165,0,.15);color:var(--gold);border:1px solid var(--gold3)}
+.rb-miner{background:var(--grn3);color:var(--grn);border:1px solid var(--bd2)}
+.rb-viewer{background:var(--cyan2);color:var(--cyan);border:1px solid rgba(0,204,255,.2)}
+.rb-apikey{background:var(--pur2);color:var(--pur);border:1px solid rgba(167,139,250,.2)}
+.rb-moderator{background:rgba(0,188,212,.15);color:#00bcd4;border:1px solid rgba(0,188,212,.25)}
+.rb-trader{background:rgba(255,152,0,.15);color:#ff9800;border:1px solid rgba(255,152,0,.25)}
+.rb-auditor{background:rgba(156,39,176,.15);color:#ba68c8;border:1px solid rgba(156,39,176,.25)}
+.rb-developer{background:rgba(124,77,255,.15);color:#b39dff;border:1px solid rgba(124,77,255,.3)}
+.rb-on{background:var(--grn3);color:var(--grn);border:1px solid var(--bd2)}
+.rb-off{background:var(--red2);color:var(--red)}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:var(--r);font-family:'Sora',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;border:none;white-space:nowrap}
+.btn-sm{padding:5px 9px;font-size:11px}
+.bg{background:var(--grn3);color:var(--grn);border:1px solid var(--bd2)}
+.bg:hover{background:var(--grn4);border-color:var(--bd3)}
+.bd{background:var(--red2);color:var(--red);border:1px solid rgba(255,68,102,.2)}
+.bd:hover{background:rgba(255,68,102,.2)}
+.bn{background:var(--surface);color:var(--txt2);border:1px solid var(--bd)}
+.be{background:rgba(59,130,246,.12);color:#5b9bff;border:1px solid rgba(59,130,246,.25)}
+.be:hover{background:rgba(59,130,246,.2)}
+.bn:hover{background:var(--raised);color:var(--txt)}
+.bgo{background:rgba(240,165,0,.1);color:var(--gold);border:1px solid var(--gold3)}
+.bgo:hover{background:rgba(240,165,0,.18)}
+
+/* ── Logs ── */
+.le{padding:9px 17px;border-bottom:1px solid rgba(0,255,136,.04);display:flex;align-items:flex-start;gap:12px;font-size:12px;transition:background .1s}
+.le:hover{background:rgba(0,255,136,.02)}
+.lts{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--txt3);white-space:nowrap;min-width:150px}
+.la{font-weight:700;min-width:100px}
+.la-ok{color:var(--grn)}
+.la-err{color:var(--red)}
+.la-adm{color:var(--gold)}
+.la-otp{color:var(--cyan)}
+.la-def{color:var(--txt2)}
+.lip{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--txt3);margin-left:auto}
+
+/* ── Modals ── */
+.mbg{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
+.mbg.on{display:flex;animation:fIn .2s ease}
+@keyframes fIn{from{opacity:0}to{opacity:1}}
+.modal{background:var(--panel);border:1px solid var(--bd2);border-radius:var(--r2);width:100%;max-width:440px;box-shadow:0 24px 80px rgba(0,0,0,.7),0 0 40px rgba(0,255,136,.06);animation:mIn .25s cubic-bezier(.22,1,.36,1) both}
+@keyframes mIn{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:none}}
+.mhd{padding:16px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.mttl{font-size:14px;font-weight:900}
+.mclose{width:26px;height:26px;border-radius:5px;background:none;border:none;color:var(--txt3);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.mclose:hover{background:var(--surface);color:var(--txt)}
+.mbdy{padding:18px}
+.mft{padding:12px 18px;border-top:1px solid var(--bd);display:flex;justify-content:flex-end;gap:7px}
+.fi{padding:9px 11px;background:var(--surface);border:1px solid var(--bd);border-radius:var(--r);color:var(--txt);font-family:'Sora',sans-serif;font-size:13px;outline:none;transition:all .2s;width:100%}
+.fi:focus{border-color:var(--bd3);box-shadow:0 0 0 3px rgba(0,255,136,.06)}
+.fl{font-size:11px;font-weight:700;color:var(--txt2);letter-spacing:.3px;margin-bottom:5px;display:block}
+.fr{margin-bottom:11px}
+
+/* ── Security ── */
+.totp-s{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--r);font-size:12.5px;font-weight:700}
+.ts-on{background:var(--grn3);border:1px solid var(--bd2);color:var(--grn)}
+.ts-off{background:var(--red2);border:1px solid rgba(255,68,102,.2);color:var(--red)}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:22px;right:22px;z-index:999;background:var(--raised);border:1px solid var(--bd2);color:var(--grn);font-size:12.5px;font-weight:700;padding:10px 17px;border-radius:var(--r);box-shadow:0 8px 32px rgba(0,0,0,.5);opacity:0;transform:translateY(6px);transition:all .22s;pointer-events:none;display:flex;align-items:center;gap:7px}
+.toast.on{opacity:1;transform:translateY(0)}
+.toast.e{border-color:rgba(255,68,102,.4);color:var(--red)}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+
+@media(max-width:768px){
+  .sb{width:52px}
+  .sb-ttl,.sb-ver,.sb-un,.sb-rl,.sb-sec,.sbl span{display:none}
+  .sbl{justify-content:center;padding:9px}
+  .sg{grid-template-columns:1fr 1fr}
+}
+  /* admin overview: 2-col + health bars */
+  .dash2col{display:grid;grid-template-columns:1.3fr 1fr;gap:12px;margin:12px 0}
+  @media(max-width:900px){.dash2col{grid-template-columns:1fr}}
+  .hbr{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--txt2)}
+  .hbr b{color:var(--txt);font-family:'JetBrains Mono',monospace;font-weight:700}
+  .bar{height:7px;border-radius:5px;background:var(--bd);overflow:hidden;margin-top:6px}
+  .bar i{display:block;height:100%;border-radius:5px;transition:width .4s}
+</style>
+  <script src="csrf-fetch.js?v=25"></script>
+  <script src="qrcode-lib.js?v=1"></script>
+  <script src="qr.js?v=3"></script>
+  <script src="i18n.js?v=34" defer></script>
+  <script src="nav.js?v=40" defer></script>
+<script src="/ai-bubble.js?v=5" defer></script>
+<script src="/anti-phishing.js?v=1" defer></script>
+  <script src="footer.js?v=35" defer></script>
+  <script src="ui-prefs.js?v=25" defer></script>
+</head>
+<body>
+
+<!-- ══ LOGIN SCREEN ══ -->
+<div id="sLogin" class="screen on">
+  <div class="lbox">
+    <div class="lhead">
+      <div class="llogo">
+        <div class="lic">M</div>
+        <div><div class="lname">SPN Coin Admin</div><div class="lsub">Blockchain Management Console</div></div>
+      </div>
+      <div class="lbadge">SECURE ADMIN ACCESS</div>
+    </div>
+    <div class="lbody">
+
+      <!-- Step 1: Credentials -->
+      <div id="s1" class="lstep">
+        <div class="errmsg" id="err1"></div>
+        <div class="frow">
+          <label class="lbl">USERNAME</label>
+          <input class="inp" id="inU" type="text" placeholder="admin" autocomplete="username"
+                 onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <div class="frow">
+          <label class="lbl">PASSWORD</label>
+          <div class="pwd-wrap">
+            <input class="inp" id="inP" type="password" placeholder="••••••••" autocomplete="current-password"
+                   onkeydown="if(event.key==='Enter')doLogin()" style="padding-right:42px">
+            <button class="eye-btn" id="eyeBtn" onclick="togglePwd()">👁</button>
+          </div>
+        </div>
+        <button class="btn-p" id="btnLogin" onclick="doLogin()">Sign In to Admin Panel</button>
+
+      </div>
+
+      <!-- Step 2: 2FA Code -->
+      <div id="s2" class="lstep" style="display:none">
+        <div style="text-align:center;margin-bottom:18px">
+          <div style="font-size:34px;margin-bottom:10px">🔐</div>
+          <div style="font-size:14px;font-weight:700;color:var(--txt)">Two-Factor Authentication</div>
+          <div style="font-size:11.5px;color:var(--txt3);margin-top:5px">Enter the 6-digit code from your Authenticator app</div>
+        </div>
+        <div class="errmsg" id="err2"></div>
+        <div class="otp-row" id="otp2">
+          <input class="oi" maxlength="1" data-i="0" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')">
+          <input class="oi" maxlength="1" data-i="1" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')">
+          <input class="oi" maxlength="1" data-i="2" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')">
+          <input class="oi" maxlength="1" data-i="3" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')">
+          <input class="oi" maxlength="1" data-i="4" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')">
+          <input class="oi" maxlength="1" data-i="5" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')">
+        </div>
+        <button class="btn-p" id="btnTotp" onclick="do2FA()" disabled>Verify Code</button>
+        <div class="back" onclick="goStep(1)">← <span>Back</span> to login</div>
+      </div>
+
+      <!-- Step 3: Setup 2FA -->
+      <div id="s3" class="lstep" style="display:none">
+        <div style="text-align:center;margin-bottom:14px">
+          <div style="font-size:28px;margin-bottom:7px">🛡️</div>
+          <div style="font-size:13px;font-weight:700;color:var(--grn)">Set Up Two-Factor Authentication</div>
+          <div style="font-size:11px;color:var(--txt3);margin-top:4px">Protect your account with an Authenticator app</div>
+        </div>
+        <div class="qrbox">
+          <canvas id="qrc1" width="180" height="180" style="display:block;margin:0 auto 10px;background:#fff;padding:10px;border-radius:8px"></canvas>
+          <div style="font-size:11px;color:var(--txt2);font-weight:600;margin-bottom:5px">Or enter this key manually:</div>
+          <div class="scbox" id="sc1" onclick="cpText(this.textContent)">—</div>
+          <div style="font-size:9.5px;color:var(--txt3)">👆 Click to copy</div>
+        </div>
+        <div style="font-size:11px;color:var(--txt2);margin-bottom:12px;line-height:1.7;padding:9px 11px;background:var(--surface);border-radius:var(--r);border:1px solid var(--bd)">
+          1. Open any authenticator app <strong style="color:var(--txt)">(Google Authenticator, Authy, Microsoft Authenticator, 1Password…)</strong><br>
+          2. Scan the QR code or enter the key manually<br>
+          3. Enter the 6-digit code below to confirm
+        </div>
+        <div class="errmsg" id="err3"></div>
+        <div class="otp-row" id="otp3">
+          <input class="oi" maxlength="1" data-i="0" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')">
+          <input class="oi" maxlength="1" data-i="1" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')">
+          <input class="oi" maxlength="1" data-i="2" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')">
+          <input class="oi" maxlength="1" data-i="3" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')">
+          <input class="oi" maxlength="1" data-i="4" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')">
+          <input class="oi" maxlength="1" data-i="5" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')">
+        </div>
+        <button class="btn-p" id="btnSetup" onclick="doSetup()" disabled>Enable 2FA &amp; Enter Panel</button>
+        <div class="back" style="opacity:.7;cursor:default">🔒 Two-factor authentication is required to enter the admin panel</div>
+      </div>
+    </div>
+    <div class="lfoot">
+      <span class="lf1" id="lfNode">SPN Coin v6.0</span>
+      <span class="lf2">Secure Connection</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ADMIN PANEL ══ -->
+<div id="sAdmin" class="screen">
+  <div class="sb">
+    <div class="sb-hd">
+      <div class="sb-logo">
+        <div class="sb-ic">M</div>
+        <div><div class="sb-ttl">SPN Coin</div><div class="sb-ver">v6.0 Admin</div></div>
+      </div>
+    </div>
+    <div class="sb-usr">
+      <div class="sb-av" id="sbAv">A</div>
+      <div><div class="sb-un" id="sbUn">admin</div><div class="sb-rl" id="sbRl">ADMIN</div></div>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-sec">Overview</div>
+      <div class="sbl on" onclick="nav('Dashboard',this)"><span class="ico">📊</span><span>Dashboard</span></div>
+      <div class="sbl" onclick="nav('Blocks',this)"><span class="ico">⛓️</span><span>Blocks</span></div>
+      <div class="sbl" onclick="nav('Mempool',this)"><span class="ico">📨</span><span>Mempool</span><span class="sbbdg" id="mpBdg">0</span></div>
+      <div class="sb-sec">Management</div>
+      <div class="sbl" onclick="nav('Users',this)"><span class="ico">👥</span><span>Users</span></div>
+      <div class="sbl" onclick="nav('Apikeys',this)"><span class="ico">🔑</span><span>API Keys</span></div>
+      <div class="sbl" onclick="nav('Ddos',this)"><span class="ico">🛡️</span><span>DDoS / IP</span></div>
+      <div class="sbl" onclick="nav('Fees',this)"><span class="ico">💰</span><span>Fee Income</span></div>
+      <div class="sb-sec">System</div>
+      <div class="sbl" onclick="nav('Logs',this)"><span class="ico">📋</span><span>Audit Logs</span></div>
+      <div class="sbl" onclick="nav('Security',this)"><span class="ico">🔐</span><span>Security / 2FA</span></div>
+      <div class="sbl" onclick="nav('Chain',this)"><span class="ico">🔍</span><span>Chain Validation</span></div>
+      <div class="sbl" onclick="nav('Threats',this)"><span class="ico">🚨</span><span>Threat Monitor</span></div>
+      <div class="sbl" onclick="nav('Monitoring',this)"><span class="ico">📡</span><span>System Monitor</span></div>
+      <div class="sbl" onclick="openServerSetup()" style="color:var(--gold)"><span class="ico">🖥️</span><span>Server Setup</span></div>
+    </div>
+    <div class="sb-ft">
+      <div style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--txt3)">
+        <span class="stdot"></span><span>Node Online</span>
+      </div>
+      <div style="height:1px;background:var(--bd);margin:6px 0"></div>
+    <a href="dashboard" style="display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:6px;font-size:12px;font-weight:600;color:var(--txt2);text-decoration:none;transition:all .15s" onmouseover="this.style.background='var(--grn3)'" onmouseout="this.style.background=''"><span>📊</span><span>Dashboard</span></a>
+    <a href="tx" style="display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:6px;font-size:12px;font-weight:600;color:var(--txt2);text-decoration:none;transition:all .15s" onmouseover="this.style.background='var(--grn3)'" onmouseout="this.style.background=''"><span>🔍</span><span>Explorer</span></a>
+    <a href="wallet" style="display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:6px;font-size:12px;font-weight:600;color:var(--txt2);text-decoration:none;transition:all .15s" onmouseover="this.style.background='var(--grn3)'" onmouseout="this.style.background=''"><span>👛</span><span>Wallet</span></a>
+    <a href="admin" style="display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:6px;font-size:12px;font-weight:700;color:var(--grn);text-decoration:none;background:var(--grn3);border:1px solid var(--bd2)"><span>🔐</span><span>Admin Panel</span></a>
+    <a href="ai-widget" style="display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:6px;font-size:12px;font-weight:600;color:#6d6bf5;text-decoration:none;transition:all .15s" onmouseover="this.style.background='rgba(59,130,246,.08)'" onmouseout="this.style.background=''"><span>🤖</span><span>AI Help</span></a>
+    <a href="miner" style="display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:6px;font-size:12px;font-weight:600;color:var(--gold);text-decoration:none;transition:all .15s" onmouseover="this.style.background='var(--gold3)'" onmouseout="this.style.background=''"><span>⛏️</span><span>Mining Pool</span></a>
+    <a href="send" style="display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:6px;font-size:12px;font-weight:600;color:var(--txt2);text-decoration:none;transition:all .15s" onmouseover="this.style.background='var(--grn3)'" onmouseout="this.style.background=''"><span>↑</span><span>Send SPN</span></a>
+    <div style="height:1px;background:var(--bd);margin:6px 0"></div>
+    <div class="sb-out" onclick="doLogout()"><span>🚪</span><span>Logout</span></div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="tpbar">
+      <div class="pt" id="pgTitle">Dashboard</div>
+      <div class="tbr">
+        <span class="tbtm" id="clk">—</span>
+        <span class="tbnet" id="ntg">MAINNET</span>
+      </div>
+    </div>
+    <div class="cnt">
+
+      <!-- DASHBOARD -->
+      <div id="pDashboard" class="tp on">
+        <div class="sg">
+          <div class="sc"><div style="font-size:18px">👥</div><div class="sv" id="oUsers">—</div><div class="sl">Registered Users</div><div class="ss" id="oAdmins">—</div></div>
+          <div class="sc"><div style="font-size:18px">🟢</div><div class="sv c" id="oSessions">—</div><div class="sl">Active Sessions</div><div class="ss">Signed-in now</div></div>
+          <div class="sc"><div style="font-size:18px">⛔</div><div class="sv" id="oBlocked" style="color:var(--red)">—</div><div class="sl">Blocked IPs</div><div class="ss">auto-banned</div></div>
+          <div class="sc"><div style="font-size:18px">🛡️</div><div class="sv g" id="oThreats">—</div><div class="sl">Threats Detected</div><div class="ss">IDS / IPS</div></div>
+        </div>
+        <div class="dash2col">
+          <div class="card">
+            <div class="ch"><div class="ct"><span class="ctd"></span>User Management</div><button class="btn btn-sm bg" onclick="nav('Users',null)">+ Manage</button></div>
+            <div class="tw"><table class="tbl"><thead><tr><th>Username</th><th>Role</th><th>2FA</th><th>Last Login</th><th>Status</th></tr></thead><tbody id="oUserTbl"><tr><td colspan="5" style="text-align:center;padding:16px;color:var(--txt3)">Loading…</td></tr></tbody></table></div>
+          </div>
+          <div class="card">
+            <div class="ch"><div class="ct"><span class="ctd"></span>System Health</div></div>
+            <div style="padding:16px 18px;display:flex;flex-direction:column;gap:14px">
+              <div><div class="hbr"><span>CPU Load</span><b id="oCpu">—</b></div><div class="bar"><i id="oCpuBar" style="width:0%;background:var(--grn)"></i></div></div>
+              <div><div class="hbr"><span>Memory</span><b id="oMem">—</b></div><div class="bar"><i id="oMemBar" style="width:0%;background:#6d6bf5"></i></div></div>
+              <div><div class="hbr"><span>Node Heap</span><b id="oHeap">—</b></div><div class="bar"><i id="oHeapBar" style="width:0%;background:var(--gold)"></i></div></div>
+              <div class="hbr" style="border-top:1px solid var(--bd);padding-top:12px"><span>Uptime</span><b id="oUptime">—</b></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch"><div class="ct"><span class="ctd" style="background:var(--red)"></span>Security · Recent Threats</div><button class="btn btn-sm bg" onclick="nav('Threats',null)">View logs →</button></div>
+          <div class="tw"><table class="tbl"><thead><tr><th>IP</th><th>Score</th><th>Last Event</th><th>Action</th></tr></thead><tbody id="oThreatTbl"><tr><td colspan="4" style="text-align:center;padding:16px;color:var(--txt3)">Loading…</td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- BLOCKS -->
+      <div id="pBlocks" class="tp">
+        <div class="card">
+          <div class="ch"><div class="ct"><span class="ctd"></span>Blockchain Blocks</div><button class="btn btn-sm bg" onclick="ldBlocks()">🔄 Refresh</button></div>
+          <div class="tw"><table class="tbl"><thead><tr><th>Height</th><th>Block Hash</th><th>Prev Hash</th><th>Txs</th><th>Nonce</th><th>Age</th></tr></thead><tbody id="bTbl"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- MEMPOOL -->
+      <div id="pMempool" class="tp">
+        <div class="card">
+          <div class="ch"><div class="ct"><span class="ctd"></span>Pending Transactions</div><button class="btn btn-sm bg" onclick="ldMempool()">🔄 Refresh</button></div>
+          <div class="tw"><table class="tbl"><thead><tr><th>TX Hash</th><th>From</th><th>To</th><th>Amount</th><th>Fee</th></tr></thead><tbody id="mpTbl"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div id="pUsers" class="tp">
+        <div class="card">
+          <div class="ch"><div class="ct"><span class="ctd"></span>User Management</div><button class="btn btn-sm bg" onclick="openM('mUser')">+ New User</button></div>
+          <div class="tw"><table class="tbl"><thead><tr><th>Username</th><th>Role</th><th>Status</th><th>2FA</th><th>Last Login</th><th>Actions</th></tr></thead><tbody id="uTbl"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- API KEYS -->
+      <div id="pApikeys" class="tp">
+        <div class="card">
+          <div class="ch"><div class="ct"><span class="ctd"></span>API Keys</div><button class="btn btn-sm bg" onclick="openM('mKey')">+ New API Key</button></div>
+          <div class="tw"><table class="tbl"><thead><tr><th>Name</th><th>Key</th><th>Role</th><th>Created</th><th>Actions</th></tr></thead><tbody id="kTbl"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- DDOS -->
+      <div id="pDdos" class="tp">
+        <div class="sg" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
+          <div class="sc"><div style="font-size:18px">🌐</div><div class="sv" id="dtot">—</div><div class="sl">Total Requests</div></div>
+          <div class="sc"><div style="font-size:18px">🚫</div><div class="sv g" id="dblk">—</div><div class="sl">Blocked Requests</div></div>
+          <div class="sc"><div style="font-size:18px">⚠️</div><div class="sv" id="dban">—</div><div class="sl">Banned IPs</div></div>
+        </div>
+        <div class="card">
+          <div class="ch"><div class="ct"><span class="ctd"></span>Block IP Address</div></div>
+          <div style="padding:14px 17px;display:flex;gap:9px;align-items:flex-end;border-bottom:1px solid var(--bd)">
+            <div style="flex:1"><label class="fl">IP ADDRESS</label><input class="fi" id="bipInp" placeholder="192.168.1.1" type="text"></div>
+            <button class="btn bd" onclick="blockIP()">🚫 Block</button>
+          </div>
+          <div id="banList" style="padding:13px 17px;color:var(--txt3);font-size:12.5px">Loading...</div>
+        </div>
+      </div>
+
+      <!-- LOGS -->
+      <div id="pLogs" class="tp">
+        <div class="card">
+          <div class="ch"><div class="ct"><span class="ctd"></span>Audit Logs</div><button class="btn btn-sm bg" onclick="ldLogs()">🔄 Refresh</button></div>
+          <div id="logBox" style="max-height:500px;overflow-y:auto"><div style="padding:20px;text-align:center;color:var(--txt3)">Loading...</div></div>
+        </div>
+      </div>
+
+      <!-- FEE INCOME -->
+      <div id="pFees" class="tp">
+        <div class="card" style="margin-bottom:16px">
+          <div class="ch"><div class="ct"><span class="ctd"></span>💰 Issuance Fee Income</div><button class="btn btn-sm bg" onclick="ldFees()">🔄 Refresh</button></div>
+          <div style="display:flex;gap:22px;flex-wrap:wrap;padding:16px 22px">
+            <div><div style="font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px">Total Collected</div><div id="feeTotal" style="font-size:24px;font-weight:800;color:var(--gold)">—</div></div>
+            <div><div style="font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px">Payments</div><div id="feeCount" style="font-size:24px;font-weight:800">—</div></div>
+            <div style="flex:1;min-width:220px"><div style="font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px">Treasury Address</div><div id="feeTreasury" class="mono" style="font-size:12px;color:var(--grn);word-break:break-all;margin-top:6px">—</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch"><div class="ct"><span class="ctd"></span>Recent Fee Payments</div></div>
+          <div id="feeBox" style="max-height:460px;overflow-y:auto"><div style="padding:20px;text-align:center;color:var(--txt3)">Loading...</div></div>
+        </div>
+      </div>
+
+      <!-- SECURITY -->
+      <div id="pSecurity" class="tp">
+        <div class="card" style="max-width:520px">
+          <div class="ch"><div class="ct"><span class="ctd"></span>Account Security</div></div>
+          <div style="padding:18px;display:flex;flex-direction:column;gap:16px">
+            <div>
+              <div style="font-size:11px;font-weight:800;color:var(--txt2);letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px">Two-Factor Authentication Status</div>
+              <div class="totp-s" id="totpSt"><span id="totpIco">⏳</span><span id="totpTxt">Checking...</span></div>
+            </div>
+            <div id="setup2fb">
+              <div style="font-size:12px;color:var(--txt2);line-height:1.7;margin-bottom:12px">Enable 2FA to protect your account against unauthorized access. Works with any authenticator app — Google Authenticator, Microsoft Authenticator, Authy, 1Password, Proton, and others.</div>
+              <button class="btn bg" onclick="setup2FA()">🔐 Enable 2FA</button>
+            </div>
+            <div id="dis2fb" style="display:none">
+              <div style="font-size:12px;color:var(--txt2);margin-bottom:10px">To disable 2FA, enter your current Authenticator code:</div>
+              <div style="display:flex;gap:8px">
+                <input class="fi" id="disOtp" placeholder="6-digit code" maxlength="6" style="font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:3px;text-align:center">
+                <button class="btn bd" onclick="dis2FA()">Disable</button>
+              </div>
+            </div>
+            <div id="recBlock" style="display:none">
+              <hr style="border:none;border-top:1px solid var(--bd)">
+              <div style="font-size:11px;font-weight:800;color:var(--txt2);letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px">Recovery Codes</div>
+              <div style="font-size:12px;color:var(--txt2);line-height:1.7;margin-bottom:10px">
+                Recovery codes let you sign in if you lose your authenticator. <span id="recRemain" style="color:var(--gold)"></span>
+                Regenerating creates a fresh set and invalidates the old ones.
+              </div>
+              <div style="display:flex;gap:8px">
+                <input class="fi" id="regOtp" placeholder="6-digit code" maxlength="6" style="font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:3px;text-align:center">
+                <button class="btn bgo" onclick="regenRecovery()">🔄 Regenerate Codes</button>
+              </div>
+            </div>
+            <hr style="border:none;border-top:1px solid var(--bd)">
+            <div>
+              <div style="font-size:11px;font-weight:800;color:var(--txt2);letter-spacing:.4px;text-transform:uppercase;margin-bottom:10px">Change Password</div>
+              <div style="display:flex;flex-direction:column;gap:9px">
+                <input class="fi" id="op" type="password" placeholder="Current password">
+                <input class="fi" id="np" type="password" placeholder="New password (min. 8 chars)">
+                <input class="fi" id="np2" type="password" placeholder="Confirm new password">
+                <button class="btn bgo" onclick="chgPwd()">💾 Save New Password</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- THREAT MONITOR -->
+      <div id="pThreats" class="tp">
+        <div class="sg" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
+          <div class="sc"><div style="font-size:18px">🚨</div><div class="sv" id="thrCount">—</div><div class="sl">Flagged IPs</div></div>
+          <div class="sc"><div style="font-size:18px">🧩</div><div class="sv c" id="sessCount">—</div><div class="sl">Active Sessions</div></div>
+          <div class="sc"><div style="font-size:18px">🔭</div><div class="sv p" id="anomCount">—</div><div class="sl">IPs Monitored</div></div>
+        </div>
+        <div class="card">
+          <div class="ch">
+            <div class="ct"><span class="ctd"></span>Top Threat IPs</div>
+            <button class="btn btn-sm bg" onclick="ldThreats()">🔄 Refresh</button>
+          </div>
+          <div class="tw">
+            <table class="tbl">
+              <thead><tr><th>IP Address</th><th>Threat Score</th><th>Last Event</th><th>Actions</th></tr></thead>
+              <tbody id="threatTbl"><tr><td colspan="4" style="text-align:center;padding:20px;color:var(--txt3)">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHAIN -->
+      <div id="pChain" class="tp">
+        <div class="card" style="max-width:540px">
+          <div class="ch"><div class="ct"><span class="ctd"></span>Chain Validation</div><button class="btn btn-sm bg" onclick="valChain()">🔍 Validate</button></div>
+          <div style="padding:22px"><div id="chainRes" style="text-align:center;color:var(--txt3);padding:20px">Click "Validate" to verify the entire blockchain integrity</div></div>
+        </div>
+      </div>
+
+      <div id="pMonitoring" class="tp">
+        <div class="stats" style="margin-bottom:16px">
+          <div class="sc"><div style="font-size:18px">⏱️</div><div class="sv" id="monUptime">—</div><div class="sl">Uptime</div></div>
+          <div class="sc"><div style="font-size:18px">🟢</div><div class="sv p" id="monStatus">—</div><div class="sl">Node Status</div></div>
+          <div class="sc"><div style="font-size:18px">⚙️</div><div class="sv" id="monNode">—</div><div class="sl">Node.js</div></div>
+          <div class="sc"><div style="font-size:18px">💻</div><div class="sv" id="monPlatform">—</div><div class="sl">Platform</div></div>
+        </div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="ch"><div class="ct"><span class="ctd"></span>Memory</div></div>
+          <div style="padding:16px 22px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--txt3);margin-bottom:6px">
+              <span>System RAM used: <b id="monSysUsed" style="color:var(--txt)">—</b></span>
+              <span id="monSysPctTxt">—</span>
+            </div>
+            <div style="background:var(--surface);border-radius:8px;height:12px;overflow:hidden;border:1px solid var(--bd)">
+              <div id="monMemBar" style="height:100%;width:0%;background:linear-gradient(90deg,#26d07c,#f5b301);transition:width .4s"></div>
+            </div>
+            <div style="display:flex;gap:24px;margin-top:14px;font-size:12px;color:var(--txt3)">
+              <span>Process RSS: <b id="monRss" style="color:var(--txt)">—</b></span>
+              <span>Heap: <b id="monHeap" style="color:var(--txt)">—</b></span>
+            </div>
+          </div>
+        </div>
+        <div class="stats" style="margin-bottom:16px">
+          <div class="sc"><div style="font-size:18px">🧮</div><div class="sv" id="monCpu">—</div><div class="sl">CPU Cores</div></div>
+          <div class="sc"><div style="font-size:18px">📈</div><div class="sv" id="monLoad">—</div><div class="sl">Load (1m)</div></div>
+          <div class="sc"><div style="font-size:18px">⛓️</div><div class="sv" id="monHeight">—</div><div class="sl">Chain Height</div></div>
+          <div class="sc"><div style="font-size:18px">🎯</div><div class="sv" id="monDiff">—</div><div class="sl">Difficulty</div></div>
+        </div>
+        <div class="stats" style="margin-bottom:16px">
+          <div class="sc"><div style="font-size:18px">📨</div><div class="sv" id="monMempool">—</div><div class="sl">Mempool</div></div>
+          <div class="sc"><div style="font-size:18px">🌐</div><div class="sv" id="monPeers">—</div><div class="sl">P2P Peers</div></div>
+          <div class="sc"><div style="font-size:18px">⚒️</div><div class="sv" id="monMiners">—</div><div class="sl">Active Miners</div></div>
+          <div class="sc"><div style="font-size:18px">📡</div><div class="sv" id="monNet">—</div><div class="sl">Network</div></div>
+        </div>
+        <div class="card">
+          <div class="ch"><div class="ct"><span class="ctd"></span>Live System Monitor · <span id="monCpuModel" style="color:var(--txt3);font-weight:400;font-size:11px">—</span></div><button class="btn btn-sm bg" onclick="ldMonitoring()">🔄 Refresh</button></div>
+          <div style="padding:12px 22px;color:var(--txt3);font-size:12px">Auto-refreshes every 5 seconds while this tab is open. For historical charts, open the <a href="/monitor" style="color:var(--gold)">full Monitoring page</a>.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="mbg" id="mUser">
+  <div class="modal">
+    <div class="mhd"><div class="mttl">New User</div><button class="mclose" onclick="closeM('mUser')">✕</button></div>
+    <div class="mbdy">
+      <div class="fr"><label class="fl">USERNAME</label><input class="fi" id="nu" placeholder="username"></div>
+      <div class="fr"><label class="fl">PASSWORD</label><input class="fi" id="np_u" type="password" placeholder="Min 8 characters" oninput="showPwHint('np_u','np_u_hint')"><div id="np_u_hint" style="font-size:11px;margin-top:6px;line-height:1.6"></div></div>
+      <div class="fr"><label class="fl">ROLE</label>
+        <select class="fi" id="nr">
+          <option value="admin">Admin — Full access</option>
+          <option value="moderator">Moderator — Manage & view logs</option>
+          <option value="miner">Miner — Mining only</option>
+          <option value="trader">Trader — Send transactions</option>
+          <option value="developer">Developer — Blockchain dev & test</option>
+          <option value="auditor">Auditor — Full read-only</option>
+          <option value="viewer" selected>Viewer — Read only</option>
+        </select>
+      </div>
+    </div>
+    <div class="mft"><button class="btn bn" onclick="closeM('mUser')">Cancel</button><button class="btn bg" onclick="addUser()">+ Create User</button></div>
+  </div>
+</div>
+
+<div class="mbg" id="mEdit">
+  <div class="modal">
+    <div class="mhd"><div class="mttl">Edit User</div><button class="mclose" onclick="closeM('mEdit')">✕</button></div>
+    <div class="mbdy">
+      <div class="fr"><label class="fl">USERNAME</label><input class="fi" id="euName" placeholder="username" autocomplete="off"></div>
+      <div class="fr"><label class="fl">ROLE</label>
+        <select class="fi" id="euRole">
+          <option value="admin">Admin — Full access</option>
+          <option value="moderator">Moderator — Manage & view logs</option>
+          <option value="miner">Miner — Mining only</option>
+          <option value="trader">Trader — Send transactions</option>
+          <option value="developer">Developer — Blockchain dev & test</option>
+          <option value="auditor">Auditor — Full read-only</option>
+          <option value="viewer">Viewer — Read only</option>
+        </select>
+      </div>
+      <div class="fr"><label class="fl">NEW PASSWORD <span style="color:var(--txt3);font-weight:400">(optional — leave blank to keep current)</span></label><input class="fi" id="euPass" type="password" placeholder="Min 8 characters" oninput="showPwHint('euPass','euPass_hint')"><div id="euPass_hint" style="font-size:11px;margin-top:6px;line-height:1.6"></div></div>
+      <div class="errmsg" id="euErr" style="color:var(--red);font-size:12px;margin-top:4px"></div>
+    </div>
+    <div class="mft"><button class="btn bn" onclick="closeM('mEdit')">Cancel</button><button class="btn bg" onclick="saveUser()">💾 Save Changes</button></div>
+  </div>
+</div>
+
+<div class="mbg" id="mKey">
+  <div class="modal">
+    <div class="mhd"><div class="mttl">New API Key</div><button class="mclose" onclick="closeM('mKey')">✕</button></div>
+    <div class="mbdy">
+      <div class="fr"><label class="fl">NAME / DESCRIPTION</label><input class="fi" id="kn" placeholder="e.g. Mining service"></div>
+      <div class="fr"><label class="fl">ROLE</label>
+        <select class="fi" id="kr">
+          <option value="viewer">viewer</option>
+          <option value="miner">miner</option>
+          <option value="apikey" selected>apikey</option>
+        </select>
+      </div>
+    </div>
+    <div class="mft"><button class="btn bn" onclick="closeM('mKey')">Cancel</button><button class="btn bg" onclick="addKey()">🔑 Generate</button></div>
+  </div>
+</div>
+
+<!-- ACCESS / PERMISSIONS VIEWER -->
+<div class="mbg" id="mAccess">
+  <div class="modal" style="max-width:520px">
+    <div class="mhd"><div class="mttl" id="accTitle">Access</div><button class="mclose" onclick="closeM('mAccess')">✕</button></div>
+    <div class="mbdy">
+      <div style="font-size:12px;color:var(--txt3);margin-bottom:12px">
+        <span style="color:var(--grn)">● Allowed</span> &nbsp; <span style="color:var(--red)">● Denied</span> — the sections and actions this role can access.
+      </div>
+      <div id="accList"></div>
+    </div>
+    <div class="mft"><button class="btn bn" onclick="closeM('mAccess')">Close</button><button class="btn be" onclick="editFromAccess()">✏️ Edit role</button></div>
+  </div>
+</div>
+
+<div class="mbg" id="mKeyShow">
+  <div class="modal">
+    <div class="mhd"><div class="mttl">✅ API Key Created</div><button class="mclose" onclick="closeM('mKeyShow')">✕</button></div>
+    <div class="mbdy">
+      <div style="font-size:12px;color:var(--txt2);margin-bottom:10px">⚠️ This key is shown only once. Save it now!</div>
+      <div class="scbox" id="newKey" onclick="cpText(this.textContent)">—</div>
+      <div style="font-size:10px;color:var(--txt3);margin-top:6px">👆 Click to copy</div>
+    </div>
+    <div class="mft"><button class="btn bg" onclick="closeM('mKeyShow')">I've saved it ✓</button></div>
+  </div>
+</div>
+
+<div class="mbg" id="m2fa">
+  <div class="modal">
+    <div class="mhd"><div class="mttl">🔐 Set Up 2FA</div><button class="mclose" onclick="closeM('m2fa')">✕</button></div>
+    <div class="mbdy">
+      <div class="qrbox">
+        <canvas id="qrc2" width="150" height="150" style="display:block;margin:0 auto 10px;border-radius:5px"></canvas>
+        <div style="font-size:11px;color:var(--txt2);font-weight:600;margin-bottom:5px">Secret Key:</div>
+        <div class="scbox" id="sc2" onclick="cpText(this.textContent)">—</div>
+      </div>
+      <div style="font-size:11px;color:var(--txt2);line-height:1.7;padding:9px 11px;background:var(--surface);border-radius:var(--r);border:1px solid var(--bd);margin-bottom:12px">
+        Open your Authenticator app, scan the QR code or enter the Secret Key, then enter the confirmation code below.
+      </div>
+      <label class="fl">CONFIRMATION CODE</label>
+      <input class="fi" id="ctotp" placeholder="000000" maxlength="6"
+             style="font-family:'JetBrains Mono',monospace;font-size:18px;letter-spacing:4px;text-align:center;margin-top:5px">
+    </div>
+    <div class="mft"><button class="btn bn" onclick="closeM('m2fa')">Cancel</button><button class="btn bg" onclick="confirm2FA()">✅ Activate 2FA</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════════
+   SPN Coin Admin Panel — JavaScript v6.0
+══════════════════════════════════════════════ */
+const API = window.SPN_COIN_API
+  || (location.hostname === 'localhost' || location.hostname === '127.0.0.1'
+      ? 'http://localhost:3000' : location.origin);
+
+let TOK = sessionStorage.getItem('adm_tok') || '';
+let ME  = JSON.parse(sessionStorage.getItem('adm_me') || 'null');
+let _u = '', _p = '';
+
+/* ── Boot ── */
+(async () => {
+  try {
+    const r = await fetch(API + '/api/coin-info');
+    if (r.ok) {
+      const d = await r.json();
+      g('lfNode').textContent = `${d.name} v${d.version || '4.0'} — ${d.network}`;
+    }
+  } catch {}
+
+  if (TOK && ME) {
+    try {
+      const r = await af('/api/auth/me');
+      if (r.username) { showAdmin(r); return; }
+    } catch {}
+    TOK = ''; ME = null; sessionStorage.clear();
+  }
+})();
+
+/* ══ LOGIN ══ */
+async function doLogin() {
+  const un = g('inU').value.trim(), pw = g('inP').value.trim();
+  if (!un || !pw) return showE('err1', 'Username and password are required');
+  dis('btnLogin', 'Signing in...'); hideE('err1');
+  try {
+    const r = await (window.csrfFetch || fetch)(API + '/api/auth/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: un, password: pw }),
+    });
+    const d = await r.json();
+    if (d.require2fa) { _u = un; _p = pw; goStep(2); return; }
+    if (d.accessToken) {
+      TOK = d.accessToken;
+      sessionStorage.setItem('adm_tok', TOK);
+      const me = await af('/api/auth/me');
+      if (!me.totpEnabled) {
+        try {
+          const sr = await af('/api/auth/2fa/setup', 'POST');
+          if (sr.secret) { showStep3(sr); return; }
+        } catch {}
+      }
+      finishLogin(me); return;
+    }
+    showE('err1', d.error || 'Login failed');
+  } catch (e) { showE('err1', 'Connection error: ' + e.message); }
+  finally { ena('btnLogin', 'Sign In to Admin Panel'); }
+}
+
+function showStep3(sr) {
+  g('sc1').textContent = sr.secret || sr.secretBase32 || '';
+  qr('qrc1', sr.qrUri || sr.otpauthUrl || '', 220);
+  goStep(3);
+}
+
+function goStep(n) {
+  ['s1','s2','s3'].forEach(id => g(id).style.display = 'none');
+  g('s' + n).style.display = '';
+  if (n === 2) g('otp2').querySelector('[data-i="0"]').focus();
+}
+
+function togglePwd() {
+  const i = g('inP');
+  i.type = i.type === 'password' ? 'text' : 'password';
+  g('eyeBtn').textContent = i.type === 'password' ? '👁' : '🙈';
+}
+
+/* OTP helpers */
+function oi(inp, wid, bid) {
+  const v = inp.value.replace(/\D/g, '').slice(-1);
+  inp.value = v; inp.classList.toggle('f', !!v);
+  if (v) { const ni = +inp.dataset.i + 1, nx = g(wid).querySelector('[data-i="' + ni + '"]'); if (nx) nx.focus(); }
+  const full = [...g(wid).querySelectorAll('.oi')].every(x => x.value.length === 1);
+  g(bid).disabled = !full;
+  if (full && bid === 'btnTotp')  setTimeout(do2FA, 80);
+  if (full && bid === 'btnSetup') setTimeout(doSetup, 80);
+}
+function ok(e, inp, wid) {
+  if (e.key === 'Backspace' && !inp.value) {
+    const pi = +inp.dataset.i - 1, pv = g(wid).querySelector('[data-i="' + pi + '"]');
+    if (pv) { pv.value = ''; pv.classList.remove('f'); pv.focus(); }
+  }
+}
+function getOtp(wid) { return [...g(wid).querySelectorAll('.oi')].map(i => i.value).join(''); }
+function clrOtp(wid) { g(wid).querySelectorAll('.oi').forEach(i => { i.value = ''; i.classList.remove('f'); }); }
+
+async function do2FA() {
+  const code = getOtp('otp2'); if (code.length !== 6) return;
+  dis('btnTotp', 'Verifying...'); hideE('err2');
+  try {
+    const r = await (window.csrfFetch||fetch)(API + '/api/auth/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: _u, password: _p, totp: code }),
+    });
+    const d = await r.json();
+    if (d.accessToken) { TOK = d.accessToken; sessionStorage.setItem('adm_tok', TOK); finishLogin(await af('/api/auth/me')); }
+    else { showE('err2', d.error || 'Invalid code'); clrOtp('otp2'); g('otp2').querySelector('[data-i="0"]').focus(); ena('btnTotp', 'Verify Code'); }
+  } catch (e) { showE('err2', 'Error: ' + e.message); ena('btnTotp', 'Verify Code'); }
+}
+
+async function doSetup() {
+  const code = getOtp('otp3'); if (code.length !== 6) return;
+  dis('btnSetup', 'Activating...'); hideE('err3');
+  try {
+    const d = await af('/api/auth/2fa/confirm', 'POST', { token: code });
+    if (d.ok) {
+      // Server hands back a fresh FULL token now that 2FA is on — swap it in.
+      if (d.accessToken) { TOK = d.accessToken; sessionStorage.setItem('adm_tok', TOK); }
+      toast('✅ 2FA enabled successfully');
+      if (d.recoveryCodes && d.recoveryCodes.length) {
+        showRecoveryCodes(d.recoveryCodes);   // must save before entering
+      } else {
+        finishLogin(await af('/api/auth/me'));
+      }
+    }
+    else { showE('err3', d.error || 'Invalid code'); clrOtp('otp3'); ena('btnSetup', 'Enable 2FA & Enter Panel'); }
+  } catch (e) { showE('err3', 'Error: ' + e.message); ena('btnSetup', 'Enable 2FA & Enter Panel'); }
+}
+
+// Show one-time recovery codes and force the user to acknowledge saving them.
+function showRecoveryCodes(codes) {
+  let modal = document.getElementById('recModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'recModal';
+    modal.className = 'mbg';
+    modal.innerHTML =
+      '<div class="modal" style="max-width:460px">' +
+        '<div class="mhd"><div class="mttl">🔑 Save your recovery codes</div></div>' +
+        '<div class="mbdy">' +
+          '<p style="font-size:12.5px;color:var(--txt2);line-height:1.7;margin-bottom:12px">' +
+            'If you lose your authenticator device, these codes are the ONLY way back into your account. ' +
+            'Each code works once. Store them somewhere safe and offline — they will NOT be shown again.</p>' +
+          '<div id="recList" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-family:monospace;font-size:14px;' +
+            'background:var(--surface);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:12px"></div>' +
+          '<div style="display:flex;gap:8px">' +
+            '<button class="btn bn btn-sm" onclick="copyRecovery()" style="flex:1">📋 Copy</button>' +
+            '<button class="btn bg btn-sm" onclick="downloadRecovery()" style="flex:1">⬇️ Download .txt</button>' +
+          '</div>' +
+          '<label style="display:flex;align-items:center;gap:8px;margin-top:14px;font-size:12.5px;color:var(--txt2);cursor:pointer">' +
+            '<input type="checkbox" id="recAck" style="width:auto" onchange="document.getElementById(\'recDone\').disabled=!this.checked"> ' +
+            'I have saved my recovery codes in a safe place</label>' +
+        '</div>' +
+        '<div class="mft"><button class="btn bg" id="recDone" disabled onclick="recoveryDone()">Continue to Panel</button></div>' +
+      '</div>';
+    document.body.appendChild(modal);
+  }
+  window._recCodes = codes;
+  document.getElementById('recList').innerHTML =
+    codes.map(c => '<span style="color:var(--gold);text-align:center;padding:4px">' + c + '</span>').join('');
+  modal.classList.add('on');
+}
+function copyRecovery() {
+  const text = (window._recCodes || []).join('\n');
+  navigator.clipboard.writeText(text).then(() => toast('📋 Copied')).catch(() => {});
+}
+function downloadRecovery() {
+  const codes = window._recCodes || [];
+  const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  var lines = [
+    '============================================================',
+    '  SPN Coin — Two-Factor Authentication Recovery Codes',
+    '============================================================',
+    '',
+    '  Created : ' + now + ' UTC',
+    '',
+    '  Keep these codes SECRET and SAFE (offline).',
+    '  If you lose your authenticator device, each code below',
+    '  lets you sign in ONCE. Cross one off after you use it.',
+    '',
+    '------------------------------------------------------------',
+    ''
+  ];
+  codes.forEach(function (c, i) {
+    lines.push('   ' + String(i + 1).padStart(2, '0') + '.   ' + c);
+  });
+  lines.push('');
+  lines.push('------------------------------------------------------------');
+  lines.push('  Anyone with these codes can access your account.');
+  lines.push('  Do NOT share them. Do NOT store them online unencrypted.');
+  lines.push('============================================================');
+
+  var blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'SPN_2FA_recovery_codes.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  toast('⬇️ Downloaded');
+}
+async function recoveryDone() {
+  document.getElementById('recModal').classList.remove('on');
+  // If we're already inside the panel (regenerate case), just close.
+  // Otherwise (first-time enable on login screen), finish login.
+  const sAdmin = document.getElementById('sAdmin');
+  const inPanel = sAdmin && sAdmin.classList.contains('on');
+  if (!inPanel) { try { finishLogin(await af('/api/auth/me')); } catch(e){} }
+}
+
+// 2FA is mandatory for the admin panel — skipping is no longer allowed.
+function skip2FA() { toast('🔒 Two-factor authentication is required to enter the admin panel'); }
+
+function finishLogin(me) {
+  ME = me; sessionStorage.setItem('adm_me', JSON.stringify(me));
+  showAdmin(me);
+}
+
+/* ══ ADMIN ══ */
+function showAdmin(me) {
+  const un = me.username || 'admin', rl = (me.role || 'admin').toUpperCase();
+  g('sbAv').textContent = un.charAt(0).toUpperCase();
+  g('sbUn').textContent = un;
+  g('sbRl').textContent = rl;
+  g('sLogin').classList.remove('on');
+  g('sAdmin').classList.add('on');
+  startClk(); ldDash(); ldNet();
+}
+
+async function doLogout() {
+  try { await af('/api/auth/logout', 'POST'); } catch {}
+  TOK = ''; ME = null; sessionStorage.clear(); location.reload();
+}
+
+function startClk() {
+  const t = () => g('clk').textContent = new Date().toLocaleTimeString('en-US', { hour12: false }) + ' UTC';
+  t(); setInterval(t, 1000);
+}
+
+async function ldNet() {
+  try {
+    const r = await fetch(API + '/api/coin-info');
+    if (r.ok) { const d = await r.json(); g('ntg').textContent = (d.network || 'mainnet').toUpperCase(); }
+  } catch {}
+}
+
+/* ── Navigation ── */
+const TITLES = { Dashboard:'Dashboard', Blocks:'Blocks', Mempool:'Mempool', Users:'User Management', Apikeys:'API Keys', Ddos:'DDoS / IP Ban', Fees:'Fee Income', Logs:'Audit Logs', Security:'Security / 2FA', Chain:'Chain Validation', Threats:'Threat Monitor', Monitoring:'System Monitor' };
+const LOADERS = { Dashboard:ldDash, Blocks:ldBlocks, Mempool:ldMempool, Users:ldUsers, Apikeys:ldKeys, Ddos:ldDdos, Fees:ldFees, Logs:ldLogs, Security:ldSec, Chain:()=>{}, Threats:ldThreats, Monitoring:ldMonitoring };
+
+/* ── System Monitor ── */
+let _monTimer = null;
+function fmtUptime(s){ s=Math.floor(s||0); const d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60); return (d?d+'d ':'')+(h?h+'h ':'')+m+'m'; }
+async function ldMonitoring(){
+  try{
+    const m = await af('/api/admin/system-metrics');
+    g('monUptime').textContent  = fmtUptime(m.uptime);
+    g('monStatus').textContent  = 'Online';
+    g('monNode').textContent    = m.node || 'v20+';
+    g('monPlatform').textContent= m.platform || '—';
+    // memory
+    g('monSysUsed').textContent = (m.sysTotalMB - m.sysFreeMB).toLocaleString('en') + ' / ' + (m.sysTotalMB||0).toLocaleString('en') + ' MB';
+    g('monSysPctTxt').textContent = (m.sysUsedPct||0) + '%';
+    g('monMemBar').style.width  = (m.sysUsedPct||0) + '%';
+    g('monRss').textContent     = (m.rssMB||0) + ' MB';
+    g('monHeap').textContent    = (m.heapUsedMB||0) + ' / ' + (m.heapTotalMB||0) + ' MB';
+    // cpu
+    g('monCpu').textContent     = (m.cpuCount||0).toString();
+    g('monLoad').textContent    = (m.load1!==undefined ? m.load1.toFixed(2) : '—');
+    g('monCpuModel').textContent= m.cpuModel || '';
+    // chain
+    g('monHeight').textContent  = (m.height||0).toLocaleString('en');
+    g('monDiff').textContent    = (m.difficulty||0).toString();
+    g('monMempool').textContent = (m.mempool||0).toString();
+    g('monPeers').textContent   = (m.peers||0).toString();
+    g('monMiners').textContent  = (m.miners||0).toString();
+    g('monNet').textContent     = m.network || '—';
+  }catch(e){ g('monStatus').textContent='Offline'; }
+  if (_monTimer) clearTimeout(_monTimer);
+  const active = document.getElementById('pMonitoring');
+  if (active && active.classList.contains('on'))
+    _monTimer = setTimeout(ldMonitoring, 5000);
+}
+function nav(pg, el) {
+  document.querySelectorAll('.sbl').forEach(l => l.classList.remove('on'));
+  if (el) el.classList.add('on');
+  document.querySelectorAll('.tp').forEach(p => p.classList.remove('on'));
+  const p = g('p' + pg); if (p) p.classList.add('on');
+  g('pgTitle').textContent = TITLES[pg] || pg;
+  if (LOADERS[pg]) LOADERS[pg]();
+}
+
+/* ══ LOADERS ══ */
+async function ldDash() {
+  try {
+    const [users, ddos, threats, sys] = await Promise.all([
+      af('/api/admin/users').catch(()=>({users:[]})),
+      af('/api/admin/ddos/stats').catch(()=>({bannedIPs:[]})),
+      af('/api/admin/security/threats').catch(()=>({topThreats:[],sessions:0})),
+      af('/api/admin/system-metrics').catch(()=>({})),
+    ]);
+    const us = users.users || users || [];
+    const admins = us.filter(u=>['owner','admin'].includes(String(u.role||'').toLowerCase())).length;
+    g('oUsers').textContent   = us.length;
+    g('oAdmins').textContent  = admins + ' admin' + (admins===1?'':'s');
+    g('oSessions').textContent= (threats.sessions!=null ? threats.sessions : '—');
+    const ban = ddos.bannedIPs || ddos.banned || [];
+    g('oBlocked').textContent = ban.length;
+    const thr = threats.topThreats || [];
+    g('oThreats').textContent = thr.length;
+
+    g('oUserTbl').innerHTML = us.length ? us.map(u=>`
+      <tr>
+        <td style="font-weight:700">${escH(u.username)}</td>
+        <td><span class="rb rb-${String(u.role||'viewer').toLowerCase()}">${escH(u.role||'—')}</span></td>
+        <td>${u.totpEnabled ? '<span style="color:var(--grn)">On</span>' : '<span style="color:var(--txt3)">Off</span>'}</td>
+        <td style="color:var(--txt3);font-size:11px">${u.lastLogin ? ago(u.lastLogin) : 'Never'}</td>
+        <td><span class="rb ${u.active!==false?'rb-on':'rb-off'}">${u.active!==false?'Active':'Inactive'}</span></td>
+      </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--txt3);padding:16px">No users</td></tr>';
+
+    if (sys && sys.uptime!=null) {
+      const cpuPct = sys.cpuCount ? Math.min(100, Math.round((sys.load1/sys.cpuCount)*100)) : 0;
+      g('oCpu').textContent    = (sys.load1!=null ? Number(sys.load1).toFixed(2) : '—') + ' load';
+      g('oCpuBar').style.width = cpuPct + '%';
+      g('oMem').textContent    = (sys.sysUsedPct||0) + '%';
+      g('oMemBar').style.width = (sys.sysUsedPct||0) + '%';
+      const heapPct = sys.heapTotalMB ? Math.round((sys.heapUsedMB/sys.heapTotalMB)*100) : 0;
+      g('oHeap').textContent    = (sys.heapUsedMB||0) + ' / ' + (sys.heapTotalMB||0) + ' MB';
+      g('oHeapBar').style.width = heapPct + '%';
+      g('oUptime').textContent  = fmtUptime(sys.uptime);
+    }
+
+    g('oThreatTbl').innerHTML = thr.length ? thr.slice(0,6).map(t=>{
+      const sc = t.score>=200 ? 'var(--red)' : t.score>=100 ? '#fbbf24' : 'var(--gold)';
+      const le = t.events && t.events[t.events.length-1];
+      const act = t.score>=200 ? 'Banned' : t.score>=100 ? 'Throttled' : 'Flagged';
+      return `<tr>
+        <td class="mono" style="color:var(--cyan)">${escH(t.ip)}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${sc}">${t.score}</td>
+        <td style="color:var(--txt3);font-size:11px">${le?escH(le.event):'—'}</td>
+        <td><span class="rb ${t.score>=100?'rb-off':'rb-admin'}">${act}</span></td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="4" style="text-align:center;color:var(--txt3);padding:16px">No threats detected 🎉</td></tr>';
+  } catch (e) { /* overview is best-effort; individual tabs show detailed errors */ }
+}
+
+async function ldBlocks() {
+  try {
+    const d = await af('/api/blocks?limit=30');
+    const bl = d.blocks || d || [];
+    g('bTbl').innerHTML = bl.map(b =>
+      `<tr><td class="mono" style="color:var(--grn)">${b.height || b.index || 0}</td>
+       <td class="mono trunc">${b.hash || '—'}</td>
+       <td class="mono trunc">${b.prevHash || b.previousHash || '—'}</td>
+       <td>${b.txCount || b.transactions || 0}</td>
+       <td class="mono">${b.nonce || 0}</td>
+       <td style="color:var(--txt3);font-size:11px">${ago(b.timestamp || 0)}</td></tr>`
+    ).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--txt3)">No blocks found</td></tr>';
+  } catch (e) { g('bTbl').innerHTML = `<tr><td colspan="6" style="color:var(--red);text-align:center">${e.message}</td></tr>`; }
+}
+
+async function ldMempool() {
+  try {
+    const d = await af('/api/mempool');
+    const txs = d.txs || d.transactions || (Array.isArray(d) ? d : []);
+    g('mpTbl').innerHTML = txs.length
+      ? txs.map(t => {
+          const fr = t.inputs?.[0]?.address || t.from || '—';
+          const to = t.outputs?.[0]?.address || t.to || '—';
+          const am = (t.outputs?.[0]?.amount || t.amount || 0) / 1e8;
+          const fe = (t.fee || 0) / 1e8;
+          return `<tr>
+            <td class="mono trunc">${(t.id || t.hash || '—').slice(0, 18)}...</td>
+            <td class="mono trunc">${fr.slice(0, 14)}...</td>
+            <td class="mono trunc">${to.slice(0, 14)}...</td>
+            <td style="color:var(--gold)">${fn(am)} SPN</td>
+            <td class="mono">${fn(fe)}</td></tr>`;
+        }).join('')
+      : '<tr><td colspan="5" style="text-align:center;padding:22px;color:var(--txt3)">Mempool is empty</td></tr>';
+  } catch (e) { g('mpTbl').innerHTML = `<tr><td colspan="5" style="color:var(--red);text-align:center">${e.message}</td></tr>`; }
+}
+
+async function ldUsers() {
+  try {
+    const d = await af('/api/admin/users');
+    const us = d.users || d || [];
+    g('uTbl').innerHTML = us.map(u => `
+      <tr>
+        <td style="font-weight:700">${u.username}</td>
+        <td><span class="rb rb-${u.role}">${u.role}</span></td>
+        <td><span class="rb ${u.active !== false ? 'rb-on' : 'rb-off'}">${u.active !== false ? 'Active' : 'Inactive'}</span></td>
+        <td>${u.totpEnabled ? '<span style="color:var(--grn)">✅ On</span>' : '<span style="color:var(--txt3)">Off</span>'}</td>
+        <td style="color:var(--txt3);font-size:11px">${u.lastLogin ? ago(u.lastLogin) : 'Never'}</td>
+        <td><div style="display:flex;gap:5px">
+          ${u.active !== false
+            ? `<button class="btn btn-sm bd" onclick="tglUser('${u.id}',false)">Disable</button>`
+            : `<button class="btn btn-sm bg" onclick="tglUser('${u.id}',true)">Enable</button>`}
+          <button class="btn btn-sm be" onclick="editUser('${u.id}','${u.username}','${u.role}')">Edit</button>
+          <button class="btn btn-sm bg" onclick="showAccess('${u.id}','${escH(u.username)}','${escH(u.role)}')">Access</button>
+          <button class="btn btn-sm bn" onclick="delUser('${u.id}','${u.username}')">Delete</button>
+        </div></td>
+      </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--txt3)">No users found</td></tr>';
+  } catch (e) { g('uTbl').innerHTML = `<tr><td colspan="6" style="color:var(--red);text-align:center">${e.message}</td></tr>`; }
+}
+
+async function ldKeys() {
+  try {
+    const d = await af('/api/admin/apikeys');
+    const ks = d.keys || d || [];
+    g('kTbl').innerHTML = ks.map(k =>
+      `<tr>
+        <td style="font-weight:700">${k.name || '—'}</td>
+        <td class="mono trunc">${(k.key || '').slice(0, 20)}...</td>
+        <td><span class="rb rb-${k.role || 'apikey'}">${k.role || 'apikey'}</span></td>
+        <td style="color:var(--txt3);font-size:11px">${k.created ? ago(k.created) : '—'}</td>
+        <td><button class="btn btn-sm bd" onclick="revKey('${k.id}')">Revoke</button></td>
+      </tr>`
+    ).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--txt3)">No API keys found</td></tr>';
+  } catch (e) { g('kTbl').innerHTML = `<tr><td colspan="5" style="color:var(--red);text-align:center">${e.message}</td></tr>`; }
+}
+
+async function ldDdos() {
+  try {
+    const d = await af('/api/admin/ddos/stats');
+    g('dtot').textContent = (d.totalRequests || 0).toLocaleString('en');
+    g('dblk').textContent = (d.blockedRequests || 0).toLocaleString('en');
+    const ban = d.bannedIPs || d.banned || [];
+    g('dban').textContent = ban.length.toString();
+    g('banList').innerHTML = ban.length
+      ? ban.map(ip => `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bd)">
+            <span class="mono" style="color:var(--red)">${ip}</span>
+            <button class="btn btn-sm bg" onclick="unbanIP('${ip}')">Unblock</button>
+          </div>`).join('')
+      : '<div style="color:var(--txt3);text-align:center;padding:10px">No IPs are currently blocked</div>';
+  } catch (e) { g('banList').innerHTML = `<span style="color:var(--red)">${e.message}</span>`; }
+}
+
+// Escape any dynamic value before putting it into innerHTML.
+function escH(s){ return String(s==null?'':s).replace(/[&<>"'`]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c])); }
+
+async function ldFees() {
+  try {
+    const d = await af('/api/admin/fees?limit=200');
+    const sym = d.symbol || 'SPN';
+    g('feeTotal').textContent = (d.totalSPN != null ? d.totalSPN.toLocaleString('en', {maximumFractionDigits:8}) : '0') + ' ' + sym;
+    g('feeCount').textContent = d.count || 0;
+    g('feeTreasury').textContent = d.treasury || '—';
+    const ps = d.payments || [];
+    g('feeBox').innerHTML = ps.length
+      ? ps.map(p => {
+          const kindColor = p.kind === 'coin' ? 'var(--gold)' : 'var(--grn)';
+          const when = new Date(p.at || 0).toLocaleString('en-US');
+          return `<div class="le" style="align-items:center">
+            <span class="la" style="background:rgba(240,165,0,.12);color:${kindColor}">${escH((p.feeSPN!=null?p.feeSPN:0))} ${escH(sym)} paid · ${escH(p.kind)}</span>
+            <span style="color:var(--txt);flex:1;font-weight:600">${escH(p.name || '')} <span style="color:var(--txt3)">(${escH(p.symbol || '')})</span></span>
+            <span class="lip mono" title="issuer" style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${escH((p.issuer||'').slice(0,16))}…</span>
+            <span class="lts">${escH(when)}</span>
+          </div>`;
+        }).join('')
+      : '<div style="padding:26px;text-align:center;color:var(--txt3)">No fee payments recorded yet.</div>';
+  } catch (e) { g('feeBox').innerHTML = `<div style="padding:18px;color:var(--red)">${escH(e.message)}</div>`; }
+}
+
+async function ldLogs() {
+  try {
+    const d = await af('/api/admin/logs?limit=60');
+    const ls = d.logs || d || [];
+    g('logBox').innerHTML = ls.length
+      ? ls.map(l => {
+          const ac = l.action || '';
+          let c = 'la-def';
+          if (ac.includes('login') && !ac.includes('fail')) c = 'la-ok';
+          else if (ac.includes('fail') || ac.includes('lock'))  c = 'la-err';
+          else if (ac.includes('admin') || ac.includes('delet') || ac.includes('creat')) c = 'la-adm';
+          else if (ac.includes('totp') || ac.includes('2fa'))   c = 'la-otp';
+          return `<div class="le">
+            <span class="lts">${escH(new Date(l.ts || l.timestamp || 0).toLocaleString('en-US'))}</span>
+            <span class="la ${c}">${escH(ac)}</span>
+            <span style="color:var(--txt2);flex:1">${escH(l.username || l.user || '')}</span>
+            <span class="lip">${escH(l.ip || '')}</span>
+          </div>`;
+        }).join('')
+      : '<div style="padding:22px;text-align:center;color:var(--txt3)">No log entries found</div>';
+  } catch (e) { g('logBox').innerHTML = `<div style="padding:18px;color:var(--red)">${escH(e.message)}</div>`; }
+}
+
+async function ldSec() {
+  try {
+    const d = await af('/api/auth/2fa/status');
+    const on = d.enabled === true;
+    g('totpSt').className = 'totp-s ' + (on ? 'ts-on' : 'ts-off');
+    g('totpIco').textContent = on ? '🔐' : '⚠️';
+    g('totpTxt').textContent = on ? '2FA is enabled — your account is protected' : '2FA is disabled — your account is at risk';
+    g('setup2fb').style.display = on ? 'none' : '';
+    g('dis2fb').style.display   = on ? ''     : 'none';
+    g('recBlock').style.display = on ? ''     : 'none';
+    if (on) {
+      try {
+        const rs = await af('/api/auth/2fa/recovery/status');
+        g('recRemain').textContent = (rs.remaining || 0) + ' unused code' + (rs.remaining === 1 ? '' : 's') + ' remaining.';
+      } catch (e) { g('recRemain').textContent = ''; }
+    }
+  } catch (e) { g('totpTxt').textContent = 'Error: ' + e.message; }
+}
+
+async function regenRecovery() {
+  const code = (g('regOtp').value || '').trim();
+  if (code.length !== 6) return toast('Enter your 6-digit code', 'e');
+  try {
+    const d = await af('/api/auth/2fa/recovery/regenerate', 'POST', { token: code });
+    if (d.ok && d.recoveryCodes) {
+      g('regOtp').value = '';
+      showRecoveryCodes(d.recoveryCodes);   // reuse the same modal (without forcing login)
+      ldSec();
+    } else { toast(d.error || 'Invalid code', 'e'); }
+  } catch (e) { toast('Error: ' + e.message, 'e'); }
+}
+
+/* ══ ACTIONS ══ */
+async function addUser() {
+  const un = g('nu').value.trim(), pw = g('np_u').value.trim(), rl = g('nr').value;
+  if (!un || !pw) return toast('Username and password are required', 'e');
+  try { await af('/api/admin/users', 'POST', { username: un, password: pw, role: rl }); toast('✅ User created'); closeM('mUser'); ldUsers(); }
+  catch (e) { toast('Error: ' + e.message, 'e'); }
+}
+async function tglUser(id, ac) {
+  try { await af('/api/admin/users/' + id, 'PUT', { active: ac }); toast(ac ? '✅ User enabled' : '⛔ User disabled'); ldUsers(); }
+  catch (e) { toast('Error: ' + e.message, 'e'); }
+}
+async function delUser(id, nm) {
+  if (!confirm('Delete user "' + nm + '"?')) return;
+  try { await af('/api/admin/users/' + id, 'DELETE'); toast('🗑️ User deleted'); ldUsers(); }
+  catch (e) { toast('Error: ' + e.message, 'e'); }
+}
+// ── Edit user (role + optional new password) ──
+let _editId = null;
+function editUser(id, nm, role) {
+  _editId = id;
+  g('euName').value = nm;
+  g('euRole').value = role || 'viewer';
+  g('euPass').value = '';
+  g('euErr').textContent = '';
+  openM('mEdit');
+}
+async function saveUser() {
+  if (!_editId) return;
+  const role = g('euRole').value;
+  const pass = g('euPass').value.trim();
+  const uname = g('euName').value.trim();
+  const body = { role };
+  if (uname) body.username = uname;
+  if (pass) {
+    if (pass.length < 8) { g('euErr').textContent = 'Password must be at least 8 characters.'; return; }
+    body.password = pass;
+  }
+  try {
+    await af('/api/admin/users/' + _editId, 'PUT', body);
+    toast('✅ User updated');
+    closeM('mEdit');
+    ldUsers();
+  } catch (e) { g('euErr').textContent = e.message; }
+}
+async function addKey() {
+  const nm = g('kn').value.trim(), rl = g('kr').value;
+  if (!nm) return toast('Name is required', 'e');
+  try {
+    const d = await af('/api/admin/apikeys', 'POST', { name: nm, role: rl });
+    g('newKey').textContent = d.key || d.apiKey || JSON.stringify(d);
+    closeM('mKey'); openM('mKeyShow'); ldKeys();
+  } catch (e) { toast('Error: ' + e.message, 'e'); }
+}
+async function revKey(id) {
+  if (!confirm('Revoke this API key?')) return;
+  try { await af('/api/admin/apikeys/' + id, 'DELETE'); toast('🔑 API key revoked'); ldKeys(); }
+  catch (e) { toast('Error: ' + e.message, 'e'); }
+}
+async function blockIP() {
+  const ip = g('bipInp').value.trim(); if (!ip) return;
+  try { await af('/api/admin/ddos/block', 'POST', { ip }); toast('🚫 IP blocked: ' + ip); g('bipInp').value = ''; ldDdos(); }
+  catch (e) { toast('Error: ' + e.message, 'e'); }
+}
+async function unbanIP(ip) {
+  try { await af('/api/admin/ddos/block/' + encodeURIComponent(ip), 'DELETE'); toast('✅ IP unblocked'); ldDdos(); }
+  catch (e) { toast('Error: ' + e.message, 'e'); }
+}
+async function valChain() {
+  g('chainRes').innerHTML = '<div style="color:var(--txt2)">⏳ Validating chain integrity...</div>';
+  try {
+    const d = await af('/api/admin/chain/validate');
+    if (d.valid) {
+      g('chainRes').innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+          <div style="font-size:38px">✅</div>
+          <div style="font-size:14px;font-weight:700;color:var(--grn)">Chain is valid</div>
+          <div style="background:var(--grn3);border:1px solid var(--bd2);border-radius:8px;padding:12px 20px;min-width:220px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+              <span style="color:var(--txt3)">Blocks checked</span>
+              <span class="mono" style="color:var(--grn)">${d.blocksChecked || 0}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px">
+              <span style="color:var(--txt3)">Errors found</span>
+              <span class="mono" style="color:var(--grn)">0</span>
+            </div>
+          </div>
+        </div>`;
+    } else {
+      g('chainRes').innerHTML = `
+        <div style="text-align:center">
+          <div style="font-size:34px;margin-bottom:10px">❌</div>
+          <div style="font-size:14px;font-weight:700;color:var(--red)">Chain validation failed!</div>
+          <div style="color:var(--red);font-size:12px;margin-top:7px">${d.errors?.[0] || 'Unknown error'}</div>
+        </div>`;
+    }
+  } catch (e) { g('chainRes').innerHTML = `<div style="color:var(--red);text-align:center">Error: ${e.message}</div>`; }
+}
+async function setup2FA() {
+  try {
+    const d = await af('/api/auth/2fa/setup', 'POST');
+    g('sc2').textContent = d.secret || d.secretBase32 || '';
+    qr('qrc2', d.qrUri || d.otpauthUrl || '', 220);
+    g('ctotp').value = '';
+    openM('m2fa');
+  } catch (e) { toast('Error: ' + e.message, 'e'); }
+}
+async function confirm2FA() {
+  const code = g('ctotp').value.replace(/\D/g, '').trim();
+  if (code.length !== 6) return toast('Enter a 6-digit code', 'e');
+  try {
+    const d = await af('/api/auth/2fa/confirm', 'POST', { token: code });
+    if (d.ok) { toast('🔐 2FA enabled successfully'); closeM('m2fa'); ldSec(); }
+    else toast(d.error || 'Invalid code', 'e');
+  } catch (e) { toast('Error: ' + e.message, 'e'); }
+}
+async function dis2FA() {
+  const code = g('disOtp').value.replace(/\D/g, '').trim();
+  if (code.length !== 6) return toast('Enter a 6-digit code', 'e');
+  try {
+    const d = await af('/api/auth/2fa/disable', 'POST', { token: code });
+    if (d.ok) { toast('⚠️ 2FA disabled'); g('disOtp').value = ''; ldSec(); }
+    else toast(d.error || 'Invalid code', 'e');
+  } catch (e) { toast('Error: ' + e.message, 'e'); }
+}
+// Live password-requirements checklist shown as the user types.
+function showPwHint(inputId, hintId) {
+  var pw = (document.getElementById(inputId) || {}).value || '';
+  var el = document.getElementById(hintId);
+  if (!el) return;
+  if (!pw) { el.innerHTML = ''; return; }
+  var rules = [
+    { ok: pw.length >= 8,          txt: 'At least 8 characters' },
+    { ok: /[a-zA-Z]/.test(pw),     txt: 'A letter (a–z)' },
+    { ok: /[0-9]/.test(pw),        txt: 'A number (0–9)' },
+    { ok: /[^a-zA-Z0-9]/.test(pw), txt: 'A symbol (@ # ! $ …)' },
+  ];
+  el.innerHTML = rules.map(function (r) {
+    return '<span style="color:' + (r.ok ? 'var(--grn,#26d07c)' : 'var(--txt3,#8a94a6)') + '">' +
+      (r.ok ? '✓' : '○') + ' ' + r.txt + '</span>';
+  }).join('&nbsp;&nbsp;');
+}
+
+async function chgPwd() {
+  const op = g('op').value, np = g('np').value, np2 = g('np2').value;
+  if (!op || !np) return toast('All fields are required', 'e');
+  if (np !== np2)  return toast('Passwords do not match', 'e');
+  if (np.length < 8) return toast('Password must be at least 8 characters', 'e');
+  try {
+    await af('/api/auth/change-password', 'POST', { oldPassword: op, newPassword: np });
+    toast('✅ Password changed');
+    g('op').value = g('np').value = g('np2').value = '';
+  } catch (e) { toast('Error: ' + e.message, 'e'); }
+}
+
+/* ── Threat Monitor ── */
+async function ldThreats() {
+  try {
+    const d = await af('/api/admin/security/threats');
+    g('thrCount').textContent = d.topThreats?.length || 0;
+    g('sessCount').textContent = d.sessions || 0;
+    g('anomCount').textContent = d.anomalyStats?.tracked || 0;
+    const rows = d.topThreats || [];
+    g('threatTbl').innerHTML = rows.length
+      ? rows.map(t => {
+          const scoreColor = t.score >= 200 ? 'var(--red)' : t.score >= 100 ? 'var(--pend)' : 'var(--gold)';
+          const lastEvt = t.events?.[t.events.length-1];
+          return `<tr>
+            <td class="mono" style="color:var(--cyan)">${t.ip}</td>
+            <td><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:${scoreColor}">${t.score}</span></td>
+            <td style="color:var(--txt3);font-size:11px">${lastEvt ? lastEvt.event + ' (+'+lastEvt.points+')' : '—'}</td>
+            <td><button class="btn btn-sm bg" onclick="resetThreat('${t.ip}')">Reset</button></td>
+          </tr>`;
+        }).join('')
+      : '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--txt3)">No threats detected 🎉</td></tr>';
+  } catch(e) { toast('Error: ' + e.message, 'e'); }
+}
+async function resetThreat(ip) {
+  try { await af('/api/admin/security/threats/' + encodeURIComponent(ip), 'DELETE'); toast('✅ Threat score reset'); ldThreats(); }
+  catch(e) { toast('Error: ' + e.message, 'e'); }
+}
+
+/* ── QR Code generator (visual placeholder) ── */
+function qr(id, uri, sz) {
+  const c = g(id); if (!c || !uri) return;
+  sz = sz || 180;
+  // Use the real QR generator (qr.js → window.SPNQR) so the code actually scans.
+  // The old canvas element is replaced by an SVG container the generator fills.
+  let host = c;
+  if (c.tagName === 'CANVAS') {
+    // swap the <canvas> for a <div> the first time, keeping the same id
+    const div = document.createElement('div');
+    div.id = c.id;
+    div.style.cssText = 'display:block;margin:0 auto 10px;background:#fff;padding:10px;border-radius:8px;width:' + (sz+20) + 'px;height:' + (sz+20) + 'px';
+    c.parentNode.replaceChild(div, c);
+    host = div;
+  } else {
+    host.innerHTML = '';
+  }
+  if (window.SPNQR && window.SPNQR.render) {
+    window.SPNQR.render(host, uri, { size: sz, dark: '#000', light: '#fff' });
+  } else {
+    host.textContent = 'QR unavailable — use the key below';
+  }
+}
+
+/* ── Utilities ── */
+async function af(path, method = 'GET', body = null) {
+  const opt = { method, headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOK } };
+  if (body) opt.body = JSON.stringify(body);
+  const r = await fetch(API + path, opt);
+  const d = await r.json();
+  if (r.status === 401) { doLogout(); throw new Error('Session expired'); }
+  if (!r.ok && d.error) throw new Error(d.error);
+  return d;
+}
+function g(id) { return document.getElementById(id); }
+function showE(id, msg) { const e = g(id); e.textContent = msg; e.classList.add('on'); }
+function hideE(id) { g(id).classList.remove('on'); }
+function dis(id, txt) { const b = g(id); b.disabled = true; b.textContent = txt; }
+function ena(id, txt) { const b = g(id); b.disabled = false; b.textContent = txt; }
+// ── Access / permissions viewer ──────────────────────────────
+// Mirror of the server-side role→permissions map (app/access-control.js).
+const ROLE_PERMS = {
+  admin:     ['view:dashboard','view:blocks','view:transactions','view:wallet','view:miners','view:logs','view:users','view:stats','mine:blocks','mine:transactions','transact:send','admin:users','admin:settings','admin:apikeys','admin:logs'],
+  moderator: ['view:dashboard','view:blocks','view:transactions','view:wallet','view:miners','view:logs','view:users','admin:logs'],
+  developer: ['view:dashboard','view:blocks','view:transactions','view:wallet','view:miners','view:logs','view:stats','mine:blocks','mine:transactions','transact:send','admin:logs'],
+  miner:     ['view:dashboard','view:blocks','view:miners','mine:blocks','mine:transactions'],
+  trader:    ['view:dashboard','view:blocks','view:transactions','view:wallet','transact:send'],
+  auditor:   ['view:dashboard','view:blocks','view:transactions','view:wallet','view:miners','view:logs','view:users','view:stats'],
+  viewer:    ['view:dashboard','view:blocks','view:transactions','view:wallet'],
+  apikey:    ['view:blocks','view:transactions','view:stats'],
+};
+// The sections/actions shown, each mapped to the permission it needs.
+const ACCESS_SECTIONS = [
+  { perm:'view:dashboard',    label:'📊 Dashboard' },
+  { perm:'view:blocks',       label:'🧱 Blocks & Explorer' },
+  { perm:'view:transactions', label:'🔗 Transactions' },
+  { perm:'view:wallet',       label:'👛 Wallet' },
+  { perm:'transact:send',     label:'↑ Send transactions' },
+  { perm:'view:miners',       label:'⛏️ Miners' },
+  { perm:'mine:blocks',       label:'⛏️ Mine blocks' },
+  { perm:'view:stats',        label:'📈 Statistics' },
+  { perm:'view:logs',         label:'📋 View audit logs' },
+  { perm:'admin:logs',        label:'📋 Full logs / fee income' },
+  { perm:'view:users',        label:'👥 View users' },
+  { perm:'admin:users',       label:'👥 Manage users' },
+  { perm:'admin:settings',    label:'⚙️ Settings' },
+  { perm:'admin:apikeys',     label:'🔑 API keys' },
+];
+let _accessTarget = null;
+function editFromAccess() {
+  if (!_accessTarget) return;
+  closeM('mAccess');
+  editUser(_accessTarget.id, _accessTarget.username, _accessTarget.role);
+}
+function showAccess(id, username, role) {
+  _accessTarget = { id, username, role };
+  const perms = ROLE_PERMS[role] || [];
+  g('accTitle').textContent = username + ' — ' + role;
+  g('accList').innerHTML = ACCESS_SECTIONS.map(s => {
+    const ok = perms.includes(s.perm);
+    const col = ok ? 'var(--grn)' : 'var(--red)';
+    const bg  = ok ? 'rgba(0,230,118,.07)' : 'rgba(255,84,102,.06)';
+    const icon = ok ? '✓' : '✕';
+    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border-radius:8px;background:${bg};border:1px solid ${col}33;margin-bottom:6px">
+      <span style="font-size:13px;color:var(--txt)">${escH(s.label)}</span>
+      <span style="font-weight:800;color:${col};font-size:14px">${icon}</span>
+    </div>`;
+  }).join('');
+  openM('mAccess');
+}
+
+function openM(id) { g(id).classList.add('on'); }
+function closeM(id) { g(id).classList.remove('on'); }
+function cpText(t) { navigator.clipboard.writeText(t || '').catch(() => {}); toast('Copied!'); }
+function fn(n) { if (!n || isNaN(n)) return '0'; return parseFloat(Number(n).toFixed(4)).toLocaleString('en', { minimumFractionDigits: 0, maximumFractionDigits: 4 }); }
+function ago(ts) {
+  const s = Math.floor((Date.now() - ts) / 1000);
+  if (s < 60) return s + 's ago';
+  if (s < 3600) return Math.floor(s / 60) + 'm ago';
+  if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+  return Math.floor(s / 86400) + 'd ago';
+}
+let _tT;
+function toast(msg, t = '') {
+  const el = g('toast'); el.textContent = msg;
+  el.className = 'toast ' + (t === 'e' ? 'e' : '');
+  void el.offsetWidth; el.classList.add('on');
+  clearTimeout(_tT); _tT = setTimeout(() => el.classList.remove('on'), 2600);
+}
+function openServerSetup() {
+  // Server setup page — opens in same tab (access gate handles auth)
+  window.location.href = '/server-setup';
+}
+
+document.querySelectorAll('.mbg').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('on'); }));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.mbg.on').forEach(m => m.classList.remove('on')); });
+</script>
+
+
+<!-- LICENSE footer badge -->
+<div style="position:fixed;bottom:6px;left:12px;z-index:8999;font-size:9.5px;color:rgba(255,255,255,.18);font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:6px">
+  <a href="/LICENSE" target="_blank" style="color:rgba(240,165,0,.35);text-decoration:none;transition:color .2s" onmouseover="this.style.color='rgba(240,165,0,.8)'" onmouseout="this.style.color='rgba(240,165,0,.35)'">© 2026 SPN Coin Project</a>
+  <span style="opacity:.4">·</span>
+  <span style="opacity:.4">PROPRIETARY</span>
+</div>
+<!-- ═══ SPN Coin AI Widget ═══ -->
+<!-- ═══════════════════════════════════════════════════════════
+     SPN Coin AI — Floating Chat Widget
+     Uses Claude claude-haiku-4-5 (Free tier) via /api/ai/chat
+     Injects live blockchain context automatically server-side.
+════════════════════════════════════════════════════════════ -->
+
+<style>
+/* ── AI Widget global styles ── */
+#ai-fab{
+  position:fixed;bottom:28px;right:28px;z-index:9000;
+  width:54px;height:54px;border-radius:50%;
+  background:linear-gradient(135deg,#0a0f1a,#1a1f35);
+  border:1.5px solid rgba(79,143,255,.45);
+  box-shadow:0 0 0 0 rgba(79,143,255,.3),0 8px 28px rgba(0,0,0,.55);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .25s;
+  animation:fabPulse 3s ease-in-out infinite;
+}
+@keyframes fabPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(79,143,255,.3),0 8px 28px rgba(0,0,0,.55)}
+  50%{box-shadow:0 0 0 8px rgba(79,143,255,0),0 8px 28px rgba(0,0,0,.55)}
+}
+#ai-fab:hover{transform:scale(1.08);border-color:rgba(79,143,255,.8)}
+#ai-fab svg{width:24px;height:24px}
+#ai-badge{
+  position:absolute;top:-3px;right:-3px;
+  width:16px;height:16px;border-radius:50%;
+  background:#6d6bf5;border:2px solid #05070d;
+  font-size:8px;color:#fff;font-weight:900;
+  display:flex;align-items:center;justify-content:center;
+  display:none;
+}
+
+#ai-panel{
+  position:fixed;bottom:96px;right:28px;z-index:9000;
+  width:380px;max-height:580px;
+  background:linear-gradient(160deg,#0a0f1a 0%,#0e1525 100%);
+  border:1px solid rgba(79,143,255,.25);
+  border-radius:18px;
+  box-shadow:0 24px 80px rgba(0,0,0,.7),0 0 0 1px rgba(79,143,255,.08),inset 0 1px 0 rgba(255,255,255,.05);
+  display:none;flex-direction:column;overflow:hidden;
+  animation:panelSlide .3s cubic-bezier(.22,1,.36,1);
+}
+@keyframes panelSlide{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+#ai-panel.open{display:flex}
+
+.ai-head{
+  padding:14px 16px 12px;
+  border-bottom:1px solid rgba(79,143,255,.12);
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(90deg,rgba(59,130,246,.08),transparent);
+  flex-shrink:0;
+}
+.ai-head-l{display:flex;align-items:center;gap:10px}
+.ai-avatar{
+  width:32px;height:32px;border-radius:10px;
+  background:linear-gradient(135deg,#1e3a8a,#6d6bf5);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  box-shadow:0 0 12px rgba(59,130,246,.35);
+}
+.ai-name{font-size:13px;font-weight:800;color:#e2e8f0;letter-spacing:-.2px}
+.ai-model{font-size:9.5px;color:#4b6fa8;font-family:"JetBrains Mono",monospace;margin-top:1px}
+.ai-status{display:flex;align-items:center;gap:4px;font-size:9px;color:#26d07c}
+.ai-status::before{content:"";width:5px;height:5px;border-radius:50%;background:#26d07c;animation:ppblue 2s infinite}
+@keyframes ppblue{0%,100%{opacity:1}50%{opacity:.3}}
+.ai-close{
+  width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);color:#64748b;
+  cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.ai-close:hover{background:rgba(255,255,255,.08);color:#e2e8f0}
+
+.ai-messages{
+  flex:1;overflow-y:auto;padding:14px;
+  display:flex;flex-direction:column;gap:10px;
+  scroll-behavior:smooth;
+}
+.ai-messages::-webkit-scrollbar{width:3px}
+.ai-messages::-webkit-scrollbar-thumb{background:rgba(79,143,255,.2);border-radius:3px}
+
+.ai-msg{display:flex;gap:8px;align-items:flex-start;animation:msgIn .25s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.ai-msg.user{flex-direction:row-reverse}
+.ai-bubble{
+  max-width:82%;padding:10px 13px;border-radius:12px;
+  font-size:12.5px;line-height:1.6;
+}
+.ai-msg.bot  .ai-bubble{
+  background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.18);
+  color:#cbd5e1;border-radius:4px 12px 12px 12px;
+}
+.ai-msg.user .ai-bubble{
+  background:linear-gradient(135deg,rgba(59,130,246,.2),rgba(37,99,235,.15));
+  border:1px solid rgba(59,130,246,.3);
+  color:#e2e8f0;border-radius:12px 4px 12px 12px;
+}
+.ai-msg.bot .ai-mic{
+  width:26px;height:26px;border-radius:8px;flex-shrink:0;margin-top:1px;
+  background:linear-gradient(135deg,#1e3a8a,#6d6bf5);
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+}
+.ai-typing{display:flex;gap:4px;align-items:center;padding:10px 13px}
+.ai-typing span{
+  width:6px;height:6px;border-radius:50%;background:#6d6bf5;
+  animation:typeBounce .9s ease infinite;
+}
+.ai-typing span:nth-child(2){animation-delay:.15s}
+.ai-typing span:nth-child(3){animation-delay:.3s}
+@keyframes typeBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-8px)}}
+
+.ai-suggestions{
+  padding:0 14px 10px;display:flex;gap:6px;flex-wrap:wrap;
+}
+.ai-chip{
+  font-size:10.5px;color:#4b6fa8;
+  background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.15);
+  border-radius:20px;padding:4px 10px;cursor:pointer;transition:all .15s;
+  white-space:nowrap;
+}
+.ai-chip:hover{background:rgba(59,130,246,.15);color:#93c5fd;border-color:rgba(59,130,246,.35)}
+
+.ai-input-wrap{
+  padding:10px 12px 12px;border-top:1px solid rgba(79,143,255,.1);
+  display:flex;gap:8px;align-items:flex-end;flex-shrink:0;
+}
+.ai-input{
+  flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(79,143,255,.18);
+  border-radius:10px;padding:9px 12px;color:#e2e8f0;
+  font-family:inherit;font-size:12.5px;resize:none;outline:none;
+  max-height:100px;min-height:36px;transition:border-color .2s;
+  line-height:1.5;
+}
+.ai-input:focus{border-color:rgba(79,143,255,.45)}
+.ai-input::placeholder{color:#2d4a6e}
+.ai-send{
+  width:36px;height:36px;border-radius:9px;flex-shrink:0;
+  background:linear-gradient(135deg,#5b59d6,#6d6bf5);border:none;
+  color:#fff;cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;box-shadow:0 4px 12px rgba(59,130,246,.3);
+}
+.ai-send:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(59,130,246,.45)}
+.ai-send:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.ai-footer{
+  padding:5px 12px 3px;font-size:9px;color:#1e3a5f;text-align:center;
+  display:flex;align-items:center;justify-content:center;gap:4px;flex-shrink:0;
+}
+.ai-footer a{color:#1e3a5f;text-decoration:none}
+.ai-footer a:hover{color:#6d6bf5}
+
+@media(max-width:500px){
+  #ai-panel{width:calc(100vw - 32px);right:16px;bottom:84px}
+}
+</style>
+
+<!-- Floating Action Button -->
+<button id="ai-fab" onclick="aiToggle()" title="SPN Coin AI Assistant (Claude)">
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2C6.48 2 2 6.48 2 12C2 13.85 2.52 15.58 3.42 17.05L2 22L7.17 20.62C8.59 21.48 10.24 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" fill="url(#aiGrad)"/>
+    <text x="12" y="16" text-anchor="middle" font-size="10" font-weight="900" fill="white" font-family="Arial">AI</text>
+    <defs>
+      <linearGradient id="aiGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#1e40af"/>
+        <stop offset="100%" stop-color="#6d6bf5"/>
+      </linearGradient>
+    </defs>
+  </svg>
+  <div id="ai-badge">!</div>
+</button>
+
+<!-- AI Chat Panel -->
+<div id="ai-panel">
+  <div class="ai-head">
+    <div class="ai-head-l">
+      <div class="ai-avatar">🤖</div>
+      <div>
+        <div class="ai-name">SPN Coin AI</div>
+        <div class="ai-model">claude-haiku · Anthropic</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="ai-status">Online</div>
+      <button class="ai-close" onclick="aiToggle()">✕</button>
+    </div>
+  </div>
+
+  <div class="ai-messages" id="aiMessages">
+    <div class="ai-msg bot">
+      <div class="ai-mic">🤖</div>
+      <div class="ai-bubble">
+        Hello! I'm SPN Coin AI, powered by Claude. I have live access to your blockchain data and can help with:<br><br>
+        • 🔍 Transaction &amp; block analysis<br>
+        • 💰 Wallet &amp; address queries<br>
+        • ⛏️ Mining questions<br>
+        • 🔐 Security guidance<br>
+        • 📊 Network statistics<br><br>
+        What would you like to know?
+      </div>
+    </div>
+  </div>
+
+  <div class="ai-suggestions" id="aiSugg">
+    <span class="ai-chip" onclick="aiAsk(this.textContent)">What is my current balance?</span>
+    <span class="ai-chip" onclick="aiAsk(this.textContent)">How does SPN mining work?</span>
+    <span class="ai-chip" onclick="aiAsk(this.textContent)">Latest block info</span>
+    <span class="ai-chip" onclick="aiAsk(this.textContent)">How to read an SPN address?</span>
+  </div>
+
+  <div class="ai-input-wrap">
+    <textarea class="ai-input" id="aiInput" placeholder="Ask anything about SPN Coin..."
+      rows="1" maxlength="2000"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend()}"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+    <button class="ai-send" id="aiSendBtn" onclick="aiSend()" title="Send">
+      <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
+        <path d="M2 8l12-6-6 12V9L2 8z" fill="white"/>
+      </svg>
+    </button>
+  </div>
+  <div class="ai-footer">
+    Powered by <a href="https://anthropic.com" target="_blank">Anthropic Claude</a>
+    &nbsp;·&nbsp; <a href="/LICENSE" target="_blank">© 2026 SPN Coin Project</a>
+  </div>
+</div>
+
+<script>
+/* ── SPN Coin AI Widget ── */
+(function() {
+  const API_BASE = window.SPN_COIN_API || '';
+  let   history  = [];
+  let   open     = false;
+  let   tok      = sessionStorage.getItem('adm_tok') ||
+                   sessionStorage.getItem('w_tok')   ||
+                   localStorage.getItem('mc_token')  ||
+                   localStorage.getItem('myc_token') || '';
+
+  // Auto-discover token from page context
+  setTimeout(() => {
+    tok = sessionStorage.getItem('adm_tok') ||
+          sessionStorage.getItem('w_tok')   ||
+          localStorage.getItem('mc_token')  ||
+          localStorage.getItem('myc_token') || tok;
+  }, 500);
+
+  window.aiToggle = function() {
+    open = !open;
+    const p = document.getElementById('ai-panel');
+    if (open) { p.classList.add('open'); document.getElementById('aiInput').focus(); }
+    else       p.classList.remove('open');
+  };
+
+  window.aiAsk = function(text) {
+    document.getElementById('aiInput').value = text;
+    document.getElementById('aiSugg').style.display = 'none';
+    aiSend();
+  };
+
+  window.aiSend = async function() {
+    const input = document.getElementById('aiInput');
+    const msg   = input.value.trim();
+    if (!msg) return;
+
+    // Add user bubble
+    addMsg('user', msg);
+    input.value = '';
+    input.style.height = 'auto';
+    document.getElementById('aiSugg').style.display = 'none';
+
+    // Show typing indicator
+    const typingId = addTyping();
+    document.getElementById('aiSendBtn').disabled = true;
+
+    try {
+      const r = await fetch(API_BASE + '/api/ai/chat', {
+        method:  'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'Authorization': 'Bearer ' + tok,
+        },
+        body: JSON.stringify({ message: msg, history }),
+      });
+
+      removeTyping(typingId);
+
+      if (r.status === 401) {
+        addMsg('bot', `🔒 Please log in to use the AI assistant. Visit the <a href="dashboard" style="color:#6d6bf5">Dashboard</a> or <a href="radar" class="">📡 Radar</a>
+      <a href="admin" style="color:#6d6bf5">Admin Panel</a> to sign in.`, true);
+        return;
+      }
+      if (r.status === 429) {
+        addMsg('bot', '⏳ You\'ve sent too many messages. Please wait a moment before trying again.');
+        return;
+      }
+      if (!r.ok) {
+        const err = await r.json().catch(() => ({}));
+        addMsg('bot', '⚠️ ' + (err.error || 'AI service unavailable. Please try again.'));
+        return;
+      }
+
+      const d = await r.json();
+      addMsg('bot', d.reply);
+
+      // Maintain rolling history (last 10 turns)
+      history.push({ role: 'user', content: msg });
+      history.push({ role: 'assistant', content: d.reply });
+      if (history.length > 20) history = history.slice(-20);
+
+    } catch (e) {
+      removeTyping(typingId);
+      addMsg('bot', '⚠️ Connection error: ' + e.message + '\n\nMake sure the SPN Coin node is running.');
+    } finally {
+      document.getElementById('aiSendBtn').disabled = false;
+    }
+  };
+
+  function addMsg(role, text, isHtml = false) {
+    const wrap = document.getElementById('aiMessages');
+    const div  = document.createElement('div');
+    div.className = 'ai-msg ' + role;
+
+    const bubble = document.createElement('div');
+    bubble.className = 'ai-bubble';
+    // Simple markdown → HTML
+    const formatted = formatText(text);
+    if (isHtml) bubble.innerHTML = formatted;
+    else        bubble.innerHTML = formatted;
+
+    if (role === 'bot') {
+      const mic = document.createElement('div');
+      mic.className = 'ai-mic';
+      mic.textContent = '🤖';
+      div.appendChild(mic);
+    }
+    div.appendChild(bubble);
+    wrap.appendChild(div);
+    wrap.scrollTop = wrap.scrollHeight;
+    return div.id;
+  }
+
+  function formatText(text) {
+    return text
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/`([^`]+)`/g, '<code style="font-family:JetBrains Mono,monospace;font-size:11px;background:rgba(59,130,246,.1);padding:1px 5px;border-radius:3px">$1</code>')
+      .replace(/\n/g, '<br>');
+  }
+
+  let typingCtr = 0;
+  function addTyping() {
+    const id   = 'typing-' + (++typingCtr);
+    const wrap = document.getElementById('aiMessages');
+    const div  = document.createElement('div');
+    div.className = 'ai-msg bot';
+    div.id        = id;
+    div.innerHTML = '<div class="ai-mic">🤖</div><div class="ai-bubble"><div class="ai-typing"><span></span><span></span><span></span></div></div>';
+    wrap.appendChild(div);
+    wrap.scrollTop = wrap.scrollHeight;
+    return id;
+  }
+
+  function removeTyping(id) {
+    document.getElementById(id)?.remove();
+  }
+})();
+</script>
+<!-- ═══ /AI Widget ═══ -->
+
+</body>
+</html>

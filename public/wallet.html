@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<!--
+  © 2026 SPN Coin Project — PROPRIETARY AND CONFIDENTIAL
+  All Rights Reserved. Unauthorized copying, modification,
+  distribution, or use of this file is strictly prohibited.
+  See LICENSE file in the project root for full details.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="64x64" href="/sepanta-coin.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/sepanta-coin-32.png?v=5">
+  <link rel="shortcut icon" href="/sepanta-coin.ico?v=5">
+  <link rel="apple-touch-icon" sizes="180x180" href="/sepanta-coin-180.png?v=5">
+  <meta name="theme-color" content="#070a0e">
+  <meta name="description" content="Your SPN Coin wallet — balance, address, QR code, and send.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Wallet — Sepanta (SPN)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080b13;--c1:#0f1626;--c2:#141d31;--c3:#182135;
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.13);--bd3:rgba(255,255,255,.25);
+  --txt:#eaf0fb;--sub:#b3bdd8;--mut:#8a97b8;
+  --gold:#f5b301;--go2:#f7c948;--grn:#26d07c;--grn2:rgba(0,230,118,.09);--grn3:rgba(0,230,118,.24);
+  --red:#f2555a;--red2:rgba(255,68,102,.12);
+  --cyan:#25d0ee;--pur:#b06bf7;
+  --r:10px;
+}
+html{scroll-behavior:smooth}
+body{font-family:"Sora",sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;font-size:14px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 65% 38% at 18% 0%,rgba(240,165,0,.055) 0%,transparent 55%),
+             radial-gradient(ellipse 50% 32% at 88% 100%,rgba(0,230,118,.04) 0%,transparent 55%)}
+
+/* TOPBAR */
+.topbar{background:rgba(13,15,24,.94);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:50;backdrop-filter:blur(14px)}
+.tb-in{max-width:980px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:54px;gap:12px}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;flex-shrink:0}
+.logo-ic{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--go2));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#000;box-shadow:0 0 16px rgba(240,165,0,.28)}
+.logo-txt{font-size:16px;font-weight:900;color:var(--gold)}
+.tnav{display:flex;gap:2px}
+.tnav a{padding:6px 12px;border-radius:6px;font-size:13px;font-weight:500;color:var(--sub);text-decoration:none;transition:all .15s}
+.tnav a:hover{background:var(--c2);color:var(--txt)}
+.tnav a.on{color:var(--gold);font-weight:700}
+.tb-user{display:flex;align-items:center;gap:8px}
+.tb-btn{padding:7px 14px;border-radius:6px;font-family:"Sora",sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;border:none}
+.tb-logout{background:rgba(255,68,102,.1);color:var(--red);border:1px solid rgba(255,68,102,.2)}
+.tb-logout:hover{background:var(--red2)}
+.tb-send{background:linear-gradient(135deg,#d49000,var(--gold));color:#000;box-shadow:0 4px 14px rgba(240,165,0,.25)}
+.tb-send:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(240,165,0,.35)}
+
+/* LOGIN OVERLAY */
+#loginOverlay{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px}
+.login-box{position:relative;background:var(--c1);border:1px solid var(--bd2);border-radius:16px;width:100%;max-width:400px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.6),0 0 70px rgba(245,179,1,.08);animation:bIn .4s cubic-bezier(.22,1,.36,1)}
+.login-box::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#f5b301,#f7c948,#f5b301);z-index:2}
+.lb-brand{display:flex;align-items:center;gap:12px}
+.lb-logo{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,#f5b301,#c98a00);display:grid;place-items:center;font-weight:900;color:#1a1200;font-size:21px;box-shadow:0 6px 20px rgba(245,179,1,.35);flex:none}
+.lb-badge{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-size:10px;font-weight:800;letter-spacing:.8px;color:#26d07c;background:rgba(38,208,124,.1);border:1px solid rgba(38,208,124,.25);border-radius:5px;padding:4px 9px}
+.lb-dot{width:6px;height:6px;border-radius:50%;background:#26d07c;box-shadow:0 0 8px #26d07c}
+.lb-foot{padding:11px 24px;border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--mut);font-family:"JetBrains Mono",monospace}
+.lb-sec{color:#26d07c}
+@keyframes bIn{from{opacity:0;transform:scale(.96) translateY(16px)}to{opacity:1;transform:none}}
+.lb-head{padding:24px 24px 18px;border-bottom:1px solid var(--bd);background:linear-gradient(135deg,rgba(245,179,1,.05),transparent)}
+.lb-ic{font-size:40px;margin-bottom:10px}
+.lb-title{font-size:18px;font-weight:900}
+.lb-sub{font-size:11.5px;color:var(--sub);margin-top:3px}
+.lb-body{padding:22px 24px}
+.lbl{font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.4px;margin-bottom:6px;display:block}
+.inp{width:100%;padding:11px 14px;background:var(--c2);border:1px solid var(--bd);border-radius:8px;color:var(--txt);font-family:"Sora",sans-serif;font-size:13.5px;outline:none;transition:all .2s;margin-bottom:12px}
+.inp:focus{border-color:rgba(240,165,0,.4);background:var(--c3);box-shadow:0 0 0 3px rgba(240,165,0,.07)}
+.inp::placeholder{color:var(--mut)}
+.btn-login{width:100%;padding:12px;background:linear-gradient(135deg,#d49000,var(--gold));border:none;border-radius:8px;color:#000;font-family:"Sora",sans-serif;font-size:14px;font-weight:900;cursor:pointer;transition:all .2s;box-shadow:0 4px 18px rgba(240,165,0,.24)}
+.btn-login:hover{transform:translateY(-1px);box-shadow:0 6px 26px rgba(240,165,0,.36)}
+.btn-login:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.lerr{font-size:12px;color:var(--red);text-align:center;margin-top:8px;display:none}
+.lerr.on{display:block}
+
+/* PAGE */
+.page{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:28px 20px 80px}
+
+/* WALLET HERO CARD */
+.hero{background:linear-gradient(160deg,var(--c1,#0f1626),#0c1322);border:1px solid var(--bd2,#1b2740);border-radius:16px;padding:28px 28px 22px;margin-bottom:22px;position:relative;overflow:hidden;animation:fu .38s ease both}
+.hero::before{content:"";position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:rgba(109,107,245,.06);pointer-events:none}
+@keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.hero-net{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;letter-spacing:.6px;padding:3px 10px;border-radius:4px;margin-bottom:14px}
+.hero-net.main{background:rgba(38,208,124,.1);border:1px solid rgba(38,208,124,.25);color:var(--grn)}
+.hero-net.test{background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);color:var(--grn)}
+.hero-net::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;animation:pp 1.8s infinite}
+@keyframes pp{0%,100%{opacity:1}50%{opacity:.3}}
+.hero-bal-label{font-size:11px;font-weight:700;color:var(--sub,#8a97b8);letter-spacing:.7px;text-transform:uppercase;margin-bottom:6px}
+.hero-bal{font-family:"JetBrains Mono",monospace;font-size:38px;font-weight:700;color:var(--txt,#eaf0fb);letter-spacing:-1px;line-height:1}
+.hero-sym{font-size:16px;font-weight:600;color:rgba(240,165,0,.65);margin-right:6px}
+.hero-usd{font-size:13px;color:var(--mut,#8a97b8);margin-top:5px}
+.hero-addr-wrap{margin-top:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.hero-addr-box{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.35);border:1px solid var(--bd2);border-radius:8px;padding:10px 14px;cursor:pointer;transition:all .15s;flex:1;min-width:0}
+.hero-addr-box:hover{border-color:rgba(240,165,0,.3);background:rgba(0,0,0,.5)}
+.hero-addr-prefix{font-size:11px;font-weight:900;color:var(--gold);flex-shrink:0;font-family:"JetBrains Mono",monospace}
+.hero-addr-body{font-family:"JetBrains Mono",monospace;font-size:12.5px;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.hero-addr-copy{font-size:12px;color:var(--mut);flex-shrink:0;transition:color .15s}
+.hero-addr-box:hover .hero-addr-copy{color:var(--gold)}
+.hero-addr-wrap{display:flex;gap:8px;align-items:stretch;justify-content:center}
+.hero-qr-btn{background:var(--bg2,#141726);border:1px solid var(--bd,rgba(255,255,255,.1));border-radius:10px;color:var(--gold);font-size:13px;font-weight:600;padding:0 16px;cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap}
+.hero-qr-btn:hover{background:rgba(240,165,0,.12);border-color:var(--gold)}
+.hero-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.btn-hero{display:inline-flex;align-items:center;gap:7px;padding:11px 20px;border-radius:8px;font-family:"Sora",sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .2s;white-space:nowrap}
+.btn-send{background:linear-gradient(135deg,#d49000,var(--gold));color:#000;box-shadow:0 4px 18px rgba(240,165,0,.25)}
+.btn-send:hover{transform:translateY(-1px);box-shadow:0 6px 26px rgba(240,165,0,.36)}
+.btn-recv{background:rgba(0,230,118,.08);color:var(--grn);border:1px solid rgba(0,230,118,.2)}
+.btn-recv:hover{background:rgba(0,230,118,.15)}
+.btn-refresh{background:var(--c2);color:var(--sub);border:1px solid var(--bd)}
+.btn-refresh:hover{background:var(--c3);color:var(--txt)}
+
+/* GRID */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+
+/* STAT CARDS */
+.stat{background:var(--c1);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;animation:fu .38s ease both}
+.stat:nth-child(2){animation-delay:.04s}
+.stat:nth-child(3){animation-delay:.08s}
+.stat:nth-child(4){animation-delay:.12s}
+.stat-ico{font-size:18px;margin-bottom:6px}
+.stat-val{font-family:"JetBrains Mono",monospace;font-size:20px;font-weight:700;letter-spacing:-.3px}
+.stat-val.g{color:var(--gold)}
+.stat-val.c{color:var(--cyan)}
+.stat-val.p{color:var(--pur)}
+.stat-val.r{color:var(--grn)}
+.stat-lbl{font-size:11px;color:var(--sub);font-weight:600;margin-top:3px}
+
+/* CARDS */
+.card{background:var(--c1);border:1px solid var(--bd);border-radius:12px;overflow:hidden;margin-bottom:16px;animation:fu .38s ease both}
+.card:nth-child(2){animation-delay:.06s}
+.ch{padding:12px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(90deg,rgba(240,165,0,.03),transparent)}
+.ct{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:800;color:var(--sub);letter-spacing:.6px;text-transform:uppercase}
+.ctd{width:6px;height:6px;border-radius:50%;background:var(--gold)}
+
+/* TX LIST */
+.tx-row{padding:13px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:14px;transition:background .1s;cursor:pointer}
+.tx-row:last-child{border-bottom:none}
+.tx-row:hover{background:rgba(255,255,255,.018)}
+.tx-ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.tx-ic.out{background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.2)}
+.tx-ic.in{background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.18)}
+.tx-ic.self{background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.2)}
+.tx-info{flex:1;min-width:0}
+.tx-hash{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tx-peer{font-size:12.5px;color:var(--txt);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}
+.tx-meta{text-align:right;flex-shrink:0}
+.tx-amt{font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:700}
+.tx-amt.out{color:var(--red)}
+.tx-amt.in{color:var(--grn)}
+.tx-time{font-size:10.5px;color:var(--mut);margin-top:2px}
+
+/* UTXO TABLE */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{padding:9px 14px;text-align:left;font-size:10px;font-weight:800;color:var(--mut);letter-spacing:.5px;text-transform:uppercase;background:rgba(0,0,0,.2);border-bottom:1px solid var(--bd)}
+.tbl td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-size:12.5px}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(255,255,255,.015)}
+.mono{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--sub)}
+.trunc{max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* RECEIVE MODAL */
+.mbg{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.75);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:20px}
+.mbg.on{display:flex}
+.modal{background:var(--c1);border:1px solid var(--bd2);border-radius:14px;width:100%;max-width:400px;box-shadow:0 24px 80px rgba(0,0,0,.7);animation:bIn .25s cubic-bezier(.22,1,.36,1)}
+.mhd{padding:16px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.mttl{font-size:14px;font-weight:900}
+.mclose{background:none;border:none;color:var(--sub);cursor:pointer;font-size:16px;padding:0;transition:color .15s}
+.mclose:hover{color:var(--txt)}
+.mbdy{padding:22px}
+.qr-wrap{background:white;border-radius:10px;padding:16px;text-align:center;margin-bottom:16px}
+.addr-full{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--txt);word-break:break-all;background:var(--c2);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;margin-bottom:10px;cursor:pointer;transition:all .15s;line-height:1.7}
+.addr-full:hover{border-color:rgba(240,165,0,.3);background:rgba(240,165,0,.04)}
+.addr-prefix-highlight{color:var(--gold);font-weight:800}
+.copy-hint{font-size:10.5px;color:var(--mut);text-align:center}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--c2);border:1px solid rgba(0,230,118,.35);color:var(--grn);font-size:12.5px;font-weight:700;padding:10px 20px;border-radius:8px;box-shadow:0 6px 24px rgba(0,0,0,.5);opacity:0;transition:all .24s;z-index:999;pointer-events:none;white-space:nowrap}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.e{border-color:rgba(255,68,102,.4);color:var(--red)}
+
+@media(max-width:680px){
+  .tnav{display:none}
+  .hero-bal{font-size:28px}
+  .hero-addr-body{font-size:11px}
+}
+.pf-body{padding:6px 20px 14px}
+.pf-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--bd);font-size:14px;color:var(--sub)}
+.pf-row:last-child{border-bottom:none}
+.pf-row b{font-family:"JetBrains Mono",monospace;color:var(--txt);font-size:15px;font-weight:700}
+.pf-row b.g,.pf-row b.gold{color:var(--gold)}
+</style>
+  <script src="qrcode-lib.js?v=2"></script>
+  <script src="otp-box.js?v=1"></script>
+  <script src="qr.js?v=4"></script>
+  <script src="csrf-fetch.js?v=25"></script>
+  <script src="i18n.js?v=34" defer></script>
+<script src="nav.js?v=40" defer></script><script src="/ai-bubble.js?v=5" defer></script>
+<script src="/anti-phishing.js?v=1" defer></script>
+  <script src="realtime.js?v=1"></script>
+
+  <script src="footer.js?v=35" defer></script>
+  <script src="ui-prefs.js?v=25" defer></script>
+  <script src="ui-utils.js?v=25"></script>
+</head>
+<body>
+
+<!-- LOGIN OVERLAY -->
+<div id="loginOverlay">
+  <div class="login-box">
+    <div class="lb-head">
+      <div class="lb-brand">
+        <div class="lb-logo">S</div>
+        <div style="text-align:left">
+          <div class="lb-title">My SPN Coin Wallet</div>
+          <div class="lb-sub">Sign in to view your wallet and balance</div>
+        </div>
+      </div>
+      <div class="lb-badge"><span class="lb-dot"></span>SECURE WALLET ACCESS</div>
+    </div>
+    <div class="lb-body">
+      <div class="lerr" id="lerr"></div>
+      <div id="credFields">
+        <label class="lbl">USERNAME</label>
+        <input class="inp" id="lUser" type="text" placeholder="admin" autocomplete="username"
+               onkeydown="if(event.key==='Enter')doLogin()">
+        <label class="lbl">PASSWORD</label>
+        <input class="inp" id="lPass" type="password" placeholder="••••••••" autocomplete="current-password"
+               onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div id="l2faWrap" style="display:none">
+        <div style="text-align:center;font-size:34px;margin:4px 0 10px">🔐</div>
+        <div style="text-align:center;font-size:15px;font-weight:800;margin-bottom:4px">Two-Factor Authentication</div>
+        <label class="lbl" style="text-align:center;display:block;margin-bottom:10px">Enter the 6-digit code from your Authenticator app</label>
+        <div class="otp-row" id="l2faRow" data-target="l2fa" data-onfull="doLogin">
+          <input class="oi" maxlength="1" data-i="0" inputmode="numeric" autocomplete="one-time-code" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+          <input class="oi" maxlength="1" data-i="1" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+          <input class="oi" maxlength="1" data-i="2" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+          <input class="oi" maxlength="1" data-i="3" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+          <input class="oi" maxlength="1" data-i="4" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+          <input class="oi" maxlength="1" data-i="5" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+        </div>
+        <input type="hidden" id="l2fa">
+        <div style="text-align:center;margin-top:10px"><a href="#" onclick="back2fa();return false" style="color:var(--gold,#f5b301);font-size:12px;text-decoration:none">← Back to login</a></div>
+      </div>
+      <button class="btn-login" id="btnLogin" onclick="doLogin()">Access Wallet</button>
+    </div>
+    <div class="lb-foot"><span>SPN Coin Wallet</span><span class="lb-sec">🔒 Secure Connection</span></div>
+  </div>
+</div>
+
+
+
+<div class="page">
+
+  <!-- HERO WALLET CARD -->
+  <div class="hero" id="heroCard">
+    <div>
+      <div class="hero-net main" id="netBadge">MAINNET</div>
+    </div>
+    <div class="hero-bal-label">AVAILABLE BALANCE</div>
+    <div style="display:flex;align-items:baseline;gap:6px">
+      <div class="hero-bal" id="heroBal">—</div>
+      <span class="hero-sym">SPN</span>
+    </div>
+    <div class="hero-usd" id="heroSats">— satoshis</div>
+
+    <!-- Full SPN Address display -->
+    <div class="hero-addr-wrap">
+      <div class="hero-addr-box" onclick="cpAddr()" id="addrBox" title="Click to copy address">
+        <span class="hero-addr-prefix" id="addrPrefix">SPN1</span>
+        <span class="hero-addr-body"  id="addrBody">Loading wallet address...</span>
+        <span class="hero-addr-copy">⎘</span>
+      </div>
+      <button class="hero-qr-btn" onclick="showQR()" title="Show QR code" id="qrBtn">▦ QR</button>
+    </div>
+
+    <div class="hero-actions">
+      <button class="btn-hero btn-send" onclick="location.href='/send'">↑ Send SPN</button>
+      <button class="btn-hero btn-recv" onclick="showReceive()">↓ Receive</button>
+      <button class="btn-hero btn-refresh" onclick="loadWallet()" id="btnRefresh">🔄 Refresh</button>
+      <button class="btn-hero" id="btnLogout" onclick="doLogout()" style="background:rgba(255,68,102,.12);color:var(--red);border:1px solid rgba(255,68,102,.25)">⎋ Logout</button>
+    </div>
+  </div>
+
+  <!-- PORTFOLIO -->
+  <div class="card">
+    <div class="ch"><div class="ct"><span class="ctd"></span>Portfolio</div></div>
+    <div class="pf-body">
+      <div class="pf-row"><span>Total Balance</span><b class="g" id="statBal">—</b></div>
+      <div class="pf-row"><span>Immature (mining)</span><b class="gold" id="pfImmature">—</b></div>
+      <div class="pf-row"><span>Unspent Outputs (UTXOs)</span><b id="statUtxo">—</b></div>
+      <div class="pf-row"><span>Tokens held</span><b id="pfTokens">0</b></div>
+    </div>
+  </div>
+
+  <!-- MY TOKENS / ASSETS -->
+  <div class="card">
+    <div class="ch">
+      <div class="ct"><span class="ctd"></span>My Tokens</div>
+      <button onclick="loadMyTokens()" style="background:var(--c2);color:var(--sub);border:1px solid var(--bd);padding:5px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">🔄</button>
+    </div>
+    <div id="tokenList">
+      <div style="padding:32px;text-align:center;color:var(--mut)">Loading tokens…</div>
+    </div>
+  </div>
+
+  <!-- TRANSACTION HISTORY -->
+  <div class="card">
+    <div class="ch">
+      <div class="ct"><span class="ctd"></span>Transaction History</div>
+      <button onclick="loadTxHistory()" style="background:var(--c2);color:var(--sub);border:1px solid var(--bd);padding:5px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">🔄</button>
+    </div>
+    <div id="txList">
+      <div style="padding:32px;text-align:center;color:var(--mut)">Loading transactions...</div>
+    </div>
+  </div>
+
+  <!-- UTXO SET -->
+  <div class="card">
+    <div class="ch"><div class="ct"><span class="ctd"></span>Unspent Outputs</div></div>
+    <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th>TX Hash</th><th>Index</th><th>Amount (SPN)</th><th>Block</th><th>Status</th></tr></thead>
+        <tbody id="utxoTbl">
+          <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--mut)">Loading UTXOs...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECURITY / 2FA -->
+  <div class="card">
+    <div class="ch"><div class="ct"><span class="ctd"></span>🔐 Security — Two-Factor Authentication (2FA)</div></div>
+    <div style="padding:4px 2px">
+      <p style="color:var(--mut);font-size:13px;margin:0 0 12px">
+        Protect your account with a time-based code from an Authenticator app
+        (Google Authenticator, Proton Authenticator, Authy…). When enabled, sign-in
+        requires your password <b>and</b> a 6-digit code.
+      </p>
+      <div id="twofaStatus" style="font-size:13px;margin-bottom:12px">Status: <span id="twofaState">checking…</span></div>
+      <button class="btn-hero btn-send" id="btnEnable2fa" style="display:none" onclick="start2faSetup()">Enable 2FA</button>
+      <button class="btn-hero" id="btnDisable2fa" style="display:none;background:rgba(255,68,102,.12);color:var(--red);border:1px solid rgba(255,68,102,.25)" onclick="disable2fa()">Disable 2FA</button>
+
+      <!-- setup panel -->
+      <div id="twofaSetup" style="display:none;margin-top:16px;border-top:1px solid var(--bd);padding-top:16px">
+        <p style="font-size:13px;color:var(--txt);margin:0 0 10px"><b>1.</b> Scan this QR in your Authenticator app:</p>
+        <div id="twofaQR" style="width:196px;height:196px;background:#fff;border-radius:10px;padding:8px;display:inline-block;line-height:0"></div>
+        <p style="font-size:12px;color:var(--mut);margin:10px 0 4px">Or enter this secret manually:</p>
+        <code id="twofaSecret" style="display:block;word-break:break-all;background:rgba(255,255,255,.05);padding:8px 10px;border-radius:8px;font-size:12px"></code>
+        <p style="font-size:13px;color:var(--txt);margin:14px 0 6px"><b>2.</b> Enter the 6-digit code to confirm:</p>
+        <input class="inp" id="twofaConfirmCode" type="text" inputmode="numeric" placeholder="123456"
+               style="max-width:220px" onkeydown="if(event.key==='Enter')confirm2fa()">
+        <div style="margin-top:12px;display:flex;gap:10px">
+          <button class="btn-hero btn-send" id="btnConfirm2fa" onclick="confirm2fa()">Confirm & Enable</button>
+          <button class="btn-hero" style="background:rgba(255,255,255,.06);color:var(--mut)" onclick="cancel2faSetup()">Cancel</button>
+        </div>
+        <div id="twofaRecovery" style="display:none;margin-top:16px">
+          <p style="font-size:13px;color:var(--gold);margin:0 0 6px"><b>✅ 2FA enabled.</b> Save these one-time recovery codes somewhere safe — each works once if you lose your device:</p>
+          <code id="twofaRecoveryList" style="display:block;white-space:pre-wrap;background:rgba(255,255,255,.05);padding:10px 12px;border-radius:8px;font-size:12px;line-height:1.9"></code>
+          <button class="btn-hero btn-send" style="margin-top:10px" onclick="download2faRecovery()">⬇️ Download as .txt</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- RECEIVE MODAL -->
+<div class="mbg" id="recvModal">
+  <div class="modal">
+    <div class="mhd">
+      <div class="mttl">↓ Receive SPN</div>
+      <button class="mclose" onclick="closeRecv()">✕</button>
+    </div>
+    <div class="mbdy">
+      <div class="qr-wrap">
+        <div id="qrCanvas" style="width:180px;height:180px;margin:0 auto"></div>
+      </div>
+      <div class="addr-full" onclick="cpAddr()" id="fullAddrDisplay">
+        <span class="addr-prefix-highlight" id="fullAddrPrefix">SPN1</span><span id="fullAddrRest">...</span>
+      </div>
+      <div class="copy-hint">👆 Click address to copy</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = window.SPN_COIN_API
+  || (location.hostname === "localhost" || location.hostname === "127.0.0.1"
+      ? "http://localhost:3000" : location.origin);
+
+let TOK  = sessionStorage.getItem("w_tok") || "";
+let ADDR = "";
+
+/* ── Boot ── */
+(async () => {
+  if (TOK) {
+    try {
+      const me = await af("/api/auth/me");
+      if (me.username) { hideLogin(me); return; }
+    } catch {}
+    TOK = ""; sessionStorage.removeItem("w_tok");
+  }
+})();
+
+/* ── Login ── */
+async function doLogin() {
+  const un = g("lUser").value.trim(), pw = g("lPass").value.trim();
+  const code = (g("l2fa") ? g("l2fa").value.trim() : "");
+  if (!un || !pw) return showLerr("Username and password required");
+  dis("btnLogin", "Signing in...");
+  try {
+    const r = await (window.csrfFetch||fetch)(API + "/api/auth/login", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: un, password: pw, totp: code || undefined }),
+    });
+    const d = await r.json();
+    if (d.accessToken) {
+      TOK = d.accessToken;
+      sessionStorage.setItem("w_tok", TOK);
+      const me = await af("/api/auth/me");
+      hideLogin(me);
+    } else if (d.require2fa) {
+      // Password OK — switch to a clean 2FA-only step (like the admin panel).
+      const cf = g("credFields"); if (cf) cf.style.display = "none";
+      g("l2faWrap").style.display = "block";
+      if (code && window.otpClear) otpClear("l2faRow");
+      if (window.otpFocus) otpFocus("l2faRow");
+      if (code) showLerr("Invalid 2FA code — try again"); else { const e = g("lerr"); if (e) e.style.display = "none"; }
+      ena("btnLogin", "Verify Code");
+    } else {
+      showLerr(d.error || "Login failed");
+      ena("btnLogin", "Access Wallet");
+    }
+  } catch (e) { showLerr("Connection error: " + e.message); ena("btnLogin", "Access Wallet"); }
+}
+
+function back2fa() {
+  const w = g("l2faWrap"); if (w) w.style.display = "none";
+  if (window.otpClear) otpClear("l2faRow");
+  const cf = g("credFields"); if (cf) cf.style.display = "";
+  const e = g("lerr"); if (e) e.style.display = "none";
+  ena("btnLogin", "Access Wallet");
+  const p = g("lPass"); if (p) { p.value = ""; p.focus(); }
+}
+
+function hideLogin(me) {
+  g("loginOverlay").style.display = "none";
+  const tu = g("tbUser"); if (tu) tu.textContent = me.username || "";
+  loadWallet();
+  refresh2faStatus();
+}
+
+/* ── Two-Factor Authentication (2FA) ── */
+async function refresh2faStatus() {
+  try {
+    const s = await af("/api/auth/2fa/status");
+    const on = !!s.enabled;
+    g("twofaState").textContent = on ? "✅ Enabled" : "⚠️ Not enabled";
+    g("twofaState").style.color = on ? "var(--grn,#26d07c)" : "var(--gold)";
+    g("btnEnable2fa").style.display  = on ? "none" : "inline-block";
+    g("btnDisable2fa").style.display = on ? "inline-block" : "none";
+    g("twofaSetup").style.display = "none";
+  } catch (e) { g("twofaState").textContent = "unavailable"; }
+}
+async function start2faSetup() {
+  try {
+    const r = await af("/api/auth/2fa/setup", "POST");
+    if (r.error) return toast(r.error, "e");
+    g("twofaSecret").textContent = r.secret || "";
+    if (r.otpauthUrl) drawQR("twofaQR", r.otpauthUrl, 180);
+    g("twofaRecovery").style.display = "none";
+    g("twofaConfirmCode").value = "";
+    g("twofaSetup").style.display = "block";
+    g("twofaConfirmCode").focus();
+  } catch (e) { toast(e.message || "Setup failed", "e"); }
+}
+async function confirm2fa() {
+  const token = g("twofaConfirmCode").value.trim();
+  if (!token) return toast("Enter the 6-digit code", "e");
+  try {
+    const r = await af("/api/auth/2fa/confirm", "POST", { token });
+    if (r.error) return toast(r.error, "e");
+    // If we were on a pending-2FA token, adopt the fresh full token and load
+    // the wallet data that the restricted token could not fetch.
+    if (r.accessToken) { TOK = r.accessToken; sessionStorage.setItem("w_tok", TOK); loadWallet(); }
+    toast("Two-factor authentication enabled");
+    if (Array.isArray(r.recoveryCodes) && r.recoveryCodes.length) {
+      _recoveryCodes = r.recoveryCodes.slice();
+      g("twofaRecoveryList").textContent = r.recoveryCodes.join("\n");
+      g("twofaRecovery").style.display = "block";
+    }
+    g("twofaState").textContent = "✅ Enabled";
+    g("twofaState").style.color = "var(--grn,#26d07c)";
+    g("btnEnable2fa").style.display = "none";
+    g("btnDisable2fa").style.display = "inline-block";
+  } catch (e) { toast(e.message || "Invalid code", "e"); }
+}
+function cancel2faSetup() { g("twofaSetup").style.display = "none"; }
+let _recoveryCodes = [];
+function download2faRecovery() {
+  if (!_recoveryCodes.length) return toast("No recovery codes to download", "e");
+  const now = new Date();
+  const lines = [
+    "SPN Coin — 2FA Recovery Codes",
+    "================================",
+    "",
+    "Generated: " + now.toLocaleString(),
+    "",
+    "Keep these codes secret and safe. Each code works ONLY ONCE.",
+    "Use one of them to sign in if you lose access to your Authenticator app.",
+    "",
+    ..._recoveryCodes.map((c, i) => (i + 1).toString().padStart(2, "0") + ". " + c),
+    "",
+    "================================",
+    "© 2026 SPN Coin Project",
+  ];
+  // \r\n line endings so it opens cleanly in Windows Notepad.
+  const blob = new Blob([lines.join("\r\n")], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "SPN_Coin_2FA_recovery_codes.txt";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast("Recovery codes downloaded");
+}
+async function disable2fa() {
+  const token = prompt("Enter a current 2FA code (or a recovery code) to disable 2FA:");
+  if (token === null) return;
+  try {
+    const r = await af("/api/auth/2fa/disable", "POST", { token: (token || "").trim() });
+    if (r.error) return toast(r.error, "e");
+    toast("Two-factor authentication disabled");
+    refresh2faStatus();
+  } catch (e) { toast(e.message || "Could not disable", "e"); }
+}
+
+async function doLogout() {
+  try { await af("/api/auth/logout", "POST"); } catch {}
+  TOK = ""; sessionStorage.clear();
+  location.reload();
+}
+
+/* ── Wallet data ── */
+async function loadWallet() {
+  try {
+    const [wi, coinInfo] = await Promise.all([
+      af("/api/wallet-info"),
+      fetch(API + "/api/coin-info").then(r => r.json()).catch(() => ({})),
+    ]);
+
+    const fullAddr  = wi.address || "";
+    ADDR            = fullAddr;
+    const isTestnet = fullAddr.startsWith("SPNt");
+    const prefix    = fullAddr.slice(0, 4);   // "SPN1" or "SPNt"
+    const rest      = fullAddr.slice(4);       // rest of address
+
+    // Hero card
+    const balSats = BigInt(wi.balance || "0");
+    const balMYC  = (Number(balSats) / 1e8).toFixed(8).replace(/\.?0+$/, "") || "0";
+    g("heroBal").textContent  = balMYC;
+    g("heroSats").textContent = Number(balSats).toLocaleString("en") + " satoshis";
+
+    // Address display — split prefix from body for visual highlighting
+    g("addrPrefix").textContent    = prefix;
+    g("addrBody").textContent      = rest;
+
+    // Network badge
+    const nb = g("netBadge");
+    if (isTestnet) {
+      nb.textContent = "TESTNET";
+      nb.className   = "hero-net test";
+    } else {
+      nb.textContent = "MAINNET";
+      nb.className   = "hero-net main";
+    }
+
+    // Stats
+    const utxos = wi.utxos || [];
+    // Coinbase maturity (100 blocks) — immature mining rewards not yet spendable
+    const MATURITY = 100;
+    let curHeight = 0;
+    try { const h = await fetch(API + "/api/health").then(r => r.json()); curHeight = Number(h.height || 0); } catch {}
+    const isImmature = u => u.isCoinbase && curHeight && (curHeight - Number(u.blockHeight || 0)) < MATURITY;
+    let immSats = 0n;
+    for (const u of utxos) { if (isImmature(u)) { try { immSats += BigInt(u.amount || 0); } catch {} } }
+    const immMYC = (Number(immSats) / 1e8).toFixed(8).replace(/\.?0+$/, "") || "0";
+
+    g("statBal").textContent   = balMYC + " SPN";
+    g("statUtxo").textContent  = (utxos.length || wi.utxoCount || 0).toString();
+    if (g("pfImmature")) g("pfImmature").textContent = immMYC + " SPN";
+
+    // UTXOs table
+    g("utxoTbl").innerHTML = utxos.length
+      ? utxos.map(u => {
+          const amt    = (Number(u.amount || 0) / 1e8).toFixed(8);
+          const cbTag  = u.isCoinbase ? `<span style="color:var(--gold);font-size:10px">CB</span>` : "";
+          const imm    = isImmature(u);
+          const badge  = imm
+            ? `<span style="color:var(--gold);font-size:11px">⏳ Immature</span>`
+            : `<span style="color:var(--grn);font-size:11px">✅ Spendable</span>`;
+          return `<tr>
+            <td class="mono trunc" title="${u.txid}">${u.txid.slice(0,18)}...</td>
+            <td class="mono">${u.vout}</td>
+            <td style="color:var(--gold);font-weight:700">${amt}</td>
+            <td class="mono">${u.blockHeight || 0}</td>
+            <td>${badge} ${cbTag}</td>
+          </tr>`;
+        }).join("")
+      : `<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--mut)">No UTXOs found</td></tr>`;
+
+    // Receive modal
+    g("fullAddrPrefix").textContent = prefix;
+    g("fullAddrRest").textContent   = rest;
+    drawQR("qrCanvas", fullAddr, 180);
+
+    // Load tx history
+    loadTxHistory();
+    loadMyTokens();
+
+  } catch (e) {
+    toast("Error loading wallet: " + e.message, "e");
+  }
+}
+
+// ── Load & render the user's tokens (name, symbol, logo, balance) ──
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+async function loadMyTokens() {
+  const box = document.getElementById('tokenList');
+  if (!box || !ADDR) return;
+  try {
+    const r = await fetch(API + '/api/address/' + ADDR + '/tokens');
+    const d = await r.json();
+    const tokens = (d && d.tokens) || [];
+    if (g('pfTokens')) g('pfTokens').textContent = tokens.length;
+    if (!tokens.length) {
+      box.innerHTML = '<div style="padding:32px;text-align:center;color:var(--mut)">'
+        + 'You don\'t hold any tokens yet.<br>'
+        + '<a href="/token-factory" style="color:var(--acc,#26d07c)">Create one →</a></div>';
+      return;
+    }
+    box.innerHTML = tokens.map(function (t) {
+      const dec = t.decimals || 0;
+      const amt = formatAmount(t.amount, dec);
+      const sym = esc(t.symbol || '?');
+      const name = esc(t.name || t.symbol || 'Token');
+      const logo = (typeof t.logo === 'string' && /^(https:\/\/|data:image\/)/.test(t.logo)) ? t.logo : '';
+      const avatar = logo
+        ? '<img src="' + esc(logo) + '" alt="" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none" onerror="this.replaceWith(document.createTextNode(\'\'))">'
+        : '<div style="width:40px;height:40px;border-radius:50%;flex:none;background:linear-gradient(135deg,#f7931a,#ffb84d);display:flex;align-items:center;justify-content:center;font-weight:800;color:#1a1205;font-size:15px">' + sym.slice(0, 2).toUpperCase() + '</div>';
+      return '<a href="/token?id=' + encodeURIComponent(t.tokenId) + '" '
+        + 'style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--bd);text-decoration:none;color:inherit;transition:.15s" '
+        + 'onmouseover="this.style.background=\'var(--c2)\'" onmouseout="this.style.background=\'\'">'
+        + avatar
+        + '<div style="flex:1;min-width:0">'
+        +   '<div style="font-weight:700;color:var(--txt,#e8f0f8)">' + name + '</div>'
+        +   '<div style="font-size:12px;color:var(--mut)">' + sym + '</div>'
+        + '</div>'
+        + '<div style="text-align:right;font-weight:700;font-family:\'JetBrains Mono\',monospace;color:var(--txt,#e8f0f8)">'
+        +   amt + ' <span style="color:var(--mut);font-weight:600">' + sym + '</span>'
+        + '</div>'
+        + '</a>';
+    }).join('');
+  } catch (e) {
+    box.innerHTML = '<div style="padding:24px;text-align:center;color:var(--mut)">Could not load tokens.</div>';
+  }
+}
+
+// Format an integer token amount by its decimals.
+function formatAmount(raw, decimals) {
+  try {
+    var s = String(raw);
+    if (!decimals) return Number(s).toLocaleString();
+    var neg = s.startsWith('-'); if (neg) s = s.slice(1);
+    while (s.length <= decimals) s = '0' + s;
+    var whole = s.slice(0, s.length - decimals);
+    var frac = s.slice(s.length - decimals).replace(/0+$/, '');
+    var out = Number(whole).toLocaleString() + (frac ? '.' + frac : '');
+    return neg ? '-' + out : out;
+  } catch (e) { return String(raw); }
+}
+
+async function loadTxHistory() {
+  try {
+    // Fetch recent blocks and filter txs involving our address
+    const d     = await fetch(API + "/api/blocks?limit=50").then(r => r.json()).catch(() => ({}));
+    const blocks = d.blocks || [];
+    const myTxs  = [];
+
+    for (const block of blocks) {
+      for (const tx of block.transactions || []) {
+        if (tx.isCoinbase) continue;
+        const inputs  = tx.inputs  || [];
+        const outputs = tx.outputs || [];
+        const fromMe  = inputs.some( i => i.address === ADDR);
+        const toMe    = outputs.some(o => o.address === ADDR);
+        if (!fromMe && !toMe) continue;
+
+        const amtOut = outputs.filter(o => o.address === ADDR).reduce((s,o) => s + Number(o.amount||0), 0);
+        const amtIn  = inputs.filter( i => i.address === ADDR).reduce((s,i) => s + Number(i.amount||0), 0);
+        const net    = amtOut - amtIn;
+        const dir    = fromMe && toMe ? "self" : fromMe ? "out" : "in";
+        const peer   = dir === "out"
+            ? (outputs.find(o => o.address !== ADDR)?.address || "—")
+            : (inputs[0]?.address || "—");
+
+        myTxs.push({ id: tx.id, block: block.height, dir, net, peer, ts: block.timestamp });
+      }
+    }
+
+    g("txList").innerHTML = myTxs.length
+      ? myTxs.slice(0, 30).map(t => {
+          const ics  = { out: "↑", in: "↓", self: "↔" };
+          const sign = t.dir === "out" ? "-" : t.dir === "in" ? "+" : "~";
+          const amt  = (Math.abs(t.net) / 1e8).toFixed(8).replace(/\.?0+$/, "") || "0";
+          return `<div class="tx-row" onclick="location.href='/tx?tx=${t.id}'">
+            <div class="tx-ic ${t.dir}">${ics[t.dir]}</div>
+            <div class="tx-info">
+              <div class="tx-hash">${t.id.slice(0,20)}...</div>
+              <div class="tx-peer">${t.dir === "self" ? "Self transfer" : t.peer.slice(0,20) + "..."}</div>
+            </div>
+            <div class="tx-meta">
+              <div class="tx-amt ${t.dir}">${sign}${amt} SPN</div>
+              <div class="tx-time">Block ${t.block} · ${ago(t.ts)}</div>
+            </div>
+          </div>`;
+        }).join("")
+      : `<div style="padding:32px;text-align:center;color:var(--mut)">No transactions found for this address</div>`;
+
+  } catch (e) {
+    g("txList").innerHTML = `<div style="padding:20px;text-align:center;color:var(--red)">${e.message}</div>`;
+  }
+}
+
+/* ── Receive modal ── */
+function showReceive() { g("recvModal").classList.add("on"); }
+function closeRecv()   { g("recvModal").classList.remove("on"); }
+
+function showQR(){ if(ADDR && window.SPNUI) SPNUI.qrModal(ADDR, 'Your SPN address'); }
+function cpAddr() {
+  if (!ADDR) return;
+  navigator.clipboard.writeText(ADDR).catch(() => {});
+  toast("✅ Address copied: " + ADDR.slice(0, 20) + "...");
+}
+
+/* ── QR generator (real, scannable — uses qr.js) ── */
+function drawQR(id, uri, sz) {
+  const c = g(id); if (!c || !uri) return;
+  // A <canvas> can't hold the generated SVG — swap it for a <div> once.
+  if (c.tagName === 'CANVAS') {
+    const d = document.createElement('div');
+    d.id = c.id; d.style.cssText = c.style.cssText;
+    c.parentNode.replaceChild(d, c);
+  }
+  const host = g(id);
+  if (window.SPNQR && window.qrcode) {
+    window.SPNQR.render(host, uri, { size: sz || 180, dark: '#080b13', light: '#ffffff' });
+  } else {
+    // QR engine failed to load (usually a stale cache) — show a tappable link
+    // so the user can still add the account to their Authenticator app.
+    host.innerHTML = '<a href="' + uri + '" style="font-size:11px;color:#080b13;word-break:break-all">Open in Authenticator app</a>';
+    console.warn('[2FA] QR library not loaded — hard-refresh the page (Ctrl+Shift+R).');
+  }
+}
+
+/* ── Utilities ── */
+async function af(path, method = "GET", body = null) {
+  const opt = { method, headers: { "Content-Type": "application/json", "Authorization": "Bearer " + TOK } };
+  if (body) opt.body = JSON.stringify(body);
+  const r = await fetch(API + path, opt);
+  const d = await r.json();
+  if (r.status === 401) { doLogout(); throw new Error("Session expired"); }
+  if (!r.ok && d.error) throw new Error(d.error);
+  return d;
+}
+function g(id) { return document.getElementById(id); }
+function dis(id, txt) { const b = g(id); b.disabled = true; b.textContent = txt; }
+function ena(id, txt) { const b = g(id); b.disabled = false; b.textContent = txt; }
+function showLerr(msg) { const e = g("lerr"); e.textContent = msg; e.classList.add("on"); }
+function fn(n) { if (!n || isNaN(n)) return "0"; return parseFloat(Number(n).toFixed(8)).toLocaleString("en", { minimumFractionDigits: 0, maximumFractionDigits: 8 }); }
+function ago(ts) { const s = Math.floor((Date.now()-ts)/1000); if (s<60) return s+"s ago"; if (s<3600) return Math.floor(s/60)+"m ago"; if (s<86400) return Math.floor(s/3600)+"h ago"; return Math.floor(s/86400)+"d ago"; }
+let _tT;
+function toast(msg, t = "") {
+  const el = g("toast"); el.textContent = msg;
+  el.className = "toast " + (t === "e" ? "e" : "");
+  void el.offsetWidth; el.classList.add("on");
+  clearTimeout(_tT); _tT = setTimeout(() => el.classList.remove("on"), 2800);
+}
+g("recvModal").addEventListener("click", e => { if (e.target === g("recvModal")) closeRecv(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeRecv(); });
+</script>
+
+
+<!-- LICENSE footer badge -->
+<div style="position:fixed;bottom:6px;left:12px;z-index:8999;font-size:9.5px;color:rgba(255,255,255,.18);font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:6px">
+  <a href="/LICENSE" target="_blank" style="color:rgba(240,165,0,.35);text-decoration:none;transition:color .2s" onmouseover="this.style.color='rgba(240,165,0,.8)'" onmouseout="this.style.color='rgba(240,165,0,.35)'">© 2026 SPN Coin Project</a>
+  <span style="opacity:.4">·</span>
+  <span style="opacity:.4">PROPRIETARY</span>
+</div>
+<!-- ═══ SPN Coin AI Widget ═══ -->
+<!-- ═══════════════════════════════════════════════════════════
+     SPN Coin AI — Floating Chat Widget
+     Uses Claude claude-haiku-4-5 (Free tier) via /api/ai/chat
+     Injects live blockchain context automatically server-side.
+════════════════════════════════════════════════════════════ -->
+
+<style>
+/* ── AI Widget global styles ── */
+#ai-fab{
+  position:fixed;bottom:28px;right:28px;z-index:9000;
+  width:54px;height:54px;border-radius:50%;
+  background:linear-gradient(135deg,#0a0f1a,#1a1f35);
+  border:1.5px solid rgba(79,143,255,.45);
+  box-shadow:0 0 0 0 rgba(79,143,255,.3),0 8px 28px rgba(0,0,0,.55);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .25s;
+  animation:fabPulse 3s ease-in-out infinite;
+}
+@keyframes fabPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(79,143,255,.3),0 8px 28px rgba(0,0,0,.55)}
+  50%{box-shadow:0 0 0 8px rgba(79,143,255,0),0 8px 28px rgba(0,0,0,.55)}
+}
+#ai-fab:hover{transform:scale(1.08);border-color:rgba(79,143,255,.8)}
+#ai-fab svg{width:24px;height:24px}
+#ai-badge{
+  position:absolute;top:-3px;right:-3px;
+  width:16px;height:16px;border-radius:50%;
+  background:#6d6bf5;border:2px solid #050708;
+  font-size:8px;color:#fff;font-weight:900;
+  display:flex;align-items:center;justify-content:center;
+  display:none;
+}
+
+#ai-panel{
+  position:fixed;bottom:96px;right:28px;z-index:9000;
+  width:380px;max-height:580px;
+  background:linear-gradient(160deg,#0a0f1a 0%,#0e1525 100%);
+  border:1px solid rgba(79,143,255,.25);
+  border-radius:18px;
+  box-shadow:0 24px 80px rgba(0,0,0,.7),0 0 0 1px rgba(79,143,255,.08),inset 0 1px 0 rgba(255,255,255,.05);
+  display:none;flex-direction:column;overflow:hidden;
+  animation:panelSlide .3s cubic-bezier(.22,1,.36,1);
+}
+@keyframes panelSlide{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+#ai-panel.open{display:flex}
+
+.ai-head{
+  padding:14px 16px 12px;
+  border-bottom:1px solid rgba(79,143,255,.12);
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(90deg,rgba(59,130,246,.08),transparent);
+  flex-shrink:0;
+}
+.ai-head-l{display:flex;align-items:center;gap:10px}
+.ai-avatar{
+  width:32px;height:32px;border-radius:10px;
+  background:linear-gradient(135deg,#1e3a8a,#6d6bf5);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  box-shadow:0 0 12px rgba(59,130,246,.35);
+}
+.ai-name{font-size:13px;font-weight:800;color:#e2e8f0;letter-spacing:-.2px}
+.ai-model{font-size:9.5px;color:#4b6fa8;font-family:"JetBrains Mono",monospace;margin-top:1px}
+.ai-status{display:flex;align-items:center;gap:4px;font-size:9px;color:#26d07c}
+.ai-status::before{content:"";width:5px;height:5px;border-radius:50%;background:#26d07c;animation:ppblue 2s infinite}
+@keyframes ppblue{0%,100%{opacity:1}50%{opacity:.3}}
+.ai-close{
+  width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);color:#64748b;
+  cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.ai-close:hover{background:rgba(255,255,255,.08);color:#e2e8f0}
+
+.ai-messages{
+  flex:1;overflow-y:auto;padding:14px;
+  display:flex;flex-direction:column;gap:10px;
+  scroll-behavior:smooth;
+}
+.ai-messages::-webkit-scrollbar{width:3px}
+.ai-messages::-webkit-scrollbar-thumb{background:rgba(79,143,255,.2);border-radius:3px}
+
+.ai-msg{display:flex;gap:8px;align-items:flex-start;animation:msgIn .25s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.ai-msg.user{flex-direction:row-reverse}
+.ai-bubble{
+  max-width:82%;padding:10px 13px;border-radius:12px;
+  font-size:12.5px;line-height:1.6;
+}
+.ai-msg.bot  .ai-bubble{
+  background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.18);
+  color:#cbd5e1;border-radius:4px 12px 12px 12px;
+}
+.ai-msg.user .ai-bubble{
+  background:linear-gradient(135deg,rgba(59,130,246,.2),rgba(37,99,235,.15));
+  border:1px solid rgba(59,130,246,.3);
+  color:#e2e8f0;border-radius:12px 4px 12px 12px;
+}
+.ai-msg.bot .ai-mic{
+  width:26px;height:26px;border-radius:8px;flex-shrink:0;margin-top:1px;
+  background:linear-gradient(135deg,#1e3a8a,#6d6bf5);
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+}
+.ai-typing{display:flex;gap:4px;align-items:center;padding:10px 13px}
+.ai-typing span{
+  width:6px;height:6px;border-radius:50%;background:#6d6bf5;
+  animation:typeBounce .9s ease infinite;
+}
+.ai-typing span:nth-child(2){animation-delay:.15s}
+.ai-typing span:nth-child(3){animation-delay:.3s}
+@keyframes typeBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-8px)}}
+
+.ai-suggestions{
+  padding:0 14px 10px;display:flex;gap:6px;flex-wrap:wrap;
+}
+.ai-chip{
+  font-size:10.5px;color:#4b6fa8;
+  background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.15);
+  border-radius:20px;padding:4px 10px;cursor:pointer;transition:all .15s;
+  white-space:nowrap;
+}
+.ai-chip:hover{background:rgba(59,130,246,.15);color:#93c5fd;border-color:rgba(59,130,246,.35)}
+
+.ai-input-wrap{
+  padding:10px 12px 12px;border-top:1px solid rgba(79,143,255,.1);
+  display:flex;gap:8px;align-items:flex-end;flex-shrink:0;
+}
+.ai-input{
+  flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(79,143,255,.18);
+  border-radius:10px;padding:9px 12px;color:#e2e8f0;
+  font-family:inherit;font-size:12.5px;resize:none;outline:none;
+  max-height:100px;min-height:36px;transition:border-color .2s;
+  line-height:1.5;
+}
+.ai-input:focus{border-color:rgba(79,143,255,.45)}
+.ai-input::placeholder{color:#2d4a6e}
+.ai-send{
+  width:36px;height:36px;border-radius:9px;flex-shrink:0;
+  background:linear-gradient(135deg,#5b59d6,#6d6bf5);border:none;
+  color:#fff;cursor:pointer;font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;box-shadow:0 4px 12px rgba(59,130,246,.3);
+}
+.ai-send:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(59,130,246,.45)}
+.ai-send:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.ai-footer{
+  padding:5px 12px 3px;font-size:9px;color:#1e3a5f;text-align:center;
+  display:flex;align-items:center;justify-content:center;gap:4px;flex-shrink:0;
+}
+.ai-footer a{color:#1e3a5f;text-decoration:none}
+.ai-footer a:hover{color:#6d6bf5}
+
+@media(max-width:500px){
+  #ai-panel{width:calc(100vw - 32px);right:16px;bottom:84px}
+}
+</style>
+
+<!-- Floating Action Button -->
+<button id="ai-fab" onclick="aiToggle()" title="SPN Coin AI Assistant (Claude)">
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2C6.48 2 2 6.48 2 12C2 13.85 2.52 15.58 3.42 17.05L2 22L7.17 20.62C8.59 21.48 10.24 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" fill="url(#aiGrad)"/>
+    <text x="12" y="16" text-anchor="middle" font-size="10" font-weight="900" fill="white" font-family="Arial">AI</text>
+    <defs>
+      <linearGradient id="aiGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="#1e40af"/>
+        <stop offset="100%" stop-color="#6d6bf5"/>
+      </linearGradient>
+    </defs>
+  </svg>
+  <div id="ai-badge">!</div>
+</button>
+
+<!-- AI Chat Panel -->
+<div id="ai-panel">
+  <div class="ai-head">
+    <div class="ai-head-l">
+      <div class="ai-avatar">🤖</div>
+      <div>
+        <div class="ai-name">SPN Coin AI</div>
+        <div class="ai-model">claude-haiku · Anthropic</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="ai-status">Online</div>
+      <button class="ai-close" onclick="aiToggle()">✕</button>
+    </div>
+  </div>
+
+  <div class="ai-messages" id="aiMessages">
+    <div class="ai-msg bot">
+      <div class="ai-mic">🤖</div>
+      <div class="ai-bubble">
+        Hello! I'm SPN Coin AI, powered by Claude. I have live access to your blockchain data and can help with:<br><br>
+        • 🔍 Transaction &amp; block analysis<br>
+        • 💰 Wallet &amp; address queries<br>
+        • ⛏️ Mining questions<br>
+        • 🔐 Security guidance<br>
+        • 📊 Network statistics<br><br>
+        What would you like to know?
+      </div>
+    </div>
+  </div>
+
+  <div class="ai-suggestions" id="aiSugg">
+    <span class="ai-chip" onclick="aiAsk(this.textContent)">What is my current balance?</span>
+    <span class="ai-chip" onclick="aiAsk(this.textContent)">How does SPN mining work?</span>
+    <span class="ai-chip" onclick="aiAsk(this.textContent)">Latest block info</span>
+    <span class="ai-chip" onclick="aiAsk(this.textContent)">How to read an SPN address?</span>
+  </div>
+
+  <div class="ai-input-wrap">
+    <textarea class="ai-input" id="aiInput" placeholder="Ask anything about SPN Coin..."
+      rows="1" maxlength="2000"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend()}"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+    <button class="ai-send" id="aiSendBtn" onclick="aiSend()" title="Send">
+      <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
+        <path d="M2 8l12-6-6 12V9L2 8z" fill="white"/>
+      </svg>
+    </button>
+  </div>
+  <div class="ai-footer">
+    Powered by <a href="https://anthropic.com" target="_blank">Anthropic Claude</a>
+    &nbsp;·&nbsp; <a href="/LICENSE" target="_blank">© 2026 SPN Coin Project</a>
+  </div>
+</div>
+
+<script>
+/* ── SPN Coin AI Widget ── */
+(function() {
+  const API_BASE = window.SPN_COIN_API || '';
+  let   history  = [];
+  let   open     = false;
+  let   tok      = sessionStorage.getItem('adm_tok') ||
+                   sessionStorage.getItem('w_tok')   ||
+                   localStorage.getItem('mc_token')  ||
+                   localStorage.getItem('myc_token') || '';
+
+  // Auto-discover token from page context
+  setTimeout(() => {
+    tok = sessionStorage.getItem('adm_tok') ||
+          sessionStorage.getItem('w_tok')   ||
+          localStorage.getItem('mc_token')  ||
+          localStorage.getItem('myc_token') || tok;
+  }, 500);
+
+  window.aiToggle = function() {
+    open = !open;
+    const p = document.getElementById('ai-panel');
+    if (open) { p.classList.add('open'); document.getElementById('aiInput').focus(); }
+    else       p.classList.remove('open');
+  };
+
+  window.aiAsk = function(text) {
+    document.getElementById('aiInput').value = text;
+    document.getElementById('aiSugg').style.display = 'none';
+    aiSend();
+  };
+
+  window.aiSend = async function() {
+    const input = document.getElementById('aiInput');
+    const msg   = input.value.trim();
+    if (!msg) return;
+
+    // Add user bubble
+    addMsg('user', msg);
+    input.value = '';
+    input.style.height = 'auto';
+    document.getElementById('aiSugg').style.display = 'none';
+
+    // Show typing indicator
+    const typingId = addTyping();
+    document.getElementById('aiSendBtn').disabled = true;
+
+    try {
+      const r = await fetch(API_BASE + '/api/ai/chat', {
+        method:  'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'Authorization': 'Bearer ' + tok,
+        },
+        body: JSON.stringify({ message: msg, history }),
+      });
+
+      removeTyping(typingId);
+
+      if (r.status === 401) {
+        addMsg('bot', '🔒 Please log in to use the AI assistant. Visit the <a href="dashboard" style="color:#6d6bf5">Dashboard</a> to sign in.', true);
+        return;
+      }
+      if (r.status === 429) {
+        addMsg('bot', '⏳ You\'ve sent too many messages. Please wait a moment before trying again.');
+        return;
+      }
+      if (!r.ok) {
+        const err = await r.json().catch(() => ({}));
+        addMsg('bot', '⚠️ ' + (err.error || 'AI service unavailable. Please try again.'));
+        return;
+      }
+
+      const d = await r.json();
+      addMsg('bot', d.reply);
+
+      // Maintain rolling history (last 10 turns)
+      history.push({ role: 'user', content: msg });
+      history.push({ role: 'assistant', content: d.reply });
+      if (history.length > 20) history = history.slice(-20);
+
+    } catch (e) {
+      removeTyping(typingId);
+      addMsg('bot', '⚠️ Connection error: ' + e.message + '\n\nMake sure the SPN Coin node is running.');
+    } finally {
+      document.getElementById('aiSendBtn').disabled = false;
+    }
+  };
+
+  function addMsg(role, text, isHtml = false) {
+    const wrap = document.getElementById('aiMessages');
+    const div  = document.createElement('div');
+    div.className = 'ai-msg ' + role;
+
+    const bubble = document.createElement('div');
+    bubble.className = 'ai-bubble';
+    // Simple markdown → HTML
+    const formatted = formatText(text);
+    if (isHtml) bubble.innerHTML = formatted;
+    else        bubble.innerHTML = formatted;
+
+    if (role === 'bot') {
+      const mic = document.createElement('div');
+      mic.className = 'ai-mic';
+      mic.textContent = '🤖';
+      div.appendChild(mic);
+    }
+    div.appendChild(bubble);
+    wrap.appendChild(div);
+    wrap.scrollTop = wrap.scrollHeight;
+    return div.id;
+  }
+
+  function formatText(text) {
+    return text
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/`([^`]+)`/g, '<code style="font-family:JetBrains Mono,monospace;font-size:11px;background:rgba(59,130,246,.1);padding:1px 5px;border-radius:3px">$1</code>')
+      .replace(/\n/g, '<br>');
+  }
+
+  let typingCtr = 0;
+  function addTyping() {
+    const id   = 'typing-' + (++typingCtr);
+    const wrap = document.getElementById('aiMessages');
+    const div  = document.createElement('div');
+    div.className = 'ai-msg bot';
+    div.id        = id;
+    div.innerHTML = '<div class="ai-mic">🤖</div><div class="ai-bubble"><div class="ai-typing"><span></span><span></span><span></span></div></div>';
+    wrap.appendChild(div);
+    wrap.scrollTop = wrap.scrollHeight;
+    return id;
+  }
+
+  function removeTyping(id) {
+    document.getElementById(id)?.remove();
+  }
+})();
+</script>
+<!-- ═══ /AI Widget ═══ -->
+
+</body>
+</html>

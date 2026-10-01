@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<!-- © 2026 SPN Coin Project — PROPRIETARY AND CONFIDENTIAL -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <link rel="icon" type="image/png" sizes="64x64" href="/sepanta-coin.png?v=5">
+  <link rel="icon" type="image/png" sizes="32x32" href="/sepanta-coin-32.png?v=5">
+  <link rel="shortcut icon" href="/sepanta-coin.ico?v=5">
+  <link rel="apple-touch-icon" sizes="180x180" href="/sepanta-coin-180.png?v=5">
+  <meta name="theme-color" content="#070a0e">
+  <meta name="description" content="Monitor SPN Coin node health and system metrics in real time.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sepanta (SPN) — Monitoring</title>
+<script src="csrf-fetch.js?v=25"></script>
+  <script src="i18n.js?v=34" defer></script>
+  <script src="nav.js?v=40" defer></script><script src="/ai-bubble.js?v=5" defer></script>
+<script src="/anti-phishing.js?v=1" defer></script>
+  <script src="footer.js?v=35" defer></script>
+  <script src="ui-prefs.js?v=25" defer></script>
+<style>
+:root{--bg:#080b13;--panel:#0c1120;--bd:rgba(148,163,208,.14);--grn:#26d07c;--cyan:#25d0ee;
+  --gold:#f5b301;--red:#f2555a;--txt:#eaf0fb;--txt2:#8a97b8;--txt3:#5a6788;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:'Sora',system-ui,sans-serif;
+  background-image:radial-gradient(900px 400px at 80% -8%,rgba(0,255,136,.05),transparent 60%);}
+.wrap{max-width:1200px;margin:0 auto;padding:22px 24px 60px}
+h1{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
+.sub{color:var(--txt2);font-size:13px;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.card{background:var(--panel);border:1px solid var(--bd);border-radius:14px;padding:16px}
+.card .k{font-size:11px;color:var(--txt2);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.card .v{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;margin-top:8px;letter-spacing:-.02em}
+.card .v small{font-size:13px;color:var(--txt3)}
+.v.grn{color:var(--grn)}.v.cyan{color:var(--cyan)}.v.gold{color:var(--gold)}.v.red{color:var(--red)}
+.bar{height:6px;background:rgba(255,255,255,.06);border-radius:3px;margin-top:10px;overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:3px;transition:width .5s}
+.row{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:18px}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.row{grid-template-columns:1fr}}
+.chart-card{background:var(--panel);border:1px solid var(--bd);border-radius:14px;padding:16px}
+.chart-card h3{font-size:13px;font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between}
+.chart-card h3 span{color:var(--txt3);font-family:'JetBrains Mono',monospace;font-weight:500}
+svg{width:100%;height:120px;display:block}
+.alerts{display:flex;flex-direction:column;gap:8px;max-height:280px;overflow-y:auto}
+.alert{display:flex;gap:10px;padding:10px 12px;border-radius:9px;font-size:12.5px;align-items:center}
+.alert.warning{background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.25)}
+.alert.critical{background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.25)}
+.alert .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.alert.warning .dot{background:var(--gold)}.alert.critical .dot{background:var(--red)}
+.ok-msg{color:var(--txt3);font-size:13px;text-align:center;padding:30px 0}
+.foot{color:var(--txt3);font-size:11px;font-family:'JetBrains Mono',monospace;margin-top:6px}
+.err{color:var(--red);font-size:13px;padding:14px;background:rgba(255,68,102,.08);border-radius:10px;border:1px solid rgba(255,68,102,.2);margin-bottom:16px;display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Node Monitoring</h1>
+  <div class="sub">Live system health, chain metrics, and alerts · refreshes every 5s</div>
+  <div class="err" id="err"></div>
+
+  <div class="grid">
+    <div class="card"><div class="k">CPU</div><div class="v grn" id="cpu">—</div><div class="bar"><i id="cpuBar" style="width:0;background:var(--grn)"></i></div></div>
+    <div class="card"><div class="k">Memory</div><div class="v cyan" id="mem">—</div><div class="bar"><i id="memBar" style="width:0;background:var(--cyan)"></i></div></div>
+    <div class="card"><div class="k">Heap</div><div class="v gold" id="heap">—</div><div class="foot" id="heapFoot">process rss —</div></div>
+    <div class="card"><div class="k">Uptime</div><div class="v" id="uptime">—</div><div class="foot" id="platFoot">—</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="card"><div class="k">Height</div><div class="v grn" id="height">—</div></div>
+    <div class="card"><div class="k">Peers</div><div class="v cyan" id="peers">—</div></div>
+    <div class="card"><div class="k">Mempool</div><div class="v gold" id="mempool">—</div></div>
+    <div class="card"><div class="k">Block interval</div><div class="v" id="interval">—</div></div>
+  </div>
+
+  <div class="row">
+    <div class="chart-card">
+      <h3>CPU &amp; Memory <span id="cpuStat">—</span></h3>
+      <svg id="chart" viewBox="0 0 600 120" preserveAspectRatio="none"></svg>
+      <div class="foot">green = CPU % · cyan = memory %</div>
+    </div>
+    <div class="chart-card">
+      <h3>Active alerts <span id="alertCount">0</span></h3>
+      <div class="alerts" id="alerts"><div class="ok-msg">Loading…</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+function tok(){ return sessionStorage.getItem('adm_tok')||localStorage.getItem('mc_token')||localStorage.getItem('token')||''; }
+async function api(p){
+  const t=tok();
+  const r=await fetch(p,{headers:t?{Authorization:'Bearer '+t}:{}});
+  if(!r.ok) throw new Error('HTTP '+r.status+' on '+p);
+  return r.json();
+}
+const fmtUptime=s=>{s=+s||0;const d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60);
+  return d?`${d}d ${h}h`:h?`${h}h ${m}m`:`${m}m`;};
+
+function drawChart(cpu, mem){
+  const svg=$('#chart'); const W=600,H=120,pad=4;
+  const line=(data,color)=>{
+    if(!data.length) return '';
+    const max=100, n=data.length;
+    const pts=data.map((v,i)=>{
+      const x=pad+(i/(Math.max(1,n-1)))*(W-2*pad);
+      const y=H-pad-(Math.min(max,v)/max)*(H-2*pad);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+    return `<polyline fill="none" stroke="${color}" stroke-width="2" points="${pts}"/>`;
+  };
+  svg.innerHTML =
+    `<line x1="0" y1="${H/2}" x2="${W}" y2="${H/2}" stroke="rgba(255,255,255,.05)"/>`+
+    line(cpu,'#26d07c')+line(mem,'#25d0ee');
+}
+
+async function refresh(){
+  try{
+    const [health, metrics, alertsData] = await Promise.all([
+      api('/api/monitor/health'),
+      api('/api/monitor/metrics'),
+      api('/api/monitor/alerts'),
+    ]);
+    $('#err').style.display='none';
+
+    // health cards
+    $('#cpu').innerHTML = health.cpu.percent+'<small>%</small>';
+    $('#cpuBar').style.width = Math.min(100,health.cpu.percent)+'%';
+    $('#cpuBar').style.background = health.cpu.percent>90?'#f2555a':'#26d07c';
+    $('#mem').innerHTML = health.memory.systemUsedPct+'<small>%</small>';
+    $('#memBar').style.width = Math.min(100,health.memory.systemUsedPct)+'%';
+    $('#heap').innerHTML = health.memory.heapUsedMB+'<small>MB</small>';
+    $('#heapFoot').textContent = 'process rss '+health.memory.processRssMB+' MB';
+    $('#uptime').textContent = fmtUptime(health.uptime.processSec);
+    $('#platFoot').textContent = health.platform.type+' · node '+health.platform.node;
+
+    // chain metrics from series
+    const S = metrics.series||{};
+    const last = (name,arr)=> (S[name]&&S[name].length)?S[name][S[name].length-1].v:'—';
+    $('#height').textContent = last('height');
+    $('#peers').textContent = last('peers');
+    $('#mempool').textContent = last('mempool');
+    const bi = last('blockInterval');
+    $('#interval').innerHTML = (bi==='—'?'—':bi+'<small>s</small>');
+
+    // chart
+    const cpuS=(S.cpu||[]).map(p=>p.v), memS=(S.memory||[]).map(p=>p.v);
+    drawChart(cpuS, memS);
+    $('#cpuStat').textContent = `cpu ${cpuS.length?cpuS[cpuS.length-1]:0}% · mem ${memS.length?memS[memS.length-1]:0}%`;
+
+    // alerts
+    const active = alertsData.active||[];
+    $('#alertCount').textContent = active.length;
+    const box=$('#alerts');
+    if(!active.length){ box.innerHTML='<div class="ok-msg">✓ All systems nominal — no active alerts.</div>'; }
+    else box.innerHTML = active.map(a=>`<div class="alert ${a.severity}"><span class="dot"></span>
+      <div><b>${a.message}</b><div class="foot">${a.metric} ${a.op} ${a.threshold} · now ${a.value}</div></div></div>`).join('');
+  }catch(e){
+    $('#err').style.display='block';
+    $('#err').textContent = 'Could not load monitoring data — you may need to sign in via the Admin panel first. ('+e.message+')';
+  }
+}
+refresh(); setInterval(refresh, 5000);
+</script>
+</body>
+</html>
