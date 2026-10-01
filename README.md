@@ -9,8 +9,8 @@ Fair launch · Zero premine · UTXO model · Real 256-bit Proof-of-Work · Strat
 [![Node](https://img.shields.io/badge/node-%3E%3D20-green)](https://nodejs.org)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](#testing)
 [![License](https://img.shields.io/badge/license-source--available-orange)](./LICENSE)
-[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
-[![CodeQL](https://github.com/OWNER/REPO/actions/workflows/codeql.yml/badge.svg)](../../actions/workflows/codeql.yml)
+[![CI](https://github.com/amirhossin14/spn-coin/actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
+[![CodeQL](https://github.com/amirhossin14/spn-coin/actions/workflows/codeql.yml/badge.svg)](../../actions/workflows/codeql.yml)
 
 </div>
 
