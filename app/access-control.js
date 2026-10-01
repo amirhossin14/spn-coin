@@ -573,6 +573,7 @@ class AccessControl {
             role:        u.role,
             roleLabel:   ROLES[u.role]?.label,
             active:      u.active,
+            totpEnabled: !!u.totpEnabled,
             created:     u.created,
             lastLogin:   u.lastLogin,
             lastIp:      u.lastIp,
