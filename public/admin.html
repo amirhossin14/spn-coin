@@ -474,7 +474,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
       <!-- LOGS -->
       <div id="pLogs" class="tp">
         <div class="card">
-          <div class="ch"><div class="ct"><span class="ctd"></span>Audit Logs</div><button class="btn btn-sm bg" onclick="ldLogs()">🔄 Refresh</button></div>
+          <div class="ch"><div class="ct"><span class="ctd"></span>Audit Logs</div><div style="display:flex;gap:8px"><button class="btn btn-sm bd" onclick="blockIpPrompt()" title="Block an IP address (15 min)">⛔ Block IP</button><button class="btn btn-sm bg" onclick="ldLogs()">🔄 Refresh</button></div></div>
           <div id="logBox" style="max-height:500px;overflow-y:auto"><div style="padding:20px;text-align:center;color:var(--txt3)">Loading...</div></div>
         </div>
       </div>
@@ -1193,6 +1193,43 @@ async function ldFees() {
   } catch (e) { g('feeBox').innerHTML = `<div style="padding:18px;color:var(--red)">${escH(e.message)}</div>`; }
 }
 
+// Robust audit-log timestamp formatter. The log source may be the DB (column
+// `ts`) or the file (`ts`/`time`), and field names can vary — try them all and
+// never render "Invalid Date". Falls back to the raw value, then a dash.
+function fmtLogTime(l) {
+  const raw = l.ts || l.time || l.timestamp || l.created_at || l.createdAt || l.date || l.at;
+  if (raw == null || raw === '') return '—';
+  // numeric epoch (seconds or ms)
+  let v = raw;
+  if (typeof v === 'number' || /^\d+$/.test(String(v))) {
+    let n = Number(v); if (n < 1e12) n *= 1000; // seconds → ms
+    const d = new Date(n);
+    return isNaN(d.getTime()) ? String(raw) : d.toLocaleString('en-US');
+  }
+  const d = new Date(raw);
+  return isNaN(d.getTime()) ? String(raw) : d.toLocaleString('en-US');
+}
+
+// Block an IP (temporary, 15 min) via the existing DDoS endpoint. Auth + CSRF
+// are enforced server-side. Strong confirm guards against self-lockout.
+async function blockIp(ip) {
+  if (!ip) return;
+  if (!confirm('بلاک کردن این IP برای ۱۵ دقیقه؟\n\n' + ip +
+      '\n\n⚠️ مطمئن شوید این IP خودتان نیست — در غیر این صورت ممکن است دسترسی‌تان قطع شود (بلاک موقتی است و بعد از ۱۵ دقیقه یا از بخش DDoS/IP برداشته می‌شود).')) return;
+  try {
+    await af('/api/admin/ddos/block', 'POST', { ip, duration: 15 * 60 * 1000 });
+    toast('⛔ IP بلاک شد: ' + ip);
+  } catch (e) { toast('خطا در بلاک: ' + e.message, 'e'); }
+}
+
+// Top "Block IP" button: ask for an IP, validate its shape, then block it.
+async function blockIpPrompt() {
+  const ip = (prompt('IP مورد نظر برای بلاک (۱۵ دقیقه) را وارد کنید:\nمثلاً: 5.62.233.205') || '').trim();
+  if (!ip) return;
+  if (!/^(\d{1,3}\.){3}\d{1,3}$|^[0-9a-fA-F:]+$/.test(ip)) { toast('فرمت IP نامعتبر است', 'e'); return; }
+  await blockIp(ip);
+}
+
 async function ldLogs() {
   try {
     const d = await af('/api/admin/logs?limit=60');
@@ -1205,11 +1242,14 @@ async function ldLogs() {
           else if (ac.includes('fail') || ac.includes('lock'))  c = 'la-err';
           else if (ac.includes('admin') || ac.includes('delet') || ac.includes('creat')) c = 'la-adm';
           else if (ac.includes('totp') || ac.includes('2fa'))   c = 'la-otp';
+          const ua = l.userAgent || l.user_agent || '';
+          const section = l.path || (l.details && l.details.path) || '';
           return `<div class="le">
-            <span class="lts">${escH(new Date(l.ts || l.timestamp || 0).toLocaleString('en-US'))}</span>
+            <span class="lts">${escH(fmtLogTime(l))}</span>
             <span class="la ${c}">${escH(ac)}</span>
             <span style="color:var(--txt2);flex:1">${escH(l.username || l.user || '')}</span>
-            <span class="lip">${escH(l.ip || '')}</span>
+            <span style="color:var(--txt3);font-size:11px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escH(ua)}">${escH(section)}</span>
+            <span class="lip" title="${escH(ua)}">${escH(l.ip || '')}</span>
           </div>`;
         }).join('')
       : '<div style="padding:22px;text-align:center;color:var(--txt3)">No log entries found</div>';
