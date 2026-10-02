@@ -180,12 +180,12 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
       <div style="text-align:center;font-size:15px;font-weight:800;margin-bottom:4px">Two-Factor Authentication</div>
       <div style="text-align:center;font-size:12px;color:var(--txt3,#8a97a8);margin:0 0 8px">Enter the 6-digit code from your Authenticator app</div>
       <div class="otp-row" id="g2faRow" data-target="g2fa" data-onfull="gateLogin">
-        <input class="oi" maxlength="1" data-i="0" inputmode="numeric" autocomplete="one-time-code" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
-        <input class="oi" maxlength="1" data-i="1" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
-        <input class="oi" maxlength="1" data-i="2" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
-        <input class="oi" maxlength="1" data-i="3" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
-        <input class="oi" maxlength="1" data-i="4" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
-        <input class="oi" maxlength="1" data-i="5" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+        <input class="oi" maxlength="1" data-i="0" inputmode="numeric" autocomplete="one-time-code" oninput="otpSync(this)" onkeydown="otpKey(event,this)" aria-label="Verification code, digit 1 of 6">
+        <input class="oi" maxlength="1" data-i="1" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)" aria-label="Verification code, digit 2 of 6">
+        <input class="oi" maxlength="1" data-i="2" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)" aria-label="Verification code, digit 3 of 6">
+        <input class="oi" maxlength="1" data-i="3" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)" aria-label="Verification code, digit 4 of 6">
+        <input class="oi" maxlength="1" data-i="4" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)" aria-label="Verification code, digit 5 of 6">
+        <input class="oi" maxlength="1" data-i="5" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)" aria-label="Verification code, digit 6 of 6">
       </div>
       <input type="hidden" id="g2fa">
       <div style="text-align:center;margin-top:10px"><a href="#" onclick="gBack2fa();return false" style="color:var(--grn);font-size:12px;text-decoration:none">← Back to login</a></div>

@@ -286,12 +286,12 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
         </div>
         <div class="errmsg" id="err2"></div>
         <div class="otp-row" id="otp2">
-          <input class="oi" maxlength="1" data-i="0" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')">
-          <input class="oi" maxlength="1" data-i="1" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')">
-          <input class="oi" maxlength="1" data-i="2" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')">
-          <input class="oi" maxlength="1" data-i="3" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')">
-          <input class="oi" maxlength="1" data-i="4" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')">
-          <input class="oi" maxlength="1" data-i="5" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')">
+          <input class="oi" maxlength="1" data-i="0" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')" aria-label="Verification code, digit 1 of 6">
+          <input class="oi" maxlength="1" data-i="1" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')" aria-label="Verification code, digit 2 of 6">
+          <input class="oi" maxlength="1" data-i="2" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')" aria-label="Verification code, digit 3 of 6">
+          <input class="oi" maxlength="1" data-i="3" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')" aria-label="Verification code, digit 4 of 6">
+          <input class="oi" maxlength="1" data-i="4" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')" aria-label="Verification code, digit 5 of 6">
+          <input class="oi" maxlength="1" data-i="5" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')" aria-label="Verification code, digit 6 of 6">
         </div>
         <button class="btn-p" id="btnTotp" onclick="do2FA()" disabled>Verify Code</button>
         <div class="back" onclick="goStep(1)">← <span>Back</span> to login</div>
@@ -317,12 +317,12 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
         </div>
         <div class="errmsg" id="err3"></div>
         <div class="otp-row" id="otp3">
-          <input class="oi" maxlength="1" data-i="0" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')">
-          <input class="oi" maxlength="1" data-i="1" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')">
-          <input class="oi" maxlength="1" data-i="2" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')">
-          <input class="oi" maxlength="1" data-i="3" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')">
-          <input class="oi" maxlength="1" data-i="4" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')">
-          <input class="oi" maxlength="1" data-i="5" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')">
+          <input class="oi" maxlength="1" data-i="0" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')" aria-label="Verification code, digit 1 of 6">
+          <input class="oi" maxlength="1" data-i="1" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')" aria-label="Verification code, digit 2 of 6">
+          <input class="oi" maxlength="1" data-i="2" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')" aria-label="Verification code, digit 3 of 6">
+          <input class="oi" maxlength="1" data-i="3" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')" aria-label="Verification code, digit 4 of 6">
+          <input class="oi" maxlength="1" data-i="4" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')" aria-label="Verification code, digit 5 of 6">
+          <input class="oi" maxlength="1" data-i="5" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')" aria-label="Verification code, digit 6 of 6">
         </div>
         <button class="btn-p" id="btnSetup" onclick="doSetup()" disabled>Enable 2FA &amp; Enter Panel</button>
         <div class="back" style="opacity:.7;cursor:default">🔒 Two-factor authentication is required to enter the admin panel</div>
