@@ -2,7 +2,7 @@
 # SPN Coin is an educational blockchain with no monetary value.
 
 Contact: mailto:Info@sepantatoken.com
-Contact: https://github.com/OWNER/REPO/security/advisories/new
+Contact: https://github.com/amirhossin14/spn-coin/security/advisories/new
 Expires: 2027-12-31T23:59:59.000Z
 Preferred-Languages: en, fa
 Canonical: https://spnchain.com/.well-known/security.txt
@@ -11,4 +11,4 @@ Canonical: https://spnchain.com/.well-known/security.txt
 # reports within 72 hours. As an educational project, we have no bug
 # bounty, but we credit reporters in our security advisories.
 
-Policy: https://github.com/OWNER/REPO/blob/main/SECURITY.md
+Policy: https://github.com/amirhossin14/spn-coin/blob/main/SECURITY.md
