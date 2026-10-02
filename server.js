@@ -1271,7 +1271,7 @@ app.post('/api/tx/submit-signed', limiters.api.middleware(), async (req, res) =>
     try {
         const txObj = Object.assign(new Transaction({}), tx);
         const { valid, errors } = txObj.validate
-            ? txObj.validate(blockchain.utxoSet, blockchain.height, {})
+            ? txObj.validate(blockchain.utxoSet, blockchain.height, { mempool: true })
             : { valid: true, errors: [] };
         if (!valid) return res.status(400).json({ error: (errors || ['invalid signature']).join('; ') });
         const r = mempool.add(txObj, blockchain.utxoSet, blockchain.height + 1);

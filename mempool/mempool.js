@@ -37,7 +37,7 @@ class Mempool {
         // Validate against UTXO set. Coinbase maturity is judged against the
         // NEXT block height (where this tx would be mined), not height 0.
         const txObj = tx instanceof Transaction ? tx : Object.assign(new Transaction({}), tx);
-        const { valid, errors } = txObj.validate(utxoSet, blockHeight, {});
+        const { valid, errors } = txObj.validate(utxoSet, blockHeight, { mempool: true });
         if (!valid) return { ok: false, error: errors.join('; ') };
 
         // Check for conflicts with other mempool transactions

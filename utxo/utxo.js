@@ -297,8 +297,15 @@ class Transaction {
         const now        = Date.now();
         const MAX_FUTURE = 7_200_000;           // 2 hours
         const MAX_AGE    = 86_400_000 * 30;     // 30 days
-        if (this.timestamp > now + MAX_FUTURE)  errors.push('Transaction timestamp too far in the future');
-        if (this.timestamp < now - MAX_AGE)      errors.push('Transaction timestamp too old');
+        // MEMPOOL-admission policy only — NOT consensus. A historical block's
+        // transactions are legitimately older than MAX_AGE, so applying this during
+        // chain re-validation would wrongly reject aged blocks (node fails to reload
+        // its own chain ~30 days after launch). Consensus timestamp rules live at the
+        // block level (future-time + median-time-past). Gate behind options.mempool.
+        if (options.mempool) {
+            if (this.timestamp > now + MAX_FUTURE)  errors.push('Transaction timestamp too far in the future');
+            if (this.timestamp < now - MAX_AGE)      errors.push('Transaction timestamp too old');
+        }
 
         if (!this.inputs?.length)  errors.push('Transaction has no inputs');
         if (!this.outputs?.length) errors.push('Transaction has no outputs');
