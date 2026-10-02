@@ -127,7 +127,7 @@ a.link{color:var(--cyn);text-decoration:none} a.link:hover{text-decoration:under
 
   <div class="search">
     <input id="si" type="text" placeholder="Block height / hash · TX hash · SPN1... address"
-           onkeydown="if(event.key==='Enter')go()">
+           onkeydown="if(event.key==='Enter')go()" aria-label="Block height / hash · TX hash · SPN1... address">
     <button onclick="go()">Search</button>
   </div>
 
@@ -217,13 +217,13 @@ a.link{color:var(--cyn);text-decoration:none} a.link:hover{text-decoration:under
       <div class="card-b">
         <div class="row"><span class="k">Block Hash</span>
           <span class="v gold"><span class="hashv"><span id="hBlock">—</span>
-          <button class="cpbtn" onclick="cp(document.getElementById('hBlock').textContent)">⧉</button></span></span></div>
+          <button class="cpbtn" onclick="cp(document.getElementById('hBlock').textContent)" aria-label="Copy">⧉</button></span></span></div>
         <div class="row"><span class="k">Previous Block</span>
           <span class="v"><span class="hashv"><a class="link" id="hPrev" href="#">—</a>
-          <button class="cpbtn" onclick="cp(document.getElementById('hPrev').textContent)">⧉</button></span></span></div>
+          <button class="cpbtn" onclick="cp(document.getElementById('hPrev').textContent)" aria-label="Copy">⧉</button></span></span></div>
         <div class="row"><span class="k">Merkle Root</span>
           <span class="v cyn"><span class="hashv"><span id="hMerkle">—</span>
-          <button class="cpbtn" onclick="cp(document.getElementById('hMerkle').textContent)">⧉</button></span></span></div>
+          <button class="cpbtn" onclick="cp(document.getElementById('hMerkle').textContent)" aria-label="Copy">⧉</button></span></span></div>
       </div>
     </div>
 

@@ -141,10 +141,10 @@ document.getElementById('content').innerHTML = `
       <h2>${d.formT}</h2>
       <form id="cform" novalidate>
         <input class="hp" type="text" name="botcheck" id="cbot" tabindex="-1" autocomplete="off" aria-hidden="true" />
-        <label>${d.name}</label><input id="cname" placeholder="${d.phName}" autocomplete="name" />
-        <label>${d.email}</label><input id="cemail" type="email" placeholder="${d.phEmail}" autocomplete="email" />
-        <label>${d.subject}</label><input id="csubject" placeholder="${d.phSubject}" />
-        <label>${d.message}</label><textarea id="cmsg" rows="5" placeholder="${d.phMsg}"></textarea>
+        <label>${d.name}</label><input id="cname" placeholder="${d.phName}" autocomplete="name" / aria-label="${d.phName}">
+        <label>${d.email}</label><input id="cemail" type="email" placeholder="${d.phEmail}" autocomplete="email" / aria-label="${d.phEmail}">
+        <label>${d.subject}</label><input id="csubject" placeholder="${d.phSubject}" / aria-label="${d.phSubject}">
+        <label>${d.message}</label><textarea id="cmsg" rows="5" placeholder="${d.phMsg}" aria-label="${d.phMsg}"></textarea>
         <button type="submit" id="cbtn"><span class="spin" id="cspin"></span><span id="cbtntext">${d.send}</span></button>
         <div id="msg"></div>
       </form>

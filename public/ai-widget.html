@@ -175,7 +175,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
     <div class="inp-wrap">
       <textarea class="inp" id="inp" placeholder="Ask anything about SPN Coin..." rows="1" maxlength="2000"
         onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"
-        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"></textarea>
+        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'" aria-label="Ask anything about SPN Coin..."></textarea>
       <button class="sbtn" id="sbtn" onclick="send()" title="Send message">
         <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M2 8l12-6-6 12V9L2 8z" fill="white"/></svg>
       </button>

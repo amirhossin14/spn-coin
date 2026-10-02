@@ -109,13 +109,13 @@
       </div>
 
       <label for="name">Name</label>
-      <input id="name" placeholder="e.g. Gold Token" maxlength="40" />
+      <input id="name" placeholder="e.g. Gold Token" maxlength="40" / aria-label="e.g. Gold Token">
       <div class="row">
-        <div><label for="symbol">Symbol</label><input id="symbol" placeholder="GLD" maxlength="10" /></div>
+        <div><label for="symbol">Symbol</label><input id="symbol" placeholder="GLD" maxlength="10" / aria-label="GLD"></div>
         <div><label for="decimals">Decimals</label><input id="decimals" type="number" value="2" min="0" max="18" /></div>
       </div>
       <label for="supply">Total supply</label>
-      <input id="supply" type="number" placeholder="1000000" min="1" />
+      <input id="supply" type="number" placeholder="1000000" min="1" / aria-label="1000000">
 
       <!-- Branding & socials (optional) -->
       <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--bd,rgba(255,255,255,.08))">
@@ -133,34 +133,34 @@
         </div>
 
         <label for="description" style="margin-top:12px" data-i18n>Description</label>
-        <textarea id="description" rows="2" placeholder="What is this token for?" style="width:100%;resize:vertical" maxlength="500"></textarea>
+        <textarea id="description" rows="2" placeholder="What is this token for?" style="width:100%;resize:vertical" maxlength="500" aria-label="What is this token for?"></textarea>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
-          <div><label for="website" data-i18n>🌐 Website</label><input id="website" type="url" placeholder="https://…" autocomplete="off" /></div>
-          <div><label for="twitter" data-i18n>𝕏 Twitter / X</label><input id="twitter" type="text" placeholder="@handle" autocomplete="off" /></div>
+          <div><label for="website" data-i18n>🌐 Website</label><input id="website" type="url" placeholder="https://…" autocomplete="off" / aria-label="https://…"></div>
+          <div><label for="twitter" data-i18n>𝕏 Twitter / X</label><input id="twitter" type="text" placeholder="@handle" autocomplete="off" / aria-label="@handle"></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
-          <div><label for="telegram" data-i18n>✈️ Telegram</label><input id="telegram" type="text" placeholder="t.me/yourchannel" autocomplete="off" /></div>
-          <div><label for="github" data-i18n>🐙 GitHub</label><input id="github" type="url" placeholder="github.com/org/repo" autocomplete="off" /></div>
+          <div><label for="telegram" data-i18n>✈️ Telegram</label><input id="telegram" type="text" placeholder="t.me/yourchannel" autocomplete="off" / aria-label="t.me/yourchannel"></div>
+          <div><label for="github" data-i18n>🐙 GitHub</label><input id="github" type="url" placeholder="github.com/org/repo" autocomplete="off" / aria-label="github.com/org/repo"></div>
         </div>
         <label for="email" style="margin-top:12px" data-i18n>✉️ Official Email</label>
-        <input id="email" type="email" placeholder="contact@yourproject.com" autocomplete="off" />
+        <input id="email" type="email" placeholder="contact@yourproject.com" autocomplete="off" / aria-label="contact@yourproject.com">
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
-          <div><label for="whitepaper" data-i18n>📄 White Paper</label><input id="whitepaper" type="url" placeholder="https://…/whitepaper.pdf" autocomplete="off" /></div>
-          <div><label for="discord" data-i18n>💬 Discord</label><input id="discord" type="text" placeholder="discord.gg/…" autocomplete="off" /></div>
+          <div><label for="whitepaper" data-i18n>📄 White Paper</label><input id="whitepaper" type="url" placeholder="https://…/whitepaper.pdf" autocomplete="off" / aria-label="https://…/whitepaper.pdf"></div>
+          <div><label for="discord" data-i18n>💬 Discord</label><input id="discord" type="text" placeholder="discord.gg/…" autocomplete="off" / aria-label="discord.gg/…"></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
-          <div><label for="facebook" data-i18n>📘 Facebook</label><input id="facebook" type="text" placeholder="facebook.com/…" autocomplete="off" /></div>
-          <div><label for="reddit" data-i18n>🤖 Reddit</label><input id="reddit" type="text" placeholder="reddit.com/r/…" autocomplete="off" /></div>
+          <div><label for="facebook" data-i18n>📘 Facebook</label><input id="facebook" type="text" placeholder="facebook.com/…" autocomplete="off" / aria-label="facebook.com/…"></div>
+          <div><label for="reddit" data-i18n>🤖 Reddit</label><input id="reddit" type="text" placeholder="reddit.com/r/…" autocomplete="off" / aria-label="reddit.com/r/…"></div>
         </div>
         <label for="medium" style="margin-top:12px" data-i18n>✍️ Medium</label>
-        <input id="medium" type="text" placeholder="medium.com/@…" autocomplete="off" />
+        <input id="medium" type="text" placeholder="medium.com/@…" autocomplete="off" / aria-label="medium.com/@…">
       </div>
 
       <div id="manualWallet" style="display:none">
       <label for="addr">Your wallet address <span style="text-transform:none;letter-spacing:0">(public — funds the fee)</span></label>
-      <input id="addr" type="text" placeholder="SPN… address" autocomplete="off" />
+      <input id="addr" type="text" placeholder="SPN… address" autocomplete="off" / aria-label="SPN… address">
 
       <div style="margin:6px 0 14px;padding:12px;border:1px dashed var(--bd,rgba(0,255,136,.2));border-radius:10px;background:rgba(0,255,136,.03)">
         <div style="font-size:12px;color:var(--muted,#7a99b8);margin-bottom:8px">
@@ -168,13 +168,13 @@
           The key is created in your browser — never sent to the server.
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-          <input id="vanityPrefix" type="text" maxlength="4" placeholder="prefix (max 4)" style="flex:1;min-width:120px" />
+          <input id="vanityPrefix" type="text" maxlength="4" placeholder="prefix (max 4)" style="flex:1;min-width:120px" / aria-label="prefix (max 4)">
           <button id="genVanity" type="button" style="white-space:nowrap">Generate</button>
         </div>
         <div id="vanityOut" style="display:none;margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:11px;word-break:break-all"></div>
       </div>
       <label for="pk">Your wallet private key <span style="text-transform:none;letter-spacing:0">(signs the mint & pays the fee)</span></label>
-      <input id="pk" type="password" placeholder="private key hex" autocomplete="off" />
+      <input id="pk" type="password" placeholder="private key hex" autocomplete="off" / aria-label="private key hex">
 
       <div class="warn">🔒 Your private key is used <b>only in your browser</b> to sign — it is never sent to the server. Enter your raw 64-hex private key. Your wallet must hold the issuance fee plus a little for the tx fee.</div>
       </div><!-- /manualWallet -->
@@ -263,13 +263,13 @@ function mgPanels(id, addr, canMint, isIssuer){
   )}</div>`;
   if(isIssuer){
     h+=`<div class="mgp" id="mg-freeze-${id}" style="display:none">${box(
-      `<label style="font-size:11px;color:var(--muted)">Target address</label><input id="mg-faddr-${id}" placeholder="SPN1..." style="width:100%;margin-top:4px" /><label style="font-size:11px;color:var(--muted);margin-top:6px;display:block">Action</label><select id="mg-fact-${id}" style="width:100%;margin-top:4px;padding:9px;background:var(--ink-3,#12141f);border:1px solid var(--line,#333);border-radius:7px;color:inherit"><option value="freeze">🧊 Freeze</option><option value="unfreeze">☀️ Unfreeze</option></select>${key('mg-fpk-'+id)}${warn('🧊 Frozen addresses cannot transfer this token.')}<button class="btn sm" onclick="mgFreeze('${id}','${addr}')">Sign & apply</button><div class="result" id="mg-fr-${id}"></div>`
+      `<label style="font-size:11px;color:var(--muted)">Target address</label><input id="mg-faddr-${id}" placeholder="SPN1..." style="width:100%;margin-top:4px" / aria-label="SPN1..."><label style="font-size:11px;color:var(--muted);margin-top:6px;display:block">Action</label><select id="mg-fact-${id}" style="width:100%;margin-top:4px;padding:9px;background:var(--ink-3,#12141f);border:1px solid var(--line,#333);border-radius:7px;color:inherit"><option value="freeze">🧊 Freeze</option><option value="unfreeze">☀️ Unfreeze</option></select>${key('mg-fpk-'+id)}${warn('🧊 Frozen addresses cannot transfer this token.')}<button class="btn sm" onclick="mgFreeze('${id}','${addr}')">Sign & apply</button><div class="result" id="mg-fr-${id}"></div>`
     )}</div>`;
     h+=`<div class="mgp" id="mg-meta-${id}" style="display:none">${box(
       `<label style="font-size:11px;color:var(--muted)">Description</label><input id="mg-mdesc-${id}" maxlength="500" style="width:100%;margin-top:4px" /><label style="font-size:11px;color:var(--muted);margin-top:6px;display:block">Logo URL</label><input id="mg-mlogo-${id}" maxlength="256" style="width:100%;margin-top:4px" /><label style="font-size:11px;color:var(--muted);margin-top:6px;display:block">Website</label><input id="mg-mweb-${id}" maxlength="256" style="width:100%;margin-top:4px" /><label style="font-size:11px;color:var(--muted);margin-top:6px;display:block">Twitter</label><input id="mg-mtw-${id}" maxlength="100" style="width:100%;margin-top:4px" /><label style="font-size:11px;color:var(--muted);margin-top:6px;display:block">Telegram</label><input id="mg-mtg-${id}" maxlength="100" style="width:100%;margin-top:4px" />${key('mg-mpk2-'+id)}${warn('📝 Public on-chain metadata. Name/symbol/supply stay locked.')}<button class="btn sm" onclick="mgMeta('${id}','${addr}')">Sign & save</button><div class="result" id="mg-metar-${id}"></div>`
     )}</div>`;
     h+=`<div class="mgp" id="mg-owner-${id}" style="display:none">${box(
-      `<label style="font-size:11px;color:var(--muted)">New issuer address</label><input id="mg-noaddr-${id}" placeholder="SPN1..." style="width:100%;margin-top:4px" />${key('mg-opk-'+id)}${warn('👑 Hands ALL issuer rights to the new address. You lose control. Irreversible.')}<button class="btn sm" onclick="mgOwner('${id}','${addr}')">Sign & transfer ownership</button><div class="result" id="mg-or-${id}"></div>`
+      `<label style="font-size:11px;color:var(--muted)">New issuer address</label><input id="mg-noaddr-${id}" placeholder="SPN1..." style="width:100%;margin-top:4px" / aria-label="SPN1...">${key('mg-opk-'+id)}${warn('👑 Hands ALL issuer rights to the new address. You lose control. Irreversible.')}<button class="btn sm" onclick="mgOwner('${id}','${addr}')">Sign & transfer ownership</button><div class="result" id="mg-or-${id}"></div>`
     )}</div>`;
   }
   return h;

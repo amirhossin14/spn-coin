@@ -171,9 +171,9 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
     <div class="gate-badge" style="margin-bottom:16px" id="gBadge">RESTRICTED — SERVER CONFIGURATION</div>
     <div id="gCredFields">
       <input class="gate-inp" id="gUser" type="text"     placeholder="Admin username" autocomplete="username"
-             onkeydown="if(event.key==='Enter')gateLogin()">
+             onkeydown="if(event.key==='Enter')gateLogin()" aria-label="Admin username">
       <input class="gate-inp" id="gPass" type="password" placeholder="Password" autocomplete="current-password"
-             onkeydown="if(event.key==='Enter')gateLogin()">
+             onkeydown="if(event.key==='Enter')gateLogin()" aria-label="Password">
     </div>
     <div id="g2faWrap" style="display:none">
       <div style="text-align:center;font-size:34px;margin:4px 0 8px">🔐</div>
@@ -259,7 +259,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
         <div style="padding:16px;text-align:center;color:var(--txt3);font-size:12px">Loading peers...</div>
       </div>
       <div class="peer-form">
-        <input class="peer-inp" id="newPeer" placeholder="https://node2.example.com" type="url">
+        <input class="peer-inp" id="newPeer" placeholder="https://node2.example.com" type="url" aria-label="https://node2.example.com">
         <button class="peer-btn" onclick="addPeer()">+ Add Peer</button>
       </div>
     </div>

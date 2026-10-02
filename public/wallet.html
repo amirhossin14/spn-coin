@@ -227,7 +227,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
       <div id="credFields">
         <label class="lbl">USERNAME</label>
         <input class="inp" id="lUser" type="text" placeholder="admin" autocomplete="username"
-               onkeydown="if(event.key==='Enter')doLogin()">
+               onkeydown="if(event.key==='Enter')doLogin()" aria-label="admin">
         <label class="lbl">PASSWORD</label>
         <input class="inp" id="lPass" type="password" placeholder="••••••••" autocomplete="current-password"
                onkeydown="if(event.key==='Enter')doLogin()">
@@ -302,7 +302,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   <div class="card">
     <div class="ch">
       <div class="ct"><span class="ctd"></span>My Tokens</div>
-      <button onclick="loadMyTokens()" style="background:var(--c2);color:var(--sub);border:1px solid var(--bd);padding:5px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">🔄</button>
+      <button onclick="loadMyTokens()" style="background:var(--c2);color:var(--sub);border:1px solid var(--bd);padding:5px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer" aria-label="Refresh">🔄</button>
     </div>
     <div id="tokenList">
       <div style="padding:32px;text-align:center;color:var(--mut)">Loading tokens…</div>
@@ -313,7 +313,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   <div class="card">
     <div class="ch">
       <div class="ct"><span class="ctd"></span>Transaction History</div>
-      <button onclick="loadTxHistory()" style="background:var(--c2);color:var(--sub);border:1px solid var(--bd);padding:5px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">🔄</button>
+      <button onclick="loadTxHistory()" style="background:var(--c2);color:var(--sub);border:1px solid var(--bd);padding:5px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer" aria-label="Refresh">🔄</button>
     </div>
     <div id="txList">
       <div style="padding:32px;text-align:center;color:var(--mut)">Loading transactions...</div>
@@ -354,7 +354,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
         <code id="twofaSecret" style="display:block;word-break:break-all;background:rgba(255,255,255,.05);padding:8px 10px;border-radius:8px;font-size:12px"></code>
         <p style="font-size:13px;color:var(--txt);margin:14px 0 6px"><b>2.</b> Enter the 6-digit code to confirm:</p>
         <input class="inp" id="twofaConfirmCode" type="text" inputmode="numeric" placeholder="123456"
-               style="max-width:220px" onkeydown="if(event.key==='Enter')confirm2fa()">
+               style="max-width:220px" onkeydown="if(event.key==='Enter')confirm2fa()" aria-label="123456">
         <div style="margin-top:12px;display:flex;gap:10px">
           <button class="btn-hero btn-send" id="btnConfirm2fa" onclick="confirm2fa()">Confirm & Enable</button>
           <button class="btn-hero" style="background:rgba(255,255,255,.06);color:var(--mut)" onclick="cancel2faSetup()">Cancel</button>
@@ -375,7 +375,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   <div class="modal">
     <div class="mhd">
       <div class="mttl">↓ Receive SPN</div>
-      <button class="mclose" onclick="closeRecv()">✕</button>
+      <button class="mclose" onclick="closeRecv()" aria-label="Close">✕</button>
     </div>
     <div class="mbdy">
       <div class="qr-wrap">
@@ -994,7 +994,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") closeRecv();
     </div>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="ai-status">Online</div>
-      <button class="ai-close" onclick="aiToggle()">✕</button>
+      <button class="ai-close" onclick="aiToggle()" aria-label="Close">✕</button>
     </div>
   </div>
 
@@ -1024,7 +1024,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") closeRecv();
     <textarea class="ai-input" id="aiInput" placeholder="Ask anything about SPN Coin..."
       rows="1" maxlength="2000"
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend()}"
-      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'" aria-label="Ask anything about SPN Coin..."></textarea>
     <button class="ai-send" id="aiSendBtn" onclick="aiSend()" title="Send">
       <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
         <path d="M2 8l12-6-6 12V9L2 8z" fill="white"/>

@@ -82,7 +82,7 @@
   <div class="card">
     <label for="addr">Your address</label>
     <div class="row" style="grid-template-columns:1fr auto">
-      <input id="addr" placeholder="SPN1..." />
+      <input id="addr" placeholder="SPN1..." / aria-label="SPN1...">
       <button class="btn" id="load" style="margin-top:0">Load</button>
     </div>
   </div>
@@ -138,9 +138,9 @@ function renderAsset(t, addr, myBal, isIssuer){
     </div>
 
     <div class="panel" id="xfer-${t.tokenId}">
-      <label>Send to address</label><input id="to-${t.tokenId}" placeholder="SPN1..." />
+      <label>Send to address</label><input id="to-${t.tokenId}" placeholder="SPN1..." / aria-label="SPN1...">
       <div class="row"><div><label>Amount</label><input id="amt-${t.tokenId}" type="number" min="1" /></div>
-      <div><label>Your private key</label><input id="pk-${t.tokenId}" type="password" autocomplete="off" placeholder="signs the transfer" /></div></div>
+      <div><label>Your private key</label><input id="pk-${t.tokenId}" type="password" autocomplete="off" placeholder="signs the transfer" / aria-label="signs the transfer"></div></div>
       <div class="warn">🔐 Your key is used only in your browser to sign — it never leaves your device.</div>
       <button class="btn" onclick="doSend('${t.tokenId}','${addr}')">Sign &amp; send</button>
       <div class="result" id="r-${t.tokenId}"></div>
@@ -157,7 +157,7 @@ function renderAsset(t, addr, myBal, isIssuer){
 
     ${isIssuer?`<!-- 🧊 FREEZE / UNFREEZE — issuer only -->
     <div class="panel" id="freeze-${t.tokenId}">
-      <label>Target address</label><input id="faddr-${t.tokenId}" placeholder="SPN1... address to freeze/unfreeze" />
+      <label>Target address</label><input id="faddr-${t.tokenId}" placeholder="SPN1... address to freeze/unfreeze" / aria-label="SPN1... address to freeze/unfreeze">
       <div class="row"><div><label>Action</label>
         <select id="fact-${t.tokenId}" style="width:100%;padding:10px;background:var(--bg1,#12141f);border:1px solid var(--line,#333);border-radius:8px;color:inherit">
           <option value="freeze">🧊 Freeze (block transfers)</option>
@@ -171,11 +171,11 @@ function renderAsset(t, addr, myBal, isIssuer){
 
     <!-- 📝 METADATA — issuer only -->
     <div class="panel" id="meta-${t.tokenId}">
-      <label>Description</label><input id="mdesc-${t.tokenId}" maxlength="500" placeholder="What is this token for?" />
-      <label>Logo URL</label><input id="mlogo-${t.tokenId}" maxlength="256" placeholder="https://.../logo.png" />
-      <label>Website</label><input id="mweb-${t.tokenId}" maxlength="256" placeholder="https://..." />
-      <div class="row"><div><label>Twitter</label><input id="mtw-${t.tokenId}" maxlength="100" placeholder="@handle" /></div>
-      <div><label>Telegram</label><input id="mtg-${t.tokenId}" maxlength="100" placeholder="t.me/..." /></div></div>
+      <label>Description</label><input id="mdesc-${t.tokenId}" maxlength="500" placeholder="What is this token for?" / aria-label="What is this token for?">
+      <label>Logo URL</label><input id="mlogo-${t.tokenId}" maxlength="256" placeholder="https://.../logo.png" / aria-label="https://.../logo.png">
+      <label>Website</label><input id="mweb-${t.tokenId}" maxlength="256" placeholder="https://..." / aria-label="https://...">
+      <div class="row"><div><label>Twitter</label><input id="mtw-${t.tokenId}" maxlength="100" placeholder="@handle" / aria-label="@handle"></div>
+      <div><label>Telegram</label><input id="mtg-${t.tokenId}" maxlength="100" placeholder="t.me/..." / aria-label="t.me/..."></div></div>
       <label>Issuer private key</label><input id="mpk2-${t.tokenId}" type="password" autocomplete="off" />
       <div class="warn">📝 Metadata is public and stored on-chain. Name, symbol and supply stay locked.</div>
       <button class="btn" onclick="doMeta('${t.tokenId}','${addr}')">Sign &amp; save</button>
@@ -184,7 +184,7 @@ function renderAsset(t, addr, myBal, isIssuer){
 
     <!-- 👑 TRANSFER OWNER — issuer only -->
     <div class="panel" id="owner-${t.tokenId}">
-      <label>New issuer address</label><input id="noaddr-${t.tokenId}" placeholder="SPN1... new owner" />
+      <label>New issuer address</label><input id="noaddr-${t.tokenId}" placeholder="SPN1... new owner" / aria-label="SPN1... new owner">
       <label>Current issuer private key</label><input id="opk-${t.tokenId}" type="password" autocomplete="off" />
       <div class="warn">👑 This hands ALL issuer rights (mint, freeze, metadata) to the new address. You will lose control. Irreversible.</div>
       <button class="btn" onclick="doOwner('${t.tokenId}','${addr}')">Sign &amp; transfer ownership</button>

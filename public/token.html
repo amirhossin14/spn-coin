@@ -111,7 +111,7 @@ a{color:inherit;text-decoration:none}
 <div class="wrap">
 
   <div class="search">
-    <input id="si" type="text" placeholder="Token ID or symbol…" onkeydown="if(event.key==='Enter')go()">
+    <input id="si" type="text" placeholder="Token ID or symbol…" onkeydown="if(event.key==='Enter')go()" aria-label="Token ID or symbol…">
     <button onclick="go()">View</button>
   </div>
 
@@ -136,7 +136,7 @@ a{color:inherit;text-decoration:none}
     <!-- wallet connect -->
     <div class="wallet-bar" id="walletBar">
       <div class="status"><span class="dot"></span><span id="wStatus">Wallet locked</span></div>
-      <input id="wKey" type="password" placeholder="private key (hex) — unlocks in your browser only" autocomplete="off">
+      <input id="wKey" type="password" placeholder="private key (hex) — unlocks in your browser only" autocomplete="off" aria-label="private key (hex) — unlocks in your browser only">
       <button id="wUnlock" onclick="unlockWallet()">Unlock</button>
       <div class="mybal" id="myBal" style="display:none"></div>
     </div>

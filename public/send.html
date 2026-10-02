@@ -575,7 +575,7 @@ body::before {
         <div class="al-frow">
           <label class="al-lbl">USERNAME</label>
           <input class="al-inp" id="lUser" type="text" placeholder="username" autocomplete="username"
-                 onkeydown="if(event.key==='Enter')doLogin()">
+                 onkeydown="if(event.key==='Enter')doLogin()" aria-label="username">
         </div>
         <div class="al-frow">
           <label class="al-lbl">PASSWORD</label>
@@ -583,7 +583,7 @@ body::before {
             <input class="al-inp" id="lPass" type="password" placeholder="••••••••" autocomplete="current-password"
                    style="padding-right:42px" onkeydown="if(event.key==='Enter')doLogin()">
             <button type="button" class="al-eye"
-                    onclick="var i=this.previousElementSibling;i.type=i.type==='password'?'text':'password'">👁</button>
+                    onclick="var i=this.previousElementSibling;i.type=i.type==='password'?'text':'password'" aria-label="Show or hide password">👁</button>
           </div>
         </div>
         </div>
@@ -651,7 +651,7 @@ body::before {
               <span class="hint">Wallet Address گیرنده</span>
             </div>
             <div class="inp-wrap" style="display:flex;gap:8px;align-items:stretch">
-              <input class="inp" id="fTo" type="text" placeholder="SPN1abc..." oninput="onToInput()" autocomplete="off" style="flex:1">
+              <input class="inp" id="fTo" type="text" placeholder="SPN1abc..." oninput="onToInput()" autocomplete="off" style="flex:1" aria-label="SPN1abc...">
               <button type="button" id="scanBtn" onclick="openQrScan()" title="اسکن QR / Scan QR" style="flex:none;background:var(--gold,#f5b301);border:none;border-radius:10px;padding:0 14px;color:#000;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center" aria-label="Scan QR code">▦</button>
             </div>
             <div class="ferr" id="toErr">⚠ آدرس وارد شده معتبر نیست</div>
@@ -664,7 +664,7 @@ body::before {
               <span class="hint" id="maxHint">Balance: — SPN</span>
             </div>
             <div class="inp-wrap">
-              <input class="inp inp-padl" id="fAmt" type="number" min="0" step="any" placeholder="0.00000000" oninput="onAmtInput()">
+              <input class="inp inp-padl" id="fAmt" type="number" min="0" step="any" placeholder="0.00000000" oninput="onAmtInput()" aria-label="0.00000000">
               <span class="inp-sym"><span class="sym-tag">SPN</span></span>
               <button class="max-btn" onclick="doMax()">MAX</button>
             </div>
@@ -704,7 +704,7 @@ body::before {
               <span class="hint">امضا در مرورگر انجام می‌شود؛ کلید هیچ‌جا ارسال نمی‌شود</span>
             </div>
             <div class="inp-wrap">
-              <input class="inp" id="fPriv" type="password" placeholder="کلید خصوصی کیف‌پول شما" autocomplete="off" oninput="onAmtInput()" style="direction:ltr">
+              <input class="inp" id="fPriv" type="password" placeholder="کلید خصوصی کیف‌پول شما" autocomplete="off" oninput="onAmtInput()" style="direction:ltr" aria-label="کلید خصوصی کیف‌پول شما">
             </div>
             <div class="ferr" id="privErr">⚠ کلید خصوصی نامعتبر است</div>
           </div>
@@ -1642,7 +1642,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="ai-status">Online</div>
-      <button class="ai-close" onclick="aiToggle()">✕</button>
+      <button class="ai-close" onclick="aiToggle()" aria-label="Close">✕</button>
     </div>
   </div>
 
@@ -1672,7 +1672,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <textarea class="ai-input" id="aiInput" placeholder="Ask anything about SPN Coin..."
       rows="1" maxlength="2000"
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend()}"
-      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'" aria-label="Ask anything about SPN Coin..."></textarea>
     <button class="ai-send" id="aiSendBtn" onclick="aiSend()" title="Send">
       <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
         <path d="M2 8l12-6-6 12V9L2 8z" fill="white"/>

@@ -71,7 +71,7 @@
       <p style="color:var(--mut);font-size:13px;margin-top:0" data-i18n>A saved wallet was found on this browser. Enter your password to unlock it.</p>
       <label for="unlockPass">Password</label>
       <div style="position:relative">
-        <input id="unlockPass" type="password" placeholder="Your wallet password" autocomplete="current-password" style="padding-right:44px" />
+        <input id="unlockPass" type="password" placeholder="Your wallet password" autocomplete="current-password" style="padding-right:44px" / aria-label="Your wallet password">
         <button type="button" id="unlockEye" aria-label="Show/hide password"
                 onclick="var i=document.getElementById('unlockPass');var s=i.type==='password';i.type=s?'text':'password';this.textContent=s?'🙈':'👁';"
                 style="position:absolute;top:50%;right:8px;transform:translateY(-50%);background:none;border:none;padding:4px;font-size:16px;cursor:pointer;line-height:1">👁</button>
@@ -91,9 +91,9 @@
     <div class="card">
       <div class="ch"><h3>♻️ Restore existing wallet</h3></div>
       <label for="restoreInput">Recovery phrase (12 or 24 words)</label>
-      <input id="restoreInput" placeholder="word1 word2 word3 …" autocomplete="off" />
+      <input id="restoreInput" placeholder="word1 word2 word3 …" autocomplete="off" / aria-label="word1 word2 word3 …">
       <label for="restorePass" style="margin-top:12px">Set a password (required — to unlock faster next time) *</label>
-      <input id="restorePass" type="password" placeholder="Min 12 chars, 3 of 4 types" autocomplete="new-password" oninput="showPwHint('restorePass','restorePwHint')" />
+      <input id="restorePass" type="password" placeholder="Min 12 chars, 3 of 4 types" autocomplete="new-password" oninput="showPwHint('restorePass','restorePwHint')" / aria-label="Min 12 chars, 3 of 4 types">
       <div id="restorePwHint" style="font-size:11.5px;color:var(--mut);margin-top:5px;line-height:1.7"></div>
       <button class="btn-ghost" id="btnRestore" style="width:100%;margin-top:12px">Restore wallet</button>
     </div>
@@ -110,7 +110,7 @@
       <div class="seed-grid" id="seedGrid"></div>
       <button class="btn-ghost" id="btnCopySeed" style="width:100%;margin-bottom:10px">📋 Copy phrase</button>
       <label for="newWalletPass" style="margin-top:6px">🔑 Set a password (required — to unlock this wallet faster next time) *</label>
-      <input id="newWalletPass" type="password" placeholder="Min 12 chars, 3 of 4 types" autocomplete="new-password" oninput="showPwHint('newWalletPass','newPwHint')" />
+      <input id="newWalletPass" type="password" placeholder="Min 12 chars, 3 of 4 types" autocomplete="new-password" oninput="showPwHint('newWalletPass','newPwHint')" / aria-label="Min 12 chars, 3 of 4 types">
       <div id="newPwHint" style="font-size:11.5px;color:var(--mut);margin-top:5px;line-height:1.7"></div>
       <div class="warn-box" style="margin-top:12px">
         📝 <b data-i18n>Save BOTH in a safe place:</b><br>
@@ -140,7 +140,7 @@
     </div>
 
     <div class="card">
-      <div class="ch"><h3>🪙 My Tokens</h3><button class="btn-ghost" id="btnRefresh" style="padding:6px 12px;font-size:12px">🔄</button></div>
+      <div class="ch"><h3>🪙 My Tokens</h3><button class="btn-ghost" id="btnRefresh" style="padding:6px 12px;font-size:12px" aria-label="Refresh">🔄</button></div>
       <div id="tokenList"><div style="padding:24px;text-align:center;color:var(--mut)">Loading…</div></div>
     </div>
 
@@ -169,11 +169,11 @@
 <!-- Send modal -->
 <div class="modal" id="sendModal">
   <div class="modal-box">
-    <div class="ch"><h3>↑ Send SPN</h3><button class="btn-ghost" style="padding:6px 12px" onclick="closeModal('sendModal')">✕</button></div>
+    <div class="ch"><h3>↑ Send SPN</h3><button class="btn-ghost" style="padding:6px 12px" onclick="closeModal('sendModal')" aria-label="Close">✕</button></div>
     <label for="sendTo">Recipient address</label>
-    <input id="sendTo" placeholder="SPN1…" autocomplete="off" />
+    <input id="sendTo" placeholder="SPN1…" autocomplete="off" / aria-label="SPN1…">
     <label for="sendAmt" style="margin-top:12px">Amount (SPN)</label>
-    <input id="sendAmt" type="number" placeholder="0.00" min="0" step="0.00000001" />
+    <input id="sendAmt" type="number" placeholder="0.00" min="0" step="0.00000001" / aria-label="0.00">
     <div id="sendMsg" style="font-size:12px;margin-top:10px"></div>
     <button class="btn-gold" id="btnSendGo" style="margin-top:14px">Send</button>
   </div>
@@ -182,7 +182,7 @@
 <!-- Receive modal -->
 <div class="modal" id="receiveModal">
   <div class="modal-box" style="text-align:center">
-    <div class="ch" style="text-align:left"><h3>↓ Receive SPN</h3><button class="btn-ghost" style="padding:6px 12px" onclick="closeModal('receiveModal')">✕</button></div>
+    <div class="ch" style="text-align:left"><h3>↓ Receive SPN</h3><button class="btn-ghost" style="padding:6px 12px" onclick="closeModal('receiveModal')" aria-label="Close">✕</button></div>
     <p style="color:var(--mut);font-size:13px">Share this address to receive SPN or tokens.</p>
     <div class="qr-box" id="qrBox"></div>
     <div class="mono" id="recvAddr" style="font-size:12px;word-break:break-all;margin-top:12px;color:var(--txt)"></div>

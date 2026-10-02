@@ -263,14 +263,14 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
         <div class="frow">
           <label class="lbl">USERNAME</label>
           <input class="inp" id="inU" type="text" placeholder="admin" autocomplete="username"
-                 onkeydown="if(event.key==='Enter')doLogin()">
+                 onkeydown="if(event.key==='Enter')doLogin()" aria-label="admin">
         </div>
         <div class="frow">
           <label class="lbl">PASSWORD</label>
           <div class="pwd-wrap">
             <input class="inp" id="inP" type="password" placeholder="••••••••" autocomplete="current-password"
                    onkeydown="if(event.key==='Enter')doLogin()" style="padding-right:42px">
-            <button class="eye-btn" id="eyeBtn" onclick="togglePwd()">👁</button>
+            <button class="eye-btn" id="eyeBtn" onclick="togglePwd()" aria-label="Show or hide password">👁</button>
           </div>
         </div>
         <button class="btn-p" id="btnLogin" onclick="doLogin()">Sign In to Admin Panel</button>
@@ -464,7 +464,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
         <div class="card">
           <div class="ch"><div class="ct"><span class="ctd"></span>Block IP Address</div></div>
           <div style="padding:14px 17px;display:flex;gap:9px;align-items:flex-end;border-bottom:1px solid var(--bd)">
-            <div style="flex:1"><label class="fl">IP ADDRESS</label><input class="fi" id="bipInp" placeholder="192.168.1.1" type="text"></div>
+            <div style="flex:1"><label class="fl">IP ADDRESS</label><input class="fi" id="bipInp" placeholder="192.168.1.1" type="text" aria-label="192.168.1.1"></div>
             <button class="btn bd" onclick="blockIP()">🚫 Block</button>
           </div>
           <div id="banList" style="padding:13px 17px;color:var(--txt3);font-size:12.5px">Loading...</div>
@@ -511,7 +511,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
             <div id="dis2fb" style="display:none">
               <div style="font-size:12px;color:var(--txt2);margin-bottom:10px">To disable 2FA, enter your current Authenticator code:</div>
               <div style="display:flex;gap:8px">
-                <input class="fi" id="disOtp" placeholder="6-digit code" maxlength="6" style="font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:3px;text-align:center">
+                <input class="fi" id="disOtp" placeholder="6-digit code" maxlength="6" style="font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:3px;text-align:center" aria-label="6-digit code">
                 <button class="btn bd" onclick="dis2FA()">Disable</button>
               </div>
             </div>
@@ -523,7 +523,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
                 Regenerating creates a fresh set and invalidates the old ones.
               </div>
               <div style="display:flex;gap:8px">
-                <input class="fi" id="regOtp" placeholder="6-digit code" maxlength="6" style="font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:3px;text-align:center">
+                <input class="fi" id="regOtp" placeholder="6-digit code" maxlength="6" style="font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:3px;text-align:center" aria-label="6-digit code">
                 <button class="btn bgo" onclick="regenRecovery()">🔄 Regenerate Codes</button>
               </div>
             </div>
@@ -531,9 +531,9 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
             <div>
               <div style="font-size:11px;font-weight:800;color:var(--txt2);letter-spacing:.4px;text-transform:uppercase;margin-bottom:10px">Change Password</div>
               <div style="display:flex;flex-direction:column;gap:9px">
-                <input class="fi" id="op" type="password" placeholder="Current password">
-                <input class="fi" id="np" type="password" placeholder="New password (min. 8 chars)">
-                <input class="fi" id="np2" type="password" placeholder="Confirm new password">
+                <input class="fi" id="op" type="password" placeholder="Current password" aria-label="Current password">
+                <input class="fi" id="np" type="password" placeholder="New password (min. 8 chars)" aria-label="New password (min. 8 chars)">
+                <input class="fi" id="np2" type="password" placeholder="Confirm new password" aria-label="Confirm new password">
                 <button class="btn bgo" onclick="chgPwd()">💾 Save New Password</button>
               </div>
             </div>
@@ -618,10 +618,10 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 <!-- MODALS -->
 <div class="mbg" id="mUser">
   <div class="modal">
-    <div class="mhd"><div class="mttl">New User</div><button class="mclose" onclick="closeM('mUser')">✕</button></div>
+    <div class="mhd"><div class="mttl">New User</div><button class="mclose" onclick="closeM('mUser')" aria-label="Close">✕</button></div>
     <div class="mbdy">
-      <div class="fr"><label class="fl">USERNAME</label><input class="fi" id="nu" placeholder="username"></div>
-      <div class="fr"><label class="fl">PASSWORD</label><input class="fi" id="np_u" type="password" placeholder="Min 8 characters" oninput="showPwHint('np_u','np_u_hint')"><div id="np_u_hint" style="font-size:11px;margin-top:6px;line-height:1.6"></div></div>
+      <div class="fr"><label class="fl">USERNAME</label><input class="fi" id="nu" placeholder="username" aria-label="username"></div>
+      <div class="fr"><label class="fl">PASSWORD</label><input class="fi" id="np_u" type="password" placeholder="Min 8 characters" oninput="showPwHint('np_u','np_u_hint')" aria-label="Min 8 characters"><div id="np_u_hint" style="font-size:11px;margin-top:6px;line-height:1.6"></div></div>
       <div class="fr"><label class="fl">ROLE</label>
         <select class="fi" id="nr">
           <option value="admin">Admin — Full access</option>
@@ -640,9 +640,9 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 
 <div class="mbg" id="mEdit">
   <div class="modal">
-    <div class="mhd"><div class="mttl">Edit User</div><button class="mclose" onclick="closeM('mEdit')">✕</button></div>
+    <div class="mhd"><div class="mttl">Edit User</div><button class="mclose" onclick="closeM('mEdit')" aria-label="Close">✕</button></div>
     <div class="mbdy">
-      <div class="fr"><label class="fl">USERNAME</label><input class="fi" id="euName" placeholder="username" autocomplete="off"></div>
+      <div class="fr"><label class="fl">USERNAME</label><input class="fi" id="euName" placeholder="username" autocomplete="off" aria-label="username"></div>
       <div class="fr"><label class="fl">ROLE</label>
         <select class="fi" id="euRole">
           <option value="admin">Admin — Full access</option>
@@ -654,7 +654,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
           <option value="viewer">Viewer — Read only</option>
         </select>
       </div>
-      <div class="fr"><label class="fl">NEW PASSWORD <span style="color:var(--txt3);font-weight:400">(optional — leave blank to keep current)</span></label><input class="fi" id="euPass" type="password" placeholder="Min 8 characters" oninput="showPwHint('euPass','euPass_hint')"><div id="euPass_hint" style="font-size:11px;margin-top:6px;line-height:1.6"></div></div>
+      <div class="fr"><label class="fl">NEW PASSWORD <span style="color:var(--txt3);font-weight:400">(optional — leave blank to keep current)</span></label><input class="fi" id="euPass" type="password" placeholder="Min 8 characters" oninput="showPwHint('euPass','euPass_hint')" aria-label="Min 8 characters"><div id="euPass_hint" style="font-size:11px;margin-top:6px;line-height:1.6"></div></div>
       <div class="errmsg" id="euErr" style="color:var(--red);font-size:12px;margin-top:4px"></div>
     </div>
     <div class="mft"><button class="btn bn" onclick="closeM('mEdit')">Cancel</button><button class="btn bg" onclick="saveUser()">💾 Save Changes</button></div>
@@ -663,9 +663,9 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 
 <div class="mbg" id="mKey">
   <div class="modal">
-    <div class="mhd"><div class="mttl">New API Key</div><button class="mclose" onclick="closeM('mKey')">✕</button></div>
+    <div class="mhd"><div class="mttl">New API Key</div><button class="mclose" onclick="closeM('mKey')" aria-label="Close">✕</button></div>
     <div class="mbdy">
-      <div class="fr"><label class="fl">NAME / DESCRIPTION</label><input class="fi" id="kn" placeholder="e.g. Mining service"></div>
+      <div class="fr"><label class="fl">NAME / DESCRIPTION</label><input class="fi" id="kn" placeholder="e.g. Mining service" aria-label="e.g. Mining service"></div>
       <div class="fr"><label class="fl">ROLE</label>
         <select class="fi" id="kr">
           <option value="viewer">viewer</option>
@@ -681,7 +681,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 <!-- ACCESS / PERMISSIONS VIEWER -->
 <div class="mbg" id="mAccess">
   <div class="modal" style="max-width:520px">
-    <div class="mhd"><div class="mttl" id="accTitle">Access</div><button class="mclose" onclick="closeM('mAccess')">✕</button></div>
+    <div class="mhd"><div class="mttl" id="accTitle">Access</div><button class="mclose" onclick="closeM('mAccess')" aria-label="Close">✕</button></div>
     <div class="mbdy">
       <div style="font-size:12px;color:var(--txt3);margin-bottom:12px">
         <span style="color:var(--grn)">● Allowed</span> &nbsp; <span style="color:var(--red)">● Denied</span> — the sections and actions this role can access.
@@ -694,7 +694,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 
 <div class="mbg" id="mKeyShow">
   <div class="modal">
-    <div class="mhd"><div class="mttl">✅ API Key Created</div><button class="mclose" onclick="closeM('mKeyShow')">✕</button></div>
+    <div class="mhd"><div class="mttl">✅ API Key Created</div><button class="mclose" onclick="closeM('mKeyShow')" aria-label="Close">✕</button></div>
     <div class="mbdy">
       <div style="font-size:12px;color:var(--txt2);margin-bottom:10px">⚠️ This key is shown only once. Save it now!</div>
       <div class="scbox" id="newKey" onclick="cpText(this.textContent)">—</div>
@@ -706,7 +706,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 
 <div class="mbg" id="m2fa">
   <div class="modal">
-    <div class="mhd"><div class="mttl">🔐 Set Up 2FA</div><button class="mclose" onclick="closeM('m2fa')">✕</button></div>
+    <div class="mhd"><div class="mttl">🔐 Set Up 2FA</div><button class="mclose" onclick="closeM('m2fa')" aria-label="Close">✕</button></div>
     <div class="mbdy">
       <div class="qrbox">
         <canvas id="qrc2" width="150" height="150" style="display:block;margin:0 auto 10px;border-radius:5px"></canvas>
@@ -718,7 +718,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
       </div>
       <label class="fl">CONFIRMATION CODE</label>
       <input class="fi" id="ctotp" placeholder="000000" maxlength="6"
-             style="font-family:'JetBrains Mono',monospace;font-size:18px;letter-spacing:4px;text-align:center;margin-top:5px">
+             style="font-family:'JetBrains Mono',monospace;font-size:18px;letter-spacing:4px;text-align:center;margin-top:5px" aria-label="000000">
     </div>
     <div class="mft"><button class="btn bn" onclick="closeM('m2fa')">Cancel</button><button class="btn bg" onclick="confirm2FA()">✅ Activate 2FA</button></div>
   </div>
@@ -1758,7 +1758,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') document.que
     </div>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="ai-status">Online</div>
-      <button class="ai-close" onclick="aiToggle()">✕</button>
+      <button class="ai-close" onclick="aiToggle()" aria-label="Close">✕</button>
     </div>
   </div>
 
@@ -1788,7 +1788,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') document.que
     <textarea class="ai-input" id="aiInput" placeholder="Ask anything about SPN Coin..."
       rows="1" maxlength="2000"
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend()}"
-      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'" aria-label="Ask anything about SPN Coin..."></textarea>
     <button class="ai-send" id="aiSendBtn" onclick="aiSend()" title="Send">
       <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
         <path d="M2 8l12-6-6 12V9L2 8z" fill="white"/>
