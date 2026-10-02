@@ -441,7 +441,7 @@ app.get(/\.html$/i, (req, res, next) => {
 // RFC 9116 — security.txt (served explicitly since static skips dotfiles).
 const SECURITY_TXT = (() => {
     try { return require('fs').readFileSync(path.join(__dirname, 'public', '.well-known', 'security.txt'), 'utf8'); }
-    catch (e) { return 'Contact: mailto:security@spncoin.example\n'; }
+    catch (e) { return 'Contact: mailto:Info@sepantatoken.com\n'; }
 })();
 app.get(['/.well-known/security.txt', '/security.txt'], (req, res) => {
     res.type('text/plain').send(SECURITY_TXT);

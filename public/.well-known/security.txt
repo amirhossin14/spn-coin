@@ -1,7 +1,7 @@
 # Security policy for the SPN Coin project (RFC 9116)
 # SPN Coin is an educational blockchain with no monetary value.
 
-Contact: mailto:security@spncoin.example
+Contact: mailto:Info@sepantatoken.com
 Contact: https://github.com/OWNER/REPO/security/advisories/new
 Expires: 2027-12-31T23:59:59.000Z
 Preferred-Languages: en, fa
