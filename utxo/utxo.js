@@ -359,13 +359,20 @@ class Transaction {
             // Additive: only runs when the spent output carries a locking `script`.
             if (Array.isArray(utxo.script) && utxo.script.length) {
                 const sigHash = sigMessage(this.id, inp);
+                // SECURITY: timelock context MUST come from real chain state, never
+                // from spender-controlled fields. Using this.locktime (CLTV) or
+                // inp.sequence (CSV) would let a spender set them arbitrarily and
+                // bypass the lock. CLTV compares against the actual block height the
+                // tx is being confirmed at; CSV against the real age of the output
+                // (confirmations = currentHeight - the height the UTXO was created).
+                const utxoHeight = (utxo.blockHeight != null) ? utxo.blockHeight
+                                 : (utxo.height != null ? utxo.height : null);
                 const res = script.evaluate(inp.scriptSig || [], utxo.script, {
                     sigHash,
-                    lockContext: this.locktime || blockHeight || 0,
-                    // Relative timelock (CSV): how much newer the spending input is
-                    // than the output it spends (confirmations / age).
-                    sequenceContext: Number(inp.sequence ?? 0) ||
-                        (blockHeight && utxo.height != null ? blockHeight - utxo.height : 0),
+                    lockContext: Number(blockHeight) || 0,
+                    sequenceContext: (utxoHeight != null && blockHeight != null)
+                        ? Math.max(0, Number(blockHeight) - Number(utxoHeight))
+                        : 0,
                 });
                 if (!res.ok) errors.push(`Script failed for input ${key}: ${res.error}`);
             }
