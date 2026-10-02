@@ -1069,11 +1069,18 @@ function openQrScan() {
   });
 }
 
-function onToInput() {
+async function onToInput() {
   const v   = document.getElementById('fTo').value.trim();
   const inp = document.getElementById('fTo');
   const err = document.getElementById('toErr');
-  const ok  = (v.startsWith('SPN1') || v.startsWith('SPNt')) ? v.length >= 30 && /^SPN[1t][A-Za-z0-9]{25,50}$/.test(v) : (v.length >= 20 && /^[A-Za-z0-9]+$/.test(v));
+  const fmtOk = (v.startsWith('SPN1') || v.startsWith('SPNt')) ? v.length >= 30 && /^SPN[1t][A-Za-z0-9]{25,50}$/.test(v) : (v.length >= 20 && /^[A-Za-z0-9]+$/.test(v));
+  let ok = fmtOk;
+  if (fmtOk && (v.startsWith('SPN1') || v.startsWith('SPNt'))) {
+    ok = await validateSpnAddress(v);
+    if (document.getElementById('fTo').value.trim() !== v) return;
+    err.textContent = ok ? '⚠ آدرس وارد شده معتبر نیست'
+                         : '⚠ checksum آدرس اشتباه است — احتمالاً یک حرف را اشتباه تایپ کرده‌اید';
+  }
   inp.classList.toggle('err', v.length > 0 && !ok);
   inp.classList.toggle('ok',  ok);
   err.classList.toggle('show', v.length > 0 && !ok);
@@ -1150,12 +1157,40 @@ function estimateFeeSat(nIn, nOut) {
   return Math.max(1000, bytes * 10);
 }
 
+async function validateSpnAddress(addr) {
+  try {
+    addr = String(addr || '').trim();
+    const m = /^SPN([1t])([A-Za-z0-9]+)$/.exec(addr);
+    if (!m) return false;
+    const b58 = m[2];
+    const ALPH = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+    let n = 0n;
+    for (const ch of b58) { const i = ALPH.indexOf(ch); if (i < 0) return false; n = n * 58n + BigInt(i); }
+    let hex = n.toString(16); if (hex.length % 2) hex = '0' + hex;
+    const bytes = hex === '0' ? [] : (hex.match(/.{2}/g) || []).map(h => parseInt(h, 16));
+    let zeros = 0; for (const c of b58) { if (c === '1') zeros++; else break; }
+    const full = new Uint8Array(zeros + bytes.length);
+    full.set(bytes, zeros);
+    if (full.length < 5) return false;
+    const payload  = full.slice(0, -4);
+    const checksum = full.slice(-4);
+    const h1 = new Uint8Array(await crypto.subtle.digest('SHA-256', payload));
+    const h2 = new Uint8Array(await crypto.subtle.digest('SHA-256', h1));
+    for (let i = 0; i < 4; i++) if (h2[i] !== checksum[i]) return false;
+    return true;
+  } catch (e) { return false; }
+}
+
 async function doSend() {
   const to   = document.getElementById('fTo').value.trim();
   const amt  = parseFloat(document.getElementById('fAmt').value);
   const priv = (document.getElementById('fPriv').value || '').trim();
 
   if (!/^SPN[t1][A-Za-z0-9]{25,50}$/.test(to)) { alert('آدرس مقصد نامعتبر است'); return; }
+  if (!(await validateSpnAddress(to))) {
+    alert('آدرس مقصد نامعتبر است (checksum اشتباه). لطفاً آدرس گیرنده را دوباره بررسی کنید — ارسال به آدرس غلط قابل بازگشت نیست.');
+    return;
+  }
   if (!(amt > 0)) { alert('مقدار نامعتبر است'); return; }
   if (!priv) { alert('کلید خصوصی را وارد کنید'); return; }
   if (!window.SPNSign || !window.SPNSign.buildSignedTx) { alert('کتابخانه امضا لود نشده — صفحه را رفرش کنید (Ctrl+Shift+R)'); return; }
