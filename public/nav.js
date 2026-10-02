@@ -92,7 +92,16 @@
       '#spn-topbar .tb-nav a .t{display:inline!important}' +
       '#spn-topbar .tb-nav a .ic,#spn-topbar .tb-nav a>span:first-child{font-size:18px;width:24px;text-align:center;flex-shrink:0}' +
       '#spn-topbar .tb-nav a.last{margin-inline-start:0}' +
-    '}';
+    '}' +
+    '.spn-sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;' +
+      'overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}' +
+    '.spn-skip{position:fixed;top:-60px;inset-inline-start:12px;z-index:100000;' +
+      'background:#f0a500;color:#000;font-weight:700;font-family:Sora,system-ui,sans-serif;' +
+      'padding:10px 16px;border-radius:0 0 10px 10px;text-decoration:none;transition:top .18s}' +
+    '.spn-skip:focus{top:0;outline:3px solid #fff;outline-offset:2px}' +
+    'a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,' +
+      'textarea:focus-visible,[tabindex]:focus-visible{outline:3px solid #f0a500;' +
+      'outline-offset:2px;border-radius:6px}';
 
   function build() {
     if (document.getElementById('spn-topbar')) return;
@@ -116,24 +125,34 @@
     bar.id = 'spn-topbar';
 
     var inner = '<div class="tb-in">' +
-      '<a class="tb-logo" href="explorer"><span class="ic">S</span><span class="txt">SPN Coin</span></a>' +
-      '<button class="tb-burger" aria-label="Menu" aria-expanded="false">☰</button>' +
-      '<div class="tb-nav">';
+      '<a class="tb-logo" href="explorer" aria-label="SPN Coin home"><span class="ic" aria-hidden="true">S</span><span class="txt">SPN Coin</span></a>' +
+      '<button class="tb-burger" aria-label="Menu" aria-expanded="false" aria-controls="spn-nav-list">☰</button>' +
+      '<div class="tb-nav" id="spn-nav-list" role="navigation" aria-label="Main navigation">';
     // Build the visible link list; append the Admin link only for an admin session.
     var links = LINKS.slice();
     if (isAdminSession()) links.push(ADMIN_LINK);
     links.forEach(function (l, i) {
-      var cls = (l.href === path || l.href === '/' + path ? 'on' : '');
+      var isOn = (l.href === path || l.href === '/' + path);
+      var cls = (isOn ? 'on' : '');
       if (i === links.length - 1) cls += ' last';
-      inner += '<a href="' + l.href + '" title="' + l.label + '"' + (cls.trim() ? ' class="' + cls.trim() + '"' : '') + '>' +
-        l.icon + '<span class="t">' + l.label + '</span></a>';
+      inner += '<a href="' + l.href + '" title="' + l.label + '"' +
+        (cls.trim() ? ' class="' + cls.trim() + '"' : '') +
+        (isOn ? ' aria-current="page"' : '') + '>' +
+        '<span aria-hidden="true">' + l.icon + '</span><span class="t">' + l.label + '</span></a>';
     });
     inner += '</div>';
     inner += '</div>';
     bar.innerHTML = inner;
+    bar.setAttribute('role', 'banner');
 
     if (document.body) {
-      document.body.insertBefore(bar, document.body.firstChild);
+      var skip = document.createElement('a');
+      skip.className = 'spn-skip';
+      skip.href = '#spn-content';
+      skip.textContent = 'Skip to main content';
+      document.body.insertBefore(skip, document.body.firstChild);
+
+      document.body.insertBefore(bar, skip.nextSibling);
 
       // ── Test-network notice banner (shown on every page) ──
       // Can be hidden by setting window.SPN_HIDE_TESTNET_BANNER = true before nav.js,
@@ -206,6 +225,41 @@
       });
     }
 
+    if (!document.getElementById('spn-live')) {
+      var live = document.createElement('div');
+      live.id = 'spn-live';
+      live.className = 'spn-sr-only';
+      live.setAttribute('aria-live', 'polite');
+      live.setAttribute('aria-atomic', 'true');
+      document.body.appendChild(live);
+      window.spnAnnounce = function (msg) {
+        try { live.textContent = ''; setTimeout(function () { live.textContent = String(msg || ''); }, 30); }
+        catch (e) {}
+      };
+    }
+    try {
+      var target = document.querySelector('main')
+        || document.querySelector('[role="main"]')
+        || document.querySelector('.wrap, .container, .page, main, .content');
+      if (!target) {
+        var sib = bar.nextElementSibling;
+        while (sib && (sib.id === 'spn-nav-backdrop' || sib.id === 'spn-testnet-banner')) sib = sib.nextElementSibling;
+        target = sib;
+      }
+      if (target) {
+        if (!target.id) target.id = 'spn-content';
+        else { var sk = document.querySelector('.spn-skip'); if (sk) sk.setAttribute('href', '#' + target.id); }
+        if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+        if (target.tagName !== 'MAIN' && !target.getAttribute('role')) target.setAttribute('role', 'main');
+      }
+    } catch (e) {}
+    try {
+      var toasts = document.querySelectorAll('#toast, .toast, [class*="toast"]');
+      toasts.forEach(function (t) {
+        if (!t.getAttribute('role')) t.setAttribute('role', 'status');
+        if (!t.getAttribute('aria-live')) t.setAttribute('aria-live', 'polite');
+      });
+    } catch (e) {}
     // If Persian is active, translate the nav labels using the shared dictionary.
     applyNavLang();
   }
