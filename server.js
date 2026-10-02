@@ -329,6 +329,13 @@ app.use((req, res, next) => {
     next();
 });
 
+// P2P block messages carry full blocks, which can exceed the default 100kb as
+// the chain grows (Bitcoin-style blocks reach multiple MB). Parse the P2P
+// endpoint with a higher limit BEFORE the global parser so blocks keep
+// propagating/syncing at scale. express.json skips a body already parsed, so
+// the global 100kb parser below still governs every other route.
+app.use('/api/p2p/message', express.json({ limit: '6mb' }));
+
 app.use(express.json({ limit: '100kb' }));
 
 // Return a clean 400 for malformed JSON instead of a 500 that could leak
