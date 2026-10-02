@@ -616,6 +616,17 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 </div>
 
 <!-- MODALS -->
+<div class="mbg" id="mBlockIp">
+  <div class="modal">
+    <div class="mhd"><div class="mttl">⛔ Block IP</div><button class="mclose" onclick="closeM('mBlockIp')">✕</button></div>
+    <div class="mbdy">
+      <div class="fr"><label class="fl">IP ADDRESS</label><input class="fi" id="blkIpInp" type="text" placeholder="5.62.233.205" autocomplete="off" onkeydown="if(event.key==='Enter')doBlockIp()"></div>
+      <div style="font-size:11.5px;color:#f0a500;line-height:1.7;margin-top:6px">⚠️ این IP برای <b>۱۵ دقیقه</b> بلاک می‌شود. مطمئن شوید IP خودتان نیست — بلاک از بخش <b>DDoS / IP</b> هم قابل برداشتن است.</div>
+    </div>
+    <div class="mft"><button class="btn bn" onclick="closeM('mBlockIp')">Cancel</button><button class="btn bd" onclick="doBlockIp()">⛔ Block</button></div>
+  </div>
+</div>
+
 <div class="mbg" id="mUser">
   <div class="modal">
     <div class="mhd"><div class="mttl">New User</div><button class="mclose" onclick="closeM('mUser')" aria-label="Close">✕</button></div>
@@ -1223,11 +1234,22 @@ async function blockIp(ip) {
 }
 
 // Top "Block IP" button: ask for an IP, validate its shape, then block it.
-async function blockIpPrompt() {
-  const ip = (prompt('IP مورد نظر برای بلاک (۱۵ دقیقه) را وارد کنید:\nمثلاً: 5.62.233.205') || '').trim();
-  if (!ip) return;
+// Open the styled Block-IP modal (replaces the native prompt).
+function blockIpPrompt() {
+  const el = g('blkIpInp'); if (el) el.value = '';
+  openM('mBlockIp');
+  setTimeout(() => { const i = g('blkIpInp'); if (i) i.focus(); }, 60);
+}
+// Confirm handler inside the Block-IP modal: validate shape, then block.
+async function doBlockIp() {
+  const ip = (g('blkIpInp').value || '').trim();
+  if (!ip) { toast('IP را وارد کنید', 'e'); return; }
   if (!/^(\d{1,3}\.){3}\d{1,3}$|^[0-9a-fA-F:]+$/.test(ip)) { toast('فرمت IP نامعتبر است', 'e'); return; }
-  await blockIp(ip);
+  try {
+    await af('/api/admin/ddos/block', 'POST', { ip, duration: 15 * 60 * 1000 });
+    toast('⛔ IP بلاک شد: ' + ip);
+    closeM('mBlockIp');
+  } catch (e) { toast('خطا در بلاک: ' + e.message, 'e'); }
 }
 
 async function ldLogs() {
