@@ -239,15 +239,15 @@ test('Security — TOTP 2FA', async (t) => {
         // Use a unique username and clean up, so the test is isolated and
         // repeatable even though access-control persists to access.lock.
         const uname = 'tfa_test_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
-        const created = ac.createUser({ username: uname, password: 'strongpass1' }, 'admin');
+        const created = ac.createUser({ username: uname, password: 'StrongPass1!' }, 'admin');
         assert.ok(created.ok && created.user, 'createUser should succeed: ' + (created.error || ''));
         const uid = created.user.id;
         const setup = ac.setupTotp(uid);
         assert.ok(setup.ok && setup.secret && setup.otpauthUrl.startsWith('otpauth://totp/'));
         assert.equal(ac.confirmTotp(uid, totp.totp(setup.secret)).ok, true);
         assert.equal(ac.getTotpStatus(uid).enabled, true);
-        assert.equal(ac.login({ username: uname, password: 'strongpass1' }).require2fa, true);
-        assert.equal(ac.login({ username: uname, password: 'strongpass1', totp: totp.totp(setup.secret) }).ok, true);
+        assert.equal(ac.login({ username: uname, password: 'StrongPass1!' }).require2fa, true);
+        assert.equal(ac.login({ username: uname, password: 'StrongPass1!', totp: totp.totp(setup.secret) }).ok, true);
         assert.equal(ac.disableTotp(uid, totp.totp(setup.secret)).ok, true);
         // Clean up so we don't pollute access.lock for the next run.
         if (ac.deleteUser) ac.deleteUser(uid, 'admin');
