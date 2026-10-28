@@ -218,14 +218,18 @@ async function loadChain() {
 
 // ── Log operations ────────────────────────────────────────────
 const LogRepo = {
-    async add({ username, action, ip, path, details } = {}) {
-        const entry = { ts: Date.now(), action, username, ip, path, details };
+    async add({ username, action, ip, path, details, userAgent, referer } = {}) {
+        // Fold the User-Agent + Referer into the JSONB details column (no schema change).
+        const det = { ...(details || {}) };
+        if (userAgent) det.ua  = String(userAgent).slice(0, 300);
+        if (referer)   det.ref = String(referer).slice(0, 300);
+        const entry = { ts: Date.now(), action, username, ip, path, details: det };
         if (pool) {
             try {
                 await pool.query(`
                     INSERT INTO spncoin_logs (ts, action, username, ip, path, details)
                     VALUES ($1, $2, $3, $4, $5, $6)
-                `, [entry.ts, action, username, ip, path, JSON.stringify(details || {})]);
+                `, [entry.ts, action, username, ip, path, JSON.stringify(det)]);
                 return;
             } catch (e) {
                 console.error("❌ [DB] log insert error:", e.message);

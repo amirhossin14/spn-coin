@@ -186,7 +186,17 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 .la-adm{color:var(--gold)}
 .la-otp{color:var(--cyan)}
 .la-def{color:var(--txt2)}
-.lip{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--txt3);margin-left:auto}
+.lpath{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--txt3);white-space:nowrap;opacity:.75;cursor:help}
+.ldev{font-size:10px;color:var(--txt2);white-space:nowrap;cursor:help}
+.llc{font-size:10px;color:var(--txt2);white-space:nowrap;margin-left:auto;text-align:right}
+.lip[title]{cursor:help}
+.lgrp{padding:7px 18px;font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--grn,#26d07c);background:var(--surface);border-bottom:1px solid var(--bd);border-top:1px solid rgba(0,255,136,.07)}
+.lsrc{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap;letter-spacing:.2px}
+.src-admin{background:rgba(255,196,0,.14);color:#ffd24a;border:1px solid rgba(255,196,0,.22)}
+.src-wallet{background:rgba(0,204,255,.12);color:#6cd6ff;border:1px solid rgba(0,204,255,.2)}
+.src-api{background:rgba(255,68,102,.12);color:#ff7a90;border:1px solid rgba(255,68,102,.2)}
+.src-other{background:var(--surface);color:var(--txt3);border:1px solid var(--bd)}
+.lip{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--txt3);margin-left:14px;white-space:nowrap}
 
 /* ── Modals ── */
 .mbg{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
@@ -201,6 +211,8 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 .mbdy{padding:18px}
 .mft{padding:12px 18px;border-top:1px solid var(--bd);display:flex;justify-content:flex-end;gap:7px}
 .fi{padding:9px 11px;background:var(--surface);border:1px solid var(--bd);border-radius:var(--r);color:var(--txt);font-family:'Sora',sans-serif;font-size:13px;outline:none;transition:all .2s;width:100%}
+/* Round password mask dots (the webfont renders them square otherwise). */
+input[type="password"]{-webkit-text-security:disc;font-family:'Segoe UI',Tahoma,Geneva,Verdana,system-ui,sans-serif;letter-spacing:3px}
 .fi:focus{border-color:var(--bd3);box-shadow:0 0 0 3px rgba(0,255,136,.06)}
 .fl{font-size:11px;font-weight:700;color:var(--txt2);letter-spacing:.3px;margin-bottom:5px;display:block}
 .fr{margin-bottom:11px}
@@ -263,14 +275,14 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
         <div class="frow">
           <label class="lbl">USERNAME</label>
           <input class="inp" id="inU" type="text" placeholder="admin" autocomplete="username"
-                 onkeydown="if(event.key==='Enter')doLogin()" aria-label="admin">
+                 onkeydown="if(event.key==='Enter')doLogin()">
         </div>
         <div class="frow">
           <label class="lbl">PASSWORD</label>
           <div class="pwd-wrap">
             <input class="inp" id="inP" type="password" placeholder="••••••••" autocomplete="current-password"
                    onkeydown="if(event.key==='Enter')doLogin()" style="padding-right:42px">
-            <button class="eye-btn" id="eyeBtn" onclick="togglePwd()" aria-label="Show or hide password">👁</button>
+            <button class="eye-btn" id="eyeBtn" onclick="togglePwd()">👁</button>
           </div>
         </div>
         <button class="btn-p" id="btnLogin" onclick="doLogin()">Sign In to Admin Panel</button>
@@ -286,12 +298,12 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
         </div>
         <div class="errmsg" id="err2"></div>
         <div class="otp-row" id="otp2">
-          <input class="oi" maxlength="1" data-i="0" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')" aria-label="Verification code, digit 1 of 6">
-          <input class="oi" maxlength="1" data-i="1" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')" aria-label="Verification code, digit 2 of 6">
-          <input class="oi" maxlength="1" data-i="2" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')" aria-label="Verification code, digit 3 of 6">
-          <input class="oi" maxlength="1" data-i="3" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')" aria-label="Verification code, digit 4 of 6">
-          <input class="oi" maxlength="1" data-i="4" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')" aria-label="Verification code, digit 5 of 6">
-          <input class="oi" maxlength="1" data-i="5" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')" aria-label="Verification code, digit 6 of 6">
+          <input class="oi" maxlength="1" data-i="0" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')">
+          <input class="oi" maxlength="1" data-i="1" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')">
+          <input class="oi" maxlength="1" data-i="2" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')">
+          <input class="oi" maxlength="1" data-i="3" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')">
+          <input class="oi" maxlength="1" data-i="4" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')">
+          <input class="oi" maxlength="1" data-i="5" oninput="oi(this,'otp2','btnTotp')" onkeydown="ok(event,this,'otp2')">
         </div>
         <button class="btn-p" id="btnTotp" onclick="do2FA()" disabled>Verify Code</button>
         <div class="back" onclick="goStep(1)">← <span>Back</span> to login</div>
@@ -317,12 +329,12 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
         </div>
         <div class="errmsg" id="err3"></div>
         <div class="otp-row" id="otp3">
-          <input class="oi" maxlength="1" data-i="0" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')" aria-label="Verification code, digit 1 of 6">
-          <input class="oi" maxlength="1" data-i="1" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')" aria-label="Verification code, digit 2 of 6">
-          <input class="oi" maxlength="1" data-i="2" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')" aria-label="Verification code, digit 3 of 6">
-          <input class="oi" maxlength="1" data-i="3" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')" aria-label="Verification code, digit 4 of 6">
-          <input class="oi" maxlength="1" data-i="4" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')" aria-label="Verification code, digit 5 of 6">
-          <input class="oi" maxlength="1" data-i="5" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')" aria-label="Verification code, digit 6 of 6">
+          <input class="oi" maxlength="1" data-i="0" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')">
+          <input class="oi" maxlength="1" data-i="1" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')">
+          <input class="oi" maxlength="1" data-i="2" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')">
+          <input class="oi" maxlength="1" data-i="3" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')">
+          <input class="oi" maxlength="1" data-i="4" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')">
+          <input class="oi" maxlength="1" data-i="5" oninput="oi(this,'otp3','btnSetup')" onkeydown="ok(event,this,'otp3')">
         </div>
         <button class="btn-p" id="btnSetup" onclick="doSetup()" disabled>Enable 2FA &amp; Enter Panel</button>
         <div class="back" style="opacity:.7;cursor:default">🔒 Two-factor authentication is required to enter the admin panel</div>
@@ -464,7 +476,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
         <div class="card">
           <div class="ch"><div class="ct"><span class="ctd"></span>Block IP Address</div></div>
           <div style="padding:14px 17px;display:flex;gap:9px;align-items:flex-end;border-bottom:1px solid var(--bd)">
-            <div style="flex:1"><label class="fl">IP ADDRESS</label><input class="fi" id="bipInp" placeholder="192.168.1.1" type="text" aria-label="192.168.1.1"></div>
+            <div style="flex:1"><label class="fl">IP ADDRESS</label><input class="fi" id="bipInp" placeholder="192.168.1.1" type="text"></div>
             <button class="btn bd" onclick="blockIP()">🚫 Block</button>
           </div>
           <div id="banList" style="padding:13px 17px;color:var(--txt3);font-size:12.5px">Loading...</div>
@@ -474,7 +486,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
       <!-- LOGS -->
       <div id="pLogs" class="tp">
         <div class="card">
-          <div class="ch"><div class="ct"><span class="ctd"></span>Audit Logs</div><div style="display:flex;gap:8px"><button class="btn btn-sm bd" onclick="blockIpPrompt()" title="Block an IP address (15 min)">⛔ Block IP</button><button class="btn btn-sm bg" onclick="ldLogs()">🔄 Refresh</button></div></div>
+          <div class="ch"><div class="ct"><span class="ctd"></span>Audit Logs</div><div style="display:flex;gap:8px"><button class="btn btn-sm bn" onclick="exportLogsPDF()">📄 Export PDF</button><button class="btn btn-sm bd" onclick="openM('mBlockIp')">🚫 Block IP</button><button class="btn btn-sm bg" onclick="ldLogs()">🔄 Refresh</button></div></div>
           <div id="logBox" style="max-height:500px;overflow-y:auto"><div style="padding:20px;text-align:center;color:var(--txt3)">Loading...</div></div>
         </div>
       </div>
@@ -511,7 +523,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
             <div id="dis2fb" style="display:none">
               <div style="font-size:12px;color:var(--txt2);margin-bottom:10px">To disable 2FA, enter your current Authenticator code:</div>
               <div style="display:flex;gap:8px">
-                <input class="fi" id="disOtp" placeholder="6-digit code" maxlength="6" style="font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:3px;text-align:center" aria-label="6-digit code">
+                <input class="fi" id="disOtp" placeholder="6-digit code" maxlength="6" style="font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:3px;text-align:center">
                 <button class="btn bd" onclick="dis2FA()">Disable</button>
               </div>
             </div>
@@ -523,7 +535,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
                 Regenerating creates a fresh set and invalidates the old ones.
               </div>
               <div style="display:flex;gap:8px">
-                <input class="fi" id="regOtp" placeholder="6-digit code" maxlength="6" style="font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:3px;text-align:center" aria-label="6-digit code">
+                <input class="fi" id="regOtp" placeholder="6-digit code" maxlength="6" style="font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:3px;text-align:center">
                 <button class="btn bgo" onclick="regenRecovery()">🔄 Regenerate Codes</button>
               </div>
             </div>
@@ -531,9 +543,9 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
             <div>
               <div style="font-size:11px;font-weight:800;color:var(--txt2);letter-spacing:.4px;text-transform:uppercase;margin-bottom:10px">Change Password</div>
               <div style="display:flex;flex-direction:column;gap:9px">
-                <input class="fi" id="op" type="password" placeholder="Current password" aria-label="Current password">
-                <input class="fi" id="np" type="password" placeholder="New password (min. 8 chars)" aria-label="New password (min. 8 chars)">
-                <input class="fi" id="np2" type="password" placeholder="Confirm new password" aria-label="Confirm new password">
+                <input class="fi" id="op" type="password" placeholder="Current password">
+                <input class="fi" id="np" type="password" placeholder="New password (min. 8 chars)">
+                <input class="fi" id="np2" type="password" placeholder="Confirm new password">
                 <button class="btn bgo" onclick="chgPwd()">💾 Save New Password</button>
               </div>
             </div>
@@ -616,23 +628,13 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 </div>
 
 <!-- MODALS -->
-<div class="mbg" id="mBlockIp">
-  <div class="modal">
-    <div class="mhd"><div class="mttl">⛔ Block IP</div><button class="mclose" onclick="closeM('mBlockIp')">✕</button></div>
-    <div class="mbdy">
-      <div class="fr"><label class="fl">IP ADDRESS</label><input class="fi" id="blkIpInp" type="text" placeholder="5.62.233.205" autocomplete="off" onkeydown="if(event.key==='Enter')doBlockIp()"></div>
-      <div style="font-size:11.5px;color:#f0a500;line-height:1.7;margin-top:6px">⚠️ این IP برای <b>۱۵ دقیقه</b> بلاک می‌شود. مطمئن شوید IP خودتان نیست — بلاک از بخش <b>DDoS / IP</b> هم قابل برداشتن است.</div>
-    </div>
-    <div class="mft"><button class="btn bn" onclick="closeM('mBlockIp')">Cancel</button><button class="btn bd" onclick="doBlockIp()">⛔ Block</button></div>
-  </div>
-</div>
-
 <div class="mbg" id="mUser">
   <div class="modal">
-    <div class="mhd"><div class="mttl">New User</div><button class="mclose" onclick="closeM('mUser')" aria-label="Close">✕</button></div>
+    <div class="mhd"><div class="mttl">New User</div><button class="mclose" onclick="closeM('mUser')">✕</button></div>
     <div class="mbdy">
-      <div class="fr"><label class="fl">USERNAME</label><input class="fi" id="nu" placeholder="username" aria-label="username"></div>
-      <div class="fr"><label class="fl">PASSWORD</label><input class="fi" id="np_u" type="password" placeholder="Min 8 characters" oninput="showPwHint('np_u','np_u_hint')" aria-label="Min 8 characters"><div id="np_u_hint" style="font-size:11px;margin-top:6px;line-height:1.6"></div></div>
+      <div class="fr"><label class="fl">USERNAME</label><input class="fi" id="nu" placeholder="username"></div>
+      <div class="fr"><label class="fl">پسورد جدید / New password</label><input class="fi" id="np_u" type="password" placeholder="Min 12 characters" oninput="showPwHint('np_u','np_u_hint');updateNuMatch()"><div id="np_u_hint" style="font-size:11px;margin-top:6px;line-height:1.6"></div><div id="np_u_match" style="font-size:11px;margin-top:4px;line-height:1.6"></div></div>
+      <div class="fr"><label class="fl">تکرار پسورد جدید / Confirm new password</label><input class="fi" id="np_u2" type="password" placeholder="Re-enter password" oninput="updateNuMatch()"></div>
       <div class="fr"><label class="fl">ROLE</label>
         <select class="fi" id="nr">
           <option value="admin">Admin — Full access</option>
@@ -651,9 +653,9 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 
 <div class="mbg" id="mEdit">
   <div class="modal">
-    <div class="mhd"><div class="mttl">Edit User</div><button class="mclose" onclick="closeM('mEdit')" aria-label="Close">✕</button></div>
+    <div class="mhd"><div class="mttl">Edit User</div><button class="mclose" onclick="closeM('mEdit')">✕</button></div>
     <div class="mbdy">
-      <div class="fr"><label class="fl">USERNAME</label><input class="fi" id="euName" placeholder="username" autocomplete="off" aria-label="username"></div>
+      <div class="fr"><label class="fl">USERNAME</label><input class="fi" id="euName" placeholder="username" autocomplete="off"></div>
       <div class="fr"><label class="fl">ROLE</label>
         <select class="fi" id="euRole">
           <option value="admin">Admin — Full access</option>
@@ -665,7 +667,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
           <option value="viewer">Viewer — Read only</option>
         </select>
       </div>
-      <div class="fr"><label class="fl">NEW PASSWORD <span style="color:var(--txt3);font-weight:400">(optional — leave blank to keep current)</span></label><input class="fi" id="euPass" type="password" placeholder="Min 8 characters" oninput="showPwHint('euPass','euPass_hint')" aria-label="Min 8 characters"><div id="euPass_hint" style="font-size:11px;margin-top:6px;line-height:1.6"></div></div>
+      <div class="fr"><label class="fl">NEW PASSWORD <span style="color:var(--txt3);font-weight:400">(optional — leave blank to keep current)</span></label><input class="fi" id="euPass" type="password" placeholder="Min 12 characters" oninput="showPwHint('euPass','euPass_hint')"><div id="euPass_hint" style="font-size:11px;margin-top:6px;line-height:1.6"></div></div>
       <div class="errmsg" id="euErr" style="color:var(--red);font-size:12px;margin-top:4px"></div>
     </div>
     <div class="mft"><button class="btn bn" onclick="closeM('mEdit')">Cancel</button><button class="btn bg" onclick="saveUser()">💾 Save Changes</button></div>
@@ -674,9 +676,9 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 
 <div class="mbg" id="mKey">
   <div class="modal">
-    <div class="mhd"><div class="mttl">New API Key</div><button class="mclose" onclick="closeM('mKey')" aria-label="Close">✕</button></div>
+    <div class="mhd"><div class="mttl">New API Key</div><button class="mclose" onclick="closeM('mKey')">✕</button></div>
     <div class="mbdy">
-      <div class="fr"><label class="fl">NAME / DESCRIPTION</label><input class="fi" id="kn" placeholder="e.g. Mining service" aria-label="e.g. Mining service"></div>
+      <div class="fr"><label class="fl">NAME / DESCRIPTION</label><input class="fi" id="kn" placeholder="e.g. Mining service"></div>
       <div class="fr"><label class="fl">ROLE</label>
         <select class="fi" id="kr">
           <option value="viewer">viewer</option>
@@ -692,7 +694,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 <!-- ACCESS / PERMISSIONS VIEWER -->
 <div class="mbg" id="mAccess">
   <div class="modal" style="max-width:520px">
-    <div class="mhd"><div class="mttl" id="accTitle">Access</div><button class="mclose" onclick="closeM('mAccess')" aria-label="Close">✕</button></div>
+    <div class="mhd"><div class="mttl" id="accTitle">Access</div><button class="mclose" onclick="closeM('mAccess')">✕</button></div>
     <div class="mbdy">
       <div style="font-size:12px;color:var(--txt3);margin-bottom:12px">
         <span style="color:var(--grn)">● Allowed</span> &nbsp; <span style="color:var(--red)">● Denied</span> — the sections and actions this role can access.
@@ -705,7 +707,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 
 <div class="mbg" id="mKeyShow">
   <div class="modal">
-    <div class="mhd"><div class="mttl">✅ API Key Created</div><button class="mclose" onclick="closeM('mKeyShow')" aria-label="Close">✕</button></div>
+    <div class="mhd"><div class="mttl">✅ API Key Created</div><button class="mclose" onclick="closeM('mKeyShow')">✕</button></div>
     <div class="mbdy">
       <div style="font-size:12px;color:var(--txt2);margin-bottom:10px">⚠️ This key is shown only once. Save it now!</div>
       <div class="scbox" id="newKey" onclick="cpText(this.textContent)">—</div>
@@ -717,7 +719,7 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
 
 <div class="mbg" id="m2fa">
   <div class="modal">
-    <div class="mhd"><div class="mttl">🔐 Set Up 2FA</div><button class="mclose" onclick="closeM('m2fa')" aria-label="Close">✕</button></div>
+    <div class="mhd"><div class="mttl">🔐 Set Up 2FA</div><button class="mclose" onclick="closeM('m2fa')">✕</button></div>
     <div class="mbdy">
       <div class="qrbox">
         <canvas id="qrc2" width="150" height="150" style="display:block;margin:0 auto 10px;border-radius:5px"></canvas>
@@ -729,9 +731,21 @@ body::after{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;back
       </div>
       <label class="fl">CONFIRMATION CODE</label>
       <input class="fi" id="ctotp" placeholder="000000" maxlength="6"
-             style="font-family:'JetBrains Mono',monospace;font-size:18px;letter-spacing:4px;text-align:center;margin-top:5px" aria-label="000000">
+             style="font-family:'JetBrains Mono',monospace;font-size:18px;letter-spacing:4px;text-align:center;margin-top:5px">
     </div>
     <div class="mft"><button class="btn bn" onclick="closeM('m2fa')">Cancel</button><button class="btn bg" onclick="confirm2FA()">✅ Activate 2FA</button></div>
+  </div>
+</div>
+
+<div class="mbg" id="mBlockIp">
+  <div class="modal">
+    <div class="mhd"><div class="mttl">🚫 Block IP Address</div><button class="mclose" onclick="closeM('mBlockIp')">✕</button></div>
+    <div class="mbdy">
+      <label class="fl">IP ADDRESS</label>
+      <input class="fi" id="blkIpInp" placeholder="e.g. 91.107.150.86" autocomplete="off" style="font-family:'JetBrains Mono',monospace" onkeydown="if(event.key==='Enter')doBlockIp()">
+      <div style="font-size:11px;color:var(--txt3);margin-top:9px;line-height:1.6">Copy an IP from a suspicious row above. It will be banned via the DDoS guard. You can unblock it later from <b>DDoS / IP</b>.</div>
+    </div>
+    <div class="mft"><button class="btn bn" onclick="closeM('mBlockIp')">Cancel</button><button class="btn bd" onclick="doBlockIp()">🚫 Block</button></div>
   </div>
 </div>
 
@@ -1204,77 +1218,104 @@ async function ldFees() {
   } catch (e) { g('feeBox').innerHTML = `<div style="padding:18px;color:var(--red)">${escH(e.message)}</div>`; }
 }
 
-// Robust audit-log timestamp formatter. The log source may be the DB (column
-// `ts`) or the file (`ts`/`time`), and field names can vary — try them all and
-// never render "Invalid Date". Falls back to the raw value, then a dash.
-function fmtLogTime(l) {
-  const raw = l.ts || l.time || l.timestamp || l.created_at || l.createdAt || l.date || l.at;
-  if (raw == null || raw === '') return '—';
-  // numeric epoch (seconds or ms)
-  let v = raw;
-  if (typeof v === 'number' || /^\d+$/.test(String(v))) {
-    let n = Number(v); if (n < 1e12) n *= 1000; // seconds → ms
-    const d = new Date(n);
-    return isNaN(d.getTime()) ? String(raw) : d.toLocaleString('en-US');
-  }
-  const d = new Date(raw);
-  return isNaN(d.getTime()) ? String(raw) : d.toLocaleString('en-US');
+// Audit timestamps arrive either as a numeric epoch (BIGINT from the DB, which
+// pg returns as a STRING → `new Date("1730…")` is Invalid Date) or as an ISO
+// string (JSON-file fallback). Normalise both before formatting.
+function fmtLogTs(raw) {
+  if (raw === undefined || raw === null || raw === '') return '—';
+  const d = /^\d+$/.test(String(raw)) ? new Date(Number(raw)) : new Date(raw);
+  return isNaN(d.getTime())
+    ? '—'
+    : d.toLocaleString('en-US', { hour12: true });
+}
+// Render "Country, City" from the geo object the server attaches (geoip-lite,
+// looked up on the server — no IP ever leaves the box). Private/local IPs → ''.
+function fmtGeo(geo) {
+  if (!geo) return '';
+  const parts = [geo.city, geo.country].filter(Boolean);
+  return parts.length ? parts.join(', ') : '';
 }
 
-// Block an IP (temporary, 15 min) via the existing DDoS endpoint. Auth + CSRF
-// are enforced server-side. Strong confirm guards against self-lockout.
-async function blockIp(ip) {
-  if (!ip) return;
-  if (!confirm('بلاک کردن این IP برای ۱۵ دقیقه؟\n\n' + ip +
-      '\n\n⚠️ مطمئن شوید این IP خودتان نیست — در غیر این صورت ممکن است دسترسی‌تان قطع شود (بلاک موقتی است و بعد از ۱۵ دقیقه یا از بخش DDoS/IP برداشته می‌شود).')) return;
-  try {
-    await af('/api/admin/ddos/block', 'POST', { ip, duration: 15 * 60 * 1000 });
-    toast('⛔ IP بلاک شد: ' + ip);
-  } catch (e) { toast('خطا در بلاک: ' + e.message, 'e'); }
+// "Today" / "Yesterday" / "Oct 27, 2026" for the day-group separators.
+function dayLabel(raw) {
+  const d = /^\d+$/.test(String(raw)) ? new Date(Number(raw)) : new Date(raw);
+  if (isNaN(d.getTime())) return 'Unknown date';
+  const t = new Date(), y = new Date(); y.setDate(t.getDate() - 1);
+  const same = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  if (same(d, t)) return 'Today';
+  if (same(d, y)) return 'Yesterday';
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+// Compact "Browser · OS" summary from a User-Agent string (full UA stays in
+// the tooltip). Falls back to a short slice when it can't be parsed.
+function parseUA(ua) {
+  if (!ua) return '';
+  const s = String(ua);
+  let br = '';
+  if (/Edg\//.test(s)) br = 'Edge';
+  else if (/OPR\/|Opera/.test(s)) br = 'Opera';
+  else if (/Firefox\//.test(s)) br = 'Firefox';
+  else if (/Chrome\//.test(s)) br = 'Chrome';
+  else if (/Safari\//.test(s)) br = 'Safari';
+  else if (/curl\//i.test(s)) br = 'curl';
+  else if (/PostmanRuntime/i.test(s)) br = 'Postman';
+  let os = '';
+  if (/Windows NT 10/.test(s)) os = 'Windows';
+  else if (/Windows/.test(s)) os = 'Windows';
+  else if (/iPhone|iPad|iOS/.test(s)) os = 'iOS';
+  else if (/Mac OS X/.test(s)) os = 'macOS';
+  else if (/Android/.test(s)) os = 'Android';
+  else if (/Linux/.test(s)) os = 'Linux';
+  const parts = [br, os].filter(Boolean);
+  return parts.length ? parts.join(' · ') : s.slice(0, 22);
 }
 
-// Top "Block IP" button: ask for an IP, validate its shape, then block it.
-// Open the styled Block-IP modal (replaces the native prompt).
-function blockIpPrompt() {
-  const el = g('blkIpInp'); if (el) el.value = '';
-  openM('mBlockIp');
-  setTimeout(() => { const i = g('blkIpInp'); if (i) i.focus(); }, 60);
-}
-// Confirm handler inside the Block-IP modal: validate shape, then block.
-async function doBlockIp() {
-  const ip = (g('blkIpInp').value || '').trim();
-  if (!ip) { toast('IP را وارد کنید', 'e'); return; }
-  if (!/^(\d{1,3}\.){3}\d{1,3}$|^[0-9a-fA-F:]+$/.test(ip)) { toast('فرمت IP نامعتبر است', 'e'); return; }
-  try {
-    await af('/api/admin/ddos/block', 'POST', { ip, duration: 15 * 60 * 1000 });
-    toast('⛔ IP بلاک شد: ' + ip);
-    closeM('mBlockIp');
-  } catch (e) { toast('خطا در بلاک: ' + e.message, 'e'); }
+// Small colored badge showing where a login/action came from (best-effort,
+// from the Referer header — see server note).
+function srcBadge(src) {
+  if (!src) return '';
+  let cls = 'src-other';
+  if (src === 'Admin Panel') cls = 'src-admin';
+  else if (src === 'Wallet' || src === 'Send') cls = 'src-wallet';
+  else if (src === 'API / Direct') cls = 'src-api';
+  return `<span class="lsrc ${cls}">${escH(src)}</span>`;
 }
 
 async function ldLogs() {
   try {
     const d = await af('/api/admin/logs?limit=60');
     const ls = d.logs || d || [];
-    g('logBox').innerHTML = ls.length
-      ? ls.map(l => {
-          const ac = l.action || '';
-          let c = 'la-def';
-          if (ac.includes('login') && !ac.includes('fail')) c = 'la-ok';
-          else if (ac.includes('fail') || ac.includes('lock'))  c = 'la-err';
-          else if (ac.includes('admin') || ac.includes('delet') || ac.includes('creat')) c = 'la-adm';
-          else if (ac.includes('totp') || ac.includes('2fa'))   c = 'la-otp';
-          const ua = l.userAgent || l.user_agent || '';
-          const section = l.path || (l.details && l.details.path) || '';
-          return `<div class="le">
-            <span class="lts">${escH(fmtLogTime(l))}</span>
-            <span class="la ${c}">${escH(ac)}</span>
-            <span style="color:var(--txt2);flex:1">${escH(l.username || l.user || '')}</span>
-            <span style="color:var(--txt3);font-size:11px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escH(ua)}">${escH(section)}</span>
-            <span class="lip" title="${escH(ua)}">${escH(l.ip || '')}</span>
-          </div>`;
-        }).join('')
-      : '<div style="padding:22px;text-align:center;color:var(--txt3)">No log entries found</div>';
+    _lastLogs = ls;
+    if (!ls.length) {
+      g('logBox').innerHTML = '<div style="padding:22px;text-align:center;color:var(--txt3)">No log entries found</div>';
+      return;
+    }
+    let html = '', lastDay = null;
+    ls.forEach(l => {
+      const rawTs = l.ts || l.timestamp || l.time || 0;
+      const day = dayLabel(rawTs);
+      if (day !== lastDay) { html += `<div class="lgrp">${escH(day)}</div>`; lastDay = day; }
+      const ac = l.action || '';
+      let c = 'la-def';
+      if (ac.includes('login') && !ac.includes('fail')) c = 'la-ok';
+      else if (ac.includes('fail') || ac.includes('lock'))  c = 'la-err';
+      else if (ac.includes('admin') || ac.includes('delet') || ac.includes('creat')) c = 'la-adm';
+      else if (ac.includes('totp') || ac.includes('2fa'))   c = 'la-otp';
+      const geoTxt  = fmtGeo(l.geo);
+      const pathTxt = l.path || '';
+      const uaTip   = l.ua ? ` title="${escH('Device: ' + l.ua)}"` : '';
+      html += `<div class="le">
+        <span class="lts">${escH(fmtLogTs(rawTs))}</span>
+        <span class="la ${c}">${escH(ac)}</span>
+        <span style="color:var(--txt2);flex:1">${escH(l.username || l.user || '')}</span>
+        ${srcBadge(l.src)}
+        ${pathTxt ? `<span class="lpath"${uaTip}>${escH(pathTxt)}</span>` : ''}
+        <span class="ldev"${uaTip}>${l.ua ? '💻 ' + escH(parseUA(l.ua)) : ''}</span>
+        <span class="llc">${geoTxt ? '🌍 ' + escH(geoTxt) : ''}</span>
+        <span class="lip"${uaTip}>${escH(l.ip || '')}</span>
+      </div>`;
+    });
+    g('logBox').innerHTML = html;
   } catch (e) { g('logBox').innerHTML = `<div style="padding:18px;color:var(--red)">${escH(e.message)}</div>`; }
 }
 
@@ -1311,11 +1352,27 @@ async function regenRecovery() {
 }
 
 /* ══ ACTIONS ══ */
+// Live "New passwords match" row for the New User modal (same style as the wallet).
+function updateNuMatch() {
+  var el = g('np_u_match'); if (!el) return;
+  var a = (g('np_u') || {}).value || '', b = (g('np_u2') || {}).value || '';
+  if (!b) { el.innerHTML = ''; return; }
+  var ok = a === b;
+  el.innerHTML = '<span style="color:' + (ok ? '#26d07c' : 'var(--txt3,#8a97b8)') + '">' +
+    (ok ? '✓' : '○') + ' New passwords match</span>';
+}
+
 async function addUser() {
-  const un = g('nu').value.trim(), pw = g('np_u').value.trim(), rl = g('nr').value;
+  const un = g('nu').value.trim(), pw = g('np_u').value.trim(), pw2 = g('np_u2').value.trim(), rl = g('nr').value;
   if (!un || !pw) return toast('Username and password are required', 'e');
-  try { await af('/api/admin/users', 'POST', { username: un, password: pw, role: rl }); toast('✅ User created'); closeM('mUser'); ldUsers(); }
-  catch (e) { toast('Error: ' + e.message, 'e'); }
+  if (pw !== pw2) return toast('Passwords do not match', 'e');
+  try {
+    await af('/api/admin/users', 'POST', { username: un, password: pw, role: rl });
+    toast('✅ User created'); closeM('mUser');
+    g('nu').value = ''; g('np_u').value = ''; g('np_u2').value = '';
+    g('np_u_hint').innerHTML = ''; g('np_u_match').innerHTML = '';
+    ldUsers();
+  } catch (e) { toast('Error: ' + e.message, 'e'); }
 }
 async function tglUser(id, ac) {
   try { await af('/api/admin/users/' + id, 'PUT', { active: ac }); toast(ac ? '✅ User enabled' : '⛔ User disabled'); ldUsers(); }
@@ -1372,6 +1429,53 @@ async function blockIP() {
   const ip = g('bipInp').value.trim(); if (!ip) return;
   try { await af('/api/admin/ddos/block', 'POST', { ip }); toast('🚫 IP blocked: ' + ip); g('bipInp').value = ''; ldDdos(); }
   catch (e) { toast('Error: ' + e.message, 'e'); }
+}
+// Last loaded audit rows, kept so the PDF export uses exactly what's on screen.
+let _lastLogs = [];
+
+// Block an IP entered in the styled modal (replaces the native prompt).
+async function doBlockIp() {
+  const ip = (g('blkIpInp').value || '').trim();
+  if (!ip) return;
+  if (!/^[0-9a-fA-F.:]{1,45}$/.test(ip)) { toast('Invalid IP address', 'e'); return; }
+  try {
+    await af('/api/admin/ddos/block', 'POST', { ip });
+    toast('🚫 IP blocked: ' + ip);
+    closeM('mBlockIp'); g('blkIpInp').value = ''; ldLogs();
+  } catch (e) { toast('Error: ' + e.message, 'e'); }
+}
+
+// Export the currently loaded audit rows as a printable page (client-side only
+// — no server endpoint, no new attack surface). The admin picks "Save as PDF".
+function exportLogsPDF() {
+  const ls = _lastLogs || [];
+  if (!ls.length) { toast('No logs to export', 'e'); return; }
+  const rows = ls.map(l => {
+    const t   = fmtLogTs(l.ts || l.timestamp || l.time || 0);
+    const geo = fmtGeo(l.geo);
+    return '<tr><td>' + escH(t) + '</td><td>' + escH(l.action || '') + '</td><td>' +
+           escH(l.username || l.user || '') + '</td><td>' + escH(l.src || '') + '</td><td>' +
+           escH(l.path || '') + '</td><td>' + escH(geo) + '</td><td>' + escH(l.ip || '') +
+           '</td><td>' + escH(l.ua || '') + '</td></tr>';
+  }).join('');
+  const when = escH(new Date().toLocaleString('en-US', { hour12: false }));
+  const html = '<!doctype html><html><head><meta charset="utf-8"><title>SPN Coin — Audit Logs</title>' +
+    '<style>body{font-family:Arial,Helvetica,sans-serif;color:#111;padding:24px}' +
+    'h1{font-size:18px;margin:0 0 4px}.meta{color:#555;font-size:12px;margin-bottom:14px}' +
+    'table{width:100%;border-collapse:collapse;font-size:11px}' +
+    'th,td{border:1px solid #ccc;padding:5px 7px;text-align:left;vertical-align:top;word-break:break-word}' +
+    'th{background:#f0f0f0}td:nth-child(8){max-width:220px;font-size:9px;color:#555}' +
+    '.b{margin-bottom:14px;padding:7px 12px;font-size:13px;cursor:pointer}' +
+    '@media print{.noprint{display:none}}</style></head><body>' +
+    '<h1>SPN Coin — Audit Logs</h1>' +
+    '<div class="meta">Exported ' + when + ' · ' + ls.length + ' entries · CONFIDENTIAL — handle securely</div>' +
+    '<button class="b noprint" onclick="window.print()">🖨️ Print / Save as PDF</button>' +
+    '<table><thead><tr><th>Time</th><th>Action</th><th>User</th><th>Source</th><th>Path</th><th>Location</th><th>IP</th><th>Device (User-Agent)</th></tr></thead><tbody>' +
+    rows + '</tbody></table></body></html>';
+  const w = window.open('', '_blank');
+  if (!w) { toast('Allow pop-ups to export', 'e'); return; }
+  w.document.write(html); w.document.close();
+  setTimeout(() => { try { w.focus(); w.print(); } catch (e) {} }, 400);
 }
 async function unbanIP(ip) {
   try { await af('/api/admin/ddos/block/' + encodeURIComponent(ip), 'DELETE'); toast('✅ IP unblocked'); ldDdos(); }
@@ -1434,40 +1538,45 @@ async function dis2FA() {
     else toast(d.error || 'Invalid code', 'e');
   } catch (e) { toast('Error: ' + e.message, 'e'); }
 }
-// Live password-requirements checklist shown as the user types.
-function showPwHint(inputId, hintId){
-  var pw=(document.getElementById(inputId)||{}).value||'';
-  var el=document.getElementById(hintId); if(!el) return;
-  if(!pw){ el.innerHTML=''; return; }
-  var low=/[a-z]/.test(pw),up=/[A-Z]/.test(pw),num=/[0-9]/.test(pw),sym=/[^a-zA-Z0-9]/.test(pw);
-  var pool=(low?26:0)+(up?26:0)+(num?10:0)+(sym?33:0)||1;
-  var bits=pw.length*Math.log2(pool);
-  if(/(.)\1\1/.test(pw)) bits-=12;
-  if(/^[0-9]+$/.test(pw)) bits-=8;
-  if(bits<0) bits=0;
-  var t = bits<28?{p:18,l:'Very weak',c:'#f2555a',g:'linear-gradient(90deg,#f2555a,#ff8a6b)'}
-        : bits<40?{p:38,l:'Weak',c:'#f59e0b',g:'linear-gradient(90deg,#f59e0b,#fbbf24)'}
-        : bits<60?{p:60,l:'Fair',c:'#f5b301',g:'linear-gradient(90deg,#f5b301,#ffd24a)'}
-        : bits<80?{p:85,l:'Strong',c:'#26d07c',g:'linear-gradient(90deg,#26d07c,#22d3ee)'}
-        :          {p:100,l:'Very strong',c:'#22d3ee',g:'linear-gradient(90deg,#26d07c,#22d3ee,#6d6bf5)'};
-  var secs=Math.pow(2,bits)/1e10;
-  var crack=(function(s){ if(s<1)return'instant';
-    var u=[['second',60],['minute',60],['hour',24],['day',365],['year',100],['century',1000]],v=s,n='second';
-    for(var i=0;i<u.length;i++){n=u[i][0]; if(v<u[i][1])break; v/=u[i][1];}
-    if(n==='century'&&v>=10)return'centuries'; v=Math.round(v); return v+' '+n+(v!==1?'s':'');})(secs);
-  function row(ok,txt){ return '<span style="color:'+(ok?'#26d07c':'var(--mut,#8a97b8)')+'">'+(ok?'\u2713':'\u25cb')+' '+txt+'</span>'; }
+// Live password-strength meter + checklist shown as the user types
+// (strength bar, estimated time to crack, and the five requirements).
+function showPwHint(inputId, hintId) {
+  var pw = (document.getElementById(inputId) || {}).value || '';
+  var el = document.getElementById(hintId);
+  if (!el) return;
+  if (!pw) { el.innerHTML = ''; return; }
+  var low = /[a-z]/.test(pw), up = /[A-Z]/.test(pw), num = /[0-9]/.test(pw), sym = /[^a-zA-Z0-9]/.test(pw);
+  var pool = (low ? 26 : 0) + (up ? 26 : 0) + (num ? 10 : 0) + (sym ? 33 : 0) || 1;
+  var bits = pw.length * Math.log2(pool);
+  if (/(.)\1\1/.test(pw)) bits -= 12;
+  if (/^[0-9]+$/.test(pw)) bits -= 8;
+  if (bits < 0) bits = 0;
+  var t = bits < 28 ? { p: 18,  l: 'Very weak',   c: '#f2555a', g: 'linear-gradient(90deg,#f2555a,#ff8a6b)' }
+        : bits < 40 ? { p: 38,  l: 'Weak',        c: '#f59e0b', g: 'linear-gradient(90deg,#f59e0b,#fbbf24)' }
+        : bits < 60 ? { p: 60,  l: 'Fair',        c: '#f5b301', g: 'linear-gradient(90deg,#f5b301,#ffd24a)' }
+        : bits < 80 ? { p: 85,  l: 'Strong',      c: '#26d07c', g: 'linear-gradient(90deg,#26d07c,#22d3ee)' }
+        :             { p: 100, l: 'Very strong', c: '#22d3ee', g: 'linear-gradient(90deg,#26d07c,#22d3ee,#6d6bf5)' };
+  var secs = Math.pow(2, bits) / 1e10;
+  var crack = (function (s) {
+    if (s < 1) return 'instant';
+    var u = [['second', 60], ['minute', 60], ['hour', 24], ['day', 365], ['year', 100], ['century', 1000]], v = s, n = 'second';
+    for (var i = 0; i < u.length; i++) { n = u[i][0]; if (v < u[i][1]) break; v /= u[i][1]; }
+    if (n === 'century' && v >= 10) return 'centuries';
+    v = Math.round(v); return v + ' ' + n + (v !== 1 ? 's' : '');
+  })(secs);
+  function row(ok, txt) { return '<span style="color:' + (ok ? '#26d07c' : 'var(--txt3,#8a97b8)') + '">' + (ok ? '✓' : '○') + ' ' + txt + '</span>'; }
   el.innerHTML =
     '<div style="display:flex;align-items:center;gap:8px;margin:2px 0 6px">'
     + '<div style="flex:1;height:7px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden">'
-    +   '<i style="display:block;height:100%;width:'+t.p+'%;border-radius:999px;background:'+t.g+';transition:width .25s"></i></div>'
-    + '<b style="font-size:11.5px;min-width:70px;text-align:right;color:'+t.c+'">'+t.l+'</b></div>'
-    + '<div style="color:var(--mut,#8a97b8);font-size:11px;margin-bottom:6px">Estimated time to crack: <b style="color:var(--txt,#eaf0fb)">'+crack+'</b></div>'
+    +   '<i style="display:block;height:100%;width:' + t.p + '%;border-radius:999px;background:' + t.g + ';transition:width .25s"></i></div>'
+    + '<b style="font-size:11.5px;min-width:70px;text-align:right;color:' + t.c + '">' + t.l + '</b></div>'
+    + '<div style="color:var(--txt3,#8a97b8);font-size:11px;margin-bottom:6px">Estimated time to crack: <b style="color:var(--txt,#eaf0fb)">' + crack + '</b></div>'
     + '<div style="display:flex;flex-wrap:wrap;gap:4px 12px">'
-    + row(pw.length>=12,'At least 12 characters')
-    + row(low,'A lowercase letter (a\u2013z)')
-    + row(up,'An uppercase letter (A\u2013Z)')
-    + row(num,'A number (0\u20139)')
-    + row(sym,'A symbol (@ # ! $ \u2026)')
+    + row(pw.length >= 12, 'At least 12 characters')
+    + row(low, 'A lowercase letter (a–z)')
+    + row(up,  'An uppercase letter (A–Z)')
+    + row(num, 'A number (0–9)')
+    + row(sym, 'A symbol (@ # ! $ …)')
     + '</div>';
 }
 
@@ -1820,7 +1929,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') document.que
     </div>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="ai-status">Online</div>
-      <button class="ai-close" onclick="aiToggle()" aria-label="Close">✕</button>
+      <button class="ai-close" onclick="aiToggle()">✕</button>
     </div>
   </div>
 
@@ -1850,7 +1959,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') document.que
     <textarea class="ai-input" id="aiInput" placeholder="Ask anything about SPN Coin..."
       rows="1" maxlength="2000"
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend()}"
-      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'" aria-label="Ask anything about SPN Coin..."></textarea>
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
     <button class="ai-send" id="aiSendBtn" onclick="aiSend()" title="Send">
       <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
         <path d="M2 8l12-6-6 12V9L2 8z" fill="white"/>

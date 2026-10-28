@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Network Status — SPN Coin</title>
+<meta name="description" content="Live status of the SPN Coin network and services: node, sync, P2P, explorer, API, mining pool and database." />
+<link rel="icon" href="/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+  :root{--bg:#080b13;--ink:#0f1626;--ink2:#141d31;--line:rgba(255,255,255,.08);--gold:#f5b301;--grn:#26d07c;--txt:#eaf0fb;--mut:#8a97b8;--red:#f2555a;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:"Sora",system-ui,sans-serif;line-height:1.6}
+  .wrap{max-width:1000px;margin:0 auto;padding:28px 16px 60px}
+  .mono{font-family:"JetBrains Mono",monospace}
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+  .ttl b{font-size:20px;font-weight:900}
+  .ttl span{display:block;font-size:12.5px;color:var(--mut)}
+  .upd{font-size:12px;color:var(--mut);display:flex;align-items:center;gap:7px}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--grn);box-shadow:0 0 0 4px rgba(38,208,124,.18);flex:none}
+  .dot.r{background:var(--red);box-shadow:0 0 0 4px rgba(242,85,90,.18)}
+  .dot.y{background:var(--gold);box-shadow:0 0 0 4px rgba(245,179,1,.18)}
+  .hero{border-radius:16px;padding:20px 22px;display:flex;align-items:center;gap:15px;margin-bottom:24px;border:1px solid var(--line);background:var(--ink)}
+  .hero.ok{background:linear-gradient(135deg,rgba(38,208,124,.12),rgba(38,208,124,.03));border-color:rgba(38,208,124,.3)}
+  .hero.warn{background:linear-gradient(135deg,rgba(245,179,1,.12),rgba(245,179,1,.03));border-color:rgba(245,179,1,.3)}
+  .hero.down{background:linear-gradient(135deg,rgba(242,85,90,.12),rgba(242,85,90,.03));border-color:rgba(242,85,90,.3)}
+  .hero .big{font-size:28px;flex:none}
+  .hero h2{margin:0;font-size:18px;font-weight:800}
+  .hero.ok h2{color:var(--grn)} .hero.warn h2{color:var(--gold)} .hero.down h2{color:var(--red)}
+  .hero p{margin:3px 0 0;font-size:13px;color:var(--mut)}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-bottom:26px}
+  @media(min-width:720px){.stats{grid-template-columns:repeat(6,1fr)}}
+  .stat{background:var(--ink);border:1px solid var(--line);border-radius:13px;padding:14px 15px}
+  .stat .k{font-size:11.5px;color:var(--mut);margin-bottom:5px}
+  .stat .v{font-size:21px;font-weight:800;font-family:"JetBrains Mono",monospace;line-height:1.1}
+  .stat .v small{font-size:12px;color:var(--mut);font-weight:500}
+  h3{font-size:13px;font-weight:800;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;margin:0 0 13px}
+  .svc{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--ink);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+  .svc .l{display:flex;align-items:center;gap:12px;min-width:0}
+  .svc .ico{width:36px;height:36px;border-radius:10px;background:var(--ink2);display:flex;align-items:center;justify-content:center;font-size:17px;flex:none}
+  .svc .nm{font-weight:700;font-size:14px}
+  .svc .ds{font-size:11.5px;color:var(--mut)}
+  .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:6px 12px;border-radius:100px;white-space:nowrap;flex:none}
+  .ok{background:rgba(38,208,124,.14);color:var(--grn);border:1px solid rgba(38,208,124,.3)}
+  .warn{background:rgba(245,179,1,.14);color:var(--gold);border:1px solid rgba(245,179,1,.3)}
+  .down{background:rgba(242,85,90,.14);color:var(--red);border:1px solid rgba(242,85,90,.3)}
+  .note{text-align:center;color:var(--mut);font-size:12px;margin-top:26px;line-height:1.9}
+  .note a{color:var(--gold);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar">
+    <div class="ttl"><b>SPN Network Status</b><span>SPN Coin — Network &amp; Service Status</span></div>
+    <div class="upd"><span class="dot" id="liveDot"></span><span id="updTxt">Loading…</span></div>
+  </div>
+
+  <div class="hero ok" id="hero">
+    <div class="big" id="heroIcon">⏳</div>
+    <div><h2 id="heroTitle">Checking status…</h2><p id="heroSub">Reading live network status…</p></div>
+  </div>
+
+  <div class="stats" id="stats">
+    <div class="stat"><div class="k">Height</div><div class="v" id="sHeight">—</div></div>
+    <div class="stat"><div class="k">Peers</div><div class="v" id="sPeers">—</div></div>
+    <div class="stat"><div class="k">Mempool</div><div class="v" id="sMempool">—</div></div>
+    <div class="stat"><div class="k">Last block</div><div class="v" id="sLast" style="font-size:15px">—</div></div>
+    <div class="stat"><div class="k">Difficulty</div><div class="v" id="sDiff" style="font-size:17px">—</div></div>
+    <div class="stat"><div class="k">Version</div><div class="v" id="sVer" style="font-size:17px">—</div></div>
+  </div>
+
+  <h3>Services</h3>
+  <div id="svcList"></div>
+
+  <div class="note">
+    This page reads the live status of the SPN network directly from the node · auto-refresh every 15s<br>
+    <a href="/explorer">Explorer</a> · <a href="/">Home</a>
+  </div>
+</div>
+
+<!-- site chrome (nav + footer + helpers), same as other pages -->
+<script src="/csrf-fetch.js?v=25"></script>
+<script src="/i18n.js?v=34" defer></script>
+<script src="/nav.js?v=40" defer></script>
+<script src="/ai-bubble.js?v=5" defer></script>
+<script src="/anti-phishing.js?v=1" defer></script>
+<script src="/footer.js?v=35" defer></script>
+<script>
+const API = window.SPN_COIN_API || (location.hostname==='localhost'||location.hostname==='127.0.0.1' ? 'http://localhost:3000' : location.origin);
+const $ = id => document.getElementById(id);
+
+const SERVICES = [
+  { id:'node',    ico:'🟢', nm:'Core Node',    ds:'Block production & validation' },
+  { id:'sync',    ico:'🔄', nm:'Sync',         ds:'Chain up-to-date status' },
+  { id:'p2p',     ico:'🌐', nm:'P2P Network',  ds:'Connectivity with other nodes' },
+  { id:'explorer',ico:'🔍', nm:'Explorer',     ds:'Browse blocks & transactions' },
+  { id:'api',     ico:'⚙️', nm:'Public API',   ds:'Programmatic access' },
+  { id:'pool',    ico:'⛏️', nm:'Mining Pool',  ds:'Stratum (optional)' },
+  { id:'db',      ico:'🗄️', nm:'Database',     ds:'Persistent storage' },
+];
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function pill(kind, txt){ return '<span class="pill '+kind+'">'+txt+'</span>'; }
+
+function renderServices(map){
+  $('svcList').innerHTML = SERVICES.map(s=>{
+    const st = map[s.id] || { kind:'warn', txt:'Unknown' };
+    return '<div class="svc"><div class="l"><div class="ico">'+s.ico+'</div>'
+      + '<div><div class="nm">'+esc(s.nm)+'</div><div class="ds">'+esc(s.ds)+'</div></div></div>'
+      + pill(st.kind, st.txt) + '</div>';
+  }).join('');
+}
+
+function fmtAge(ms){
+  if(ms==null || !isFinite(ms) || ms<0) return '—';
+  const s = Math.floor(ms/1000);
+  if(s<60)   return 'just now';
+  const m = Math.floor(s/60);
+  if(m<60)   return m+(m===1?' minute ago':' minutes ago');
+  const h = Math.floor(m/60);
+  if(h<24)   return h+(h===1?' hour ago':' hours ago');
+  const dd = Math.floor(h/24);
+  return dd+(dd===1?' day ago':' days ago');
+}
+function twoDigit(n){ return (n<10?'0':'')+n; }
+
+async function getJSON(url, ms){
+  const ctrl = new AbortController();
+  const t = setTimeout(()=>ctrl.abort(), ms||8000);
+  try{ const r = await fetch(API+url, { signal: ctrl.signal, cache:'no-store' }); clearTimeout(t); if(!r.ok) throw 0; return await r.json(); }
+  catch(e){ clearTimeout(t); return null; }
+}
+
+function setHero(kind, icon, title, sub){
+  const h=$('hero'); h.className='hero '+kind;
+  $('heroIcon').textContent=icon; $('heroTitle').textContent=title; $('heroSub').textContent=sub;
+}
+function setLiveDot(kind){ $('liveDot').className='dot'+(kind==='down'?' r':kind==='warn'?' y':''); }
+
+async function refresh(){
+  const health = await getJSON('/api/health');
+  const latest = await getJSON('/api/blocks?limit=1');
+  const now = Date.now();
+  const d = new Date();
+  $('updTxt').textContent = 'Last check: '+twoDigit(d.getHours())+':'+twoDigit(d.getMinutes())+':'+twoDigit(d.getSeconds());
+
+  const map = {};
+
+  if(!health){
+    setHero('down','⛔','Network disruption','Node unreachable');
+    setLiveDot('down');
+    ['node','sync','p2p','explorer','api','pool','db'].forEach(id=> map[id] = { kind:'down', txt:'Offline' });
+    $('sHeight').textContent='—'; $('sPeers').textContent='—'; $('sMempool').textContent='—';
+    $('sLast').textContent='—'; $('sDiff').textContent='—'; $('sVer').textContent='—';
+    renderServices(map);
+    return;
+  }
+
+  const height  = Number(health.height||0);
+  const peers   = Number(health.peers||0);
+  const mempool = Number(health.mempool||0);
+  const miners  = Number(health.miners||0);
+  const db      = String(health.db||'off');
+
+  let lastTs=null, diff=null;
+  if(latest && latest.blocks && latest.blocks[0]){
+    lastTs = Number(latest.blocks[0].timestamp)||null;
+    diff   = latest.blocks[0].difficulty;
+  }
+  const lastAge = (lastTs && lastTs>1e12) ? (now - lastTs) : null;
+
+  $('sHeight').textContent  = '#'+height;
+  $('sPeers').textContent   = String(peers);
+  $('sMempool').innerHTML   = String(mempool)+' <small>tx</small>';
+  $('sLast').textContent    = fmtAge(lastAge);
+  $('sDiff').textContent    = (diff!=null? diff : '—');
+  $('sVer').textContent     = esc(health.version||'—');
+
+  map.node = { kind:'ok', txt:'✔ Active' };
+  map.sync = { kind:'ok', txt:'✔ Synced' };
+  map.p2p  = peers>=1 ? { kind:'ok', txt:'✔ Connected ('+peers+' peers)' } : { kind:'warn', txt:'Alone (0 peers)' };
+  map.explorer = latest ? { kind:'ok', txt:'✔ Active' } : { kind:'warn', txt:'No response' };
+  map.api  = { kind:'ok', txt:'✔ Active' };
+  map.pool = miners>0 ? { kind:'ok', txt:'✔ Active ('+miners+')' } : { kind:'warn', txt:'Inactive' };
+  map.db   = db==='up' ? { kind:'ok', txt:'✔ Active' }
+           : db==='down' ? { kind:'down', txt:'Down' }
+           : db==='off' ? { kind:'warn', txt:'In-memory' }
+           : { kind:'warn', txt:'Checking…' };
+  renderServices(map);
+
+  const anyDown = Object.values(map).some(s=>s.kind==='down');
+  if(anyDown){ setHero('warn','⚠️','Partial outage','Some services are experiencing issues'); setLiveDot('warn'); }
+  else { setHero('ok','✅','All systems operational','The network is healthy'); setLiveDot('ok'); }
+}
+
+refresh();
+setInterval(refresh, 15000);
+</script>
+</body>
+</html>

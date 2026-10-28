@@ -1,6 +1,6 @@
 {
   "name": "spncoin-node",
-  "version": "6.4.4",
+  "version": "6.6.1",
   "description": "SPN Coin Full Node — Proprietary blockchain software. All rights reserved.",
   "main": "server.js",
   "scripts": {
@@ -27,6 +27,7 @@
     "dotenv": "^17.4.2",
     "elliptic": "^6.6.1",
     "express": "^5.2.1",
+    "geoip-lite": "^1.4.10",
     "js-sha3": "^0.13.0",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.23.0",

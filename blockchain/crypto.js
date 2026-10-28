@@ -231,25 +231,31 @@ function derivePublicKey(privateKeyHex) {
  */
 function getRawPublicKey(spkiHex) {
     const der = Buffer.isBuffer(spkiHex) ? spkiHex : Buffer.from(spkiHex, "hex");
-    // Find compressed point marker (0x02 or 0x03) followed by 32 bytes
-    for (let i = 0; i <= der.length - 33; i++) {
-        if ((der[i] === 0x02 || der[i] === 0x03) && i > 0) {
-            // Make sure what precedes looks like DER structure (not a random 0x02)
-            // The byte before a raw public key in SPKI is typically 0x00 or an OID
-            return der.slice(i, i + 33);
-        }
+    // Compress an uncompressed point (0x04 || X(32) || Y(32)) to 0x02/0x03 || X.
+    const compress = (buf, off) => {
+        const x = buf.slice(off + 1, off + 33);
+        const y = buf.slice(off + 33, off + 65);
+        const prefix = (y[y.length - 1] & 1) ? 0x03 : 0x02;
+        return Buffer.concat([Buffer.from([prefix]), x]);
+    };
+    // A secp256k1 SPKI always ENDS with the public point: 0x04 || X || Y (65 bytes).
+    // Reading it from the tail is a precise parse (the point is the last element of
+    // the DER structure), unlike scanning for a 0x02/0x03 byte which lands inside the
+    // fixed OID bytes and yields a NON-standard hash. This makes HASH160(pubkey) —
+    // and therefore the address — match the Bitcoin standard while keeping the SPN
+    // brand prefix (added separately in publicKeyToAddress).
+    if (der.length >= 65 && der[der.length - 65] === 0x04) {
+        return compress(der, der.length - 65);
     }
-    // Fallback: uncompressed point (0x04 + 64 bytes) -> compress it
-    for (let i = 0; i <= der.length - 65; i++) {
-        if (der[i] === 0x04) {
-            const x      = der.slice(i + 1, i + 33);
-            const yLast  = der[i + 64];
-            const prefix = (yLast & 1) ? 0x03 : 0x02;
-            return Buffer.concat([Buffer.from([prefix]), x]);
-        }
+    // Already a 33-byte compressed key.
+    if (der.length === 33 && (der[0] === 0x02 || der[0] === 0x03)) return der;
+    // Bare 65-byte uncompressed point (no SPKI wrapper).
+    if (der.length === 65 && der[0] === 0x04) return compress(der, 0);
+    // Fallback: scan for an uncompressed point marker anywhere.
+    for (let i = 0; i + 65 <= der.length; i++) {
+        if (der[i] === 0x04) return compress(der, i);
     }
-    // Last fallback: hash the full DER (deterministic, won't validate but won't crash)
-    return Buffer.from(sha256(der), "hex").slice(0, 33);
+    throw new Error("Cannot extract public key from SPKI/DER");
 }
 
 /** Sign dataHash (hex string) with privateKeyHex (DER-PKCS8). Returns hex DER signature. */

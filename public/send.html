@@ -550,6 +550,7 @@ body::before {
   <script src="footer.js?v=35" defer></script>
   <script src="ui-prefs.js?v=25" defer></script>
   <script src="ui-utils.js?v=25"></script>
+<style>/* Round password mask dots */ input[type=password]{-webkit-text-security:disc;font-family:'Segoe UI',Tahoma,Geneva,Verdana,system-ui,sans-serif;letter-spacing:3px}</style>
 </head>
 <body>
 <div class="page">
@@ -575,7 +576,7 @@ body::before {
         <div class="al-frow">
           <label class="al-lbl">USERNAME</label>
           <input class="al-inp" id="lUser" type="text" placeholder="username" autocomplete="username"
-                 onkeydown="if(event.key==='Enter')doLogin()" aria-label="username">
+                 onkeydown="if(event.key==='Enter')doLogin()">
         </div>
         <div class="al-frow">
           <label class="al-lbl">PASSWORD</label>
@@ -583,7 +584,7 @@ body::before {
             <input class="al-inp" id="lPass" type="password" placeholder="••••••••" autocomplete="current-password"
                    style="padding-right:42px" onkeydown="if(event.key==='Enter')doLogin()">
             <button type="button" class="al-eye"
-                    onclick="var i=this.previousElementSibling;i.type=i.type==='password'?'text':'password'" aria-label="Show or hide password">👁</button>
+                    onclick="var i=this.previousElementSibling;i.type=i.type==='password'?'text':'password'">👁</button>
           </div>
         </div>
         </div>
@@ -592,12 +593,12 @@ body::before {
           <div style="text-align:center;font-size:15px;font-weight:800;margin-bottom:4px">Two-Factor Authentication</div>
           <label class="al-lbl" style="text-align:center;display:block;margin-bottom:8px">کد ۶ رقمی Authenticator را وارد کنید</label>
           <div class="otp-row" id="l2faRow" data-target="l2fa" data-onfull="doLogin">
-            <input class="oi" maxlength="1" data-i="0" inputmode="numeric" autocomplete="one-time-code" oninput="otpSync(this)" onkeydown="otpKey(event,this)" aria-label="Verification code, digit 1 of 6">
-            <input class="oi" maxlength="1" data-i="1" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)" aria-label="Verification code, digit 2 of 6">
-            <input class="oi" maxlength="1" data-i="2" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)" aria-label="Verification code, digit 3 of 6">
-            <input class="oi" maxlength="1" data-i="3" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)" aria-label="Verification code, digit 4 of 6">
-            <input class="oi" maxlength="1" data-i="4" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)" aria-label="Verification code, digit 5 of 6">
-            <input class="oi" maxlength="1" data-i="5" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)" aria-label="Verification code, digit 6 of 6">
+            <input class="oi" maxlength="1" data-i="0" inputmode="numeric" autocomplete="one-time-code" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+            <input class="oi" maxlength="1" data-i="1" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+            <input class="oi" maxlength="1" data-i="2" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+            <input class="oi" maxlength="1" data-i="3" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+            <input class="oi" maxlength="1" data-i="4" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+            <input class="oi" maxlength="1" data-i="5" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
           </div>
           <input type="hidden" id="l2fa">
           <div style="text-align:center;margin-top:10px"><a href="#" onclick="back2fa();return false" style="color:var(--gold,#f5b301);font-size:12px;text-decoration:none">← Back to login</a></div>
@@ -651,7 +652,7 @@ body::before {
               <span class="hint">Wallet Address گیرنده</span>
             </div>
             <div class="inp-wrap" style="display:flex;gap:8px;align-items:stretch">
-              <input class="inp" id="fTo" type="text" placeholder="SPN1abc..." oninput="onToInput()" autocomplete="off" style="flex:1" aria-label="SPN1abc...">
+              <input class="inp" id="fTo" type="text" placeholder="SPN1abc..." oninput="onToInput()" autocomplete="off" style="flex:1">
               <button type="button" id="scanBtn" onclick="openQrScan()" title="اسکن QR / Scan QR" style="flex:none;background:var(--gold,#f5b301);border:none;border-radius:10px;padding:0 14px;color:#000;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center" aria-label="Scan QR code">▦</button>
             </div>
             <div class="ferr" id="toErr">⚠ آدرس وارد شده معتبر نیست</div>
@@ -664,7 +665,7 @@ body::before {
               <span class="hint" id="maxHint">Balance: — SPN</span>
             </div>
             <div class="inp-wrap">
-              <input class="inp inp-padl" id="fAmt" type="number" min="0" step="any" placeholder="0.00000000" oninput="onAmtInput()" aria-label="0.00000000">
+              <input class="inp inp-padl" id="fAmt" type="number" min="0" step="any" placeholder="0.00000000" oninput="onAmtInput()">
               <span class="inp-sym"><span class="sym-tag">SPN</span></span>
               <button class="max-btn" onclick="doMax()">MAX</button>
             </div>
@@ -704,7 +705,7 @@ body::before {
               <span class="hint">امضا در مرورگر انجام می‌شود؛ کلید هیچ‌جا ارسال نمی‌شود</span>
             </div>
             <div class="inp-wrap">
-              <input class="inp" id="fPriv" type="password" placeholder="کلید خصوصی کیف‌پول شما" autocomplete="off" oninput="onAmtInput()" style="direction:ltr" aria-label="کلید خصوصی کیف‌پول شما">
+              <input class="inp" id="fPriv" type="password" placeholder="کلید خصوصی کیف‌پول شما" autocomplete="off" oninput="onAmtInput()" style="direction:ltr">
             </div>
             <div class="ferr" id="privErr">⚠ کلید خصوصی نامعتبر است</div>
           </div>
@@ -1069,18 +1070,11 @@ function openQrScan() {
   });
 }
 
-async function onToInput() {
+function onToInput() {
   const v   = document.getElementById('fTo').value.trim();
   const inp = document.getElementById('fTo');
   const err = document.getElementById('toErr');
-  const fmtOk = (v.startsWith('SPN1') || v.startsWith('SPNt')) ? v.length >= 30 && /^SPN[1t][A-Za-z0-9]{25,50}$/.test(v) : (v.length >= 20 && /^[A-Za-z0-9]+$/.test(v));
-  let ok = fmtOk;
-  if (fmtOk && (v.startsWith('SPN1') || v.startsWith('SPNt'))) {
-    ok = await validateSpnAddress(v);
-    if (document.getElementById('fTo').value.trim() !== v) return;
-    err.textContent = ok ? '⚠ آدرس وارد شده معتبر نیست'
-                         : '⚠ checksum آدرس اشتباه است — احتمالاً یک حرف را اشتباه تایپ کرده‌اید';
-  }
+  const ok  = (v.startsWith('SPN1') || v.startsWith('SPNt')) ? v.length >= 30 && /^SPN[1t][A-Za-z0-9]{25,50}$/.test(v) : (v.length >= 20 && /^[A-Za-z0-9]+$/.test(v));
   inp.classList.toggle('err', v.length > 0 && !ok);
   inp.classList.toggle('ok',  ok);
   err.classList.toggle('show', v.length > 0 && !ok);
@@ -1157,40 +1151,12 @@ function estimateFeeSat(nIn, nOut) {
   return Math.max(1000, bytes * 10);
 }
 
-async function validateSpnAddress(addr) {
-  try {
-    addr = String(addr || '').trim();
-    const m = /^SPN([1t])([A-Za-z0-9]+)$/.exec(addr);
-    if (!m) return false;
-    const b58 = m[2];
-    const ALPH = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
-    let n = 0n;
-    for (const ch of b58) { const i = ALPH.indexOf(ch); if (i < 0) return false; n = n * 58n + BigInt(i); }
-    let hex = n.toString(16); if (hex.length % 2) hex = '0' + hex;
-    const bytes = hex === '0' ? [] : (hex.match(/.{2}/g) || []).map(h => parseInt(h, 16));
-    let zeros = 0; for (const c of b58) { if (c === '1') zeros++; else break; }
-    const full = new Uint8Array(zeros + bytes.length);
-    full.set(bytes, zeros);
-    if (full.length < 5) return false;
-    const payload  = full.slice(0, -4);
-    const checksum = full.slice(-4);
-    const h1 = new Uint8Array(await crypto.subtle.digest('SHA-256', payload));
-    const h2 = new Uint8Array(await crypto.subtle.digest('SHA-256', h1));
-    for (let i = 0; i < 4; i++) if (h2[i] !== checksum[i]) return false;
-    return true;
-  } catch (e) { return false; }
-}
-
 async function doSend() {
   const to   = document.getElementById('fTo').value.trim();
   const amt  = parseFloat(document.getElementById('fAmt').value);
   const priv = (document.getElementById('fPriv').value || '').trim();
 
   if (!/^SPN[t1][A-Za-z0-9]{25,50}$/.test(to)) { alert('آدرس مقصد نامعتبر است'); return; }
-  if (!(await validateSpnAddress(to))) {
-    alert('آدرس مقصد نامعتبر است (checksum اشتباه). لطفاً آدرس گیرنده را دوباره بررسی کنید — ارسال به آدرس غلط قابل بازگشت نیست.');
-    return;
-  }
   if (!(amt > 0)) { alert('مقدار نامعتبر است'); return; }
   if (!priv) { alert('کلید خصوصی را وارد کنید'); return; }
   if (!window.SPNSign || !window.SPNSign.buildSignedTx) { alert('کتابخانه امضا لود نشده — صفحه را رفرش کنید (Ctrl+Shift+R)'); return; }
@@ -1677,7 +1643,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="ai-status">Online</div>
-      <button class="ai-close" onclick="aiToggle()" aria-label="Close">✕</button>
+      <button class="ai-close" onclick="aiToggle()">✕</button>
     </div>
   </div>
 
@@ -1707,7 +1673,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <textarea class="ai-input" id="aiInput" placeholder="Ask anything about SPN Coin..."
       rows="1" maxlength="2000"
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend()}"
-      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'" aria-label="Ask anything about SPN Coin..."></textarea>
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
     <button class="ai-send" id="aiSendBtn" onclick="aiSend()" title="Send">
       <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
         <path d="M2 8l12-6-6 12V9L2 8z" fill="white"/>

@@ -297,15 +297,8 @@ class Transaction {
         const now        = Date.now();
         const MAX_FUTURE = 7_200_000;           // 2 hours
         const MAX_AGE    = 86_400_000 * 30;     // 30 days
-        // MEMPOOL-admission policy only — NOT consensus. A historical block's
-        // transactions are legitimately older than MAX_AGE, so applying this during
-        // chain re-validation would wrongly reject aged blocks (node fails to reload
-        // its own chain ~30 days after launch). Consensus timestamp rules live at the
-        // block level (future-time + median-time-past). Gate behind options.mempool.
-        if (options.mempool) {
-            if (this.timestamp > now + MAX_FUTURE)  errors.push('Transaction timestamp too far in the future');
-            if (this.timestamp < now - MAX_AGE)      errors.push('Transaction timestamp too old');
-        }
+        if (this.timestamp > now + MAX_FUTURE)  errors.push('Transaction timestamp too far in the future');
+        if (this.timestamp < now - MAX_AGE)      errors.push('Transaction timestamp too old');
 
         if (!this.inputs?.length)  errors.push('Transaction has no inputs');
         if (!this.outputs?.length) errors.push('Transaction has no outputs');
@@ -359,20 +352,13 @@ class Transaction {
             // Additive: only runs when the spent output carries a locking `script`.
             if (Array.isArray(utxo.script) && utxo.script.length) {
                 const sigHash = sigMessage(this.id, inp);
-                // SECURITY: timelock context MUST come from real chain state, never
-                // from spender-controlled fields. Using this.locktime (CLTV) or
-                // inp.sequence (CSV) would let a spender set them arbitrarily and
-                // bypass the lock. CLTV compares against the actual block height the
-                // tx is being confirmed at; CSV against the real age of the output
-                // (confirmations = currentHeight - the height the UTXO was created).
-                const utxoHeight = (utxo.blockHeight != null) ? utxo.blockHeight
-                                 : (utxo.height != null ? utxo.height : null);
                 const res = script.evaluate(inp.scriptSig || [], utxo.script, {
                     sigHash,
-                    lockContext: Number(blockHeight) || 0,
-                    sequenceContext: (utxoHeight != null && blockHeight != null)
-                        ? Math.max(0, Number(blockHeight) - Number(utxoHeight))
-                        : 0,
+                    lockContext: this.locktime || blockHeight || 0,
+                    // Relative timelock (CSV): how much newer the spending input is
+                    // than the output it spends (confirmations / age).
+                    sequenceContext: Number(inp.sequence ?? 0) ||
+                        (blockHeight && utxo.height != null ? blockHeight - utxo.height : 0),
                 });
                 if (!res.ok) errors.push(`Script failed for input ${key}: ${res.error}`);
             }

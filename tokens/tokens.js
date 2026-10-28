@@ -20,9 +20,30 @@ const crypto = require("crypto");
 const { sha256, sign, verify, publicKeyToAddress } = require("../blockchain/crypto");
 const { CHAIN_ID, TOKEN } = require("../config");
 
-// Deterministic body serialization (fixed key order) for signing/verifying.
+// Anti-spam: the most token ops a single carrier tx may apply. Bounds in-memory
+// ledger growth so one transaction can't create thousands of tokens (unbounded
+// Map growth / OOM), even when issuance is free (no treasury configured). A tx is
+// already capped at MAX_TX_SIZE (100 KB), so 50 ops is far above any legitimate use.
+const MAX_TOKEN_OPS_PER_TX = Number(process.env.MAX_TOKEN_OPS_PER_TX) || 50;
+
+// Deterministic body serialization for signing/verifying. Recursively sorts keys
+// at EVERY depth so nested objects (e.g. an issue op's `meta`) are canonicalized
+// and therefore COVERED by the op signature. MUST match public/token-sign.js and
+// tokens/token-extensions.js canon(). The old version passed a top-level key array
+// to JSON.stringify, which silently dropped nested keys — leaving `meta` unsigned
+// (and, since the browser signer already sorts deeply, making any meta-bearing
+// issue op fail verification here due to the hash mismatch).
+function _sortDeep(v) {
+    if (Array.isArray(v)) return v.map(_sortDeep);
+    if (v && typeof v === "object") {
+        const out = {};
+        for (const k of Object.keys(v).sort()) out[k] = _sortDeep(v[k]);
+        return out;
+    }
+    return v;
+}
 function canon(body) {
-    return JSON.stringify(body, Object.keys(body).sort());
+    return JSON.stringify(_sortDeep(body));
 }
 function opHash(op) {
     const { sig, ...body } = op;   // eslint-disable-line no-unused-vars
@@ -272,19 +293,39 @@ class TokenLayer {
     applyTx(tx) {
         const ops = tx && tx.data && Array.isArray(tx.data.tokenOps) ? tx.data.tokenOps : [];
         if (!ops.length) return [];
+        // Anti-spam cap. Reject ALL ops in an over-stuffed tx (deterministic across
+        // nodes, so token state stays consistent network-wide).
+        if (ops.length > MAX_TOKEN_OPS_PER_TX) {
+            return ops.map(() => ({ ok: false, error: `too many token ops in one tx (max ${MAX_TOKEN_OPS_PER_TX})` }));
+        }
         // How much this tx pays to the treasury and to the burn address
         // (together they fund the issuance fee).
-        let feePaidToTreasury = 0n;
-        let feePaidToBurn     = 0n;
+        let availTreasury = 0n;
+        let availBurn     = 0n;
         for (const o of (tx.outputs || [])) {
             try {
-                if (this.treasury && o.address === this.treasury) feePaidToTreasury += BigInt(o.amount);
-                if (this.burnAddress && o.address === this.burnAddress) feePaidToBurn += BigInt(o.amount);
+                if (this.treasury && o.address === this.treasury) availTreasury += BigInt(o.amount);
+                if (this.burnAddress && o.address === this.burnAddress) availBurn += BigInt(o.amount);
             } catch { /* ignore */ }
         }
         const results = [];
         const txid = tx.id || tx.hash || null;
-        for (const op of ops) results.push(this.applyOp(op, { feePaidToTreasury, feePaidToBurn, txid }));
+        for (const op of ops) {
+            // Each op sees only the fee budget STILL available in this tx. A paid
+            // issue consumes its required fee below, so multiple issue ops in one
+            // transaction can no longer share a single fee payment ("pay once,
+            // mint many").
+            const res = this.applyOp(op, { feePaidToTreasury: availTreasury, feePaidToBurn: availBurn, txid });
+            if (res && res.ok && op && op.type === "issue" && this.treasury) {
+                const requiredFee = (op.kind === "coin") ? this.coinFee : this.issuanceFee;
+                if (requiredFee > 0n) {
+                    const { burn, treasury } = this.feeSplit(requiredFee);
+                    availTreasury = availTreasury > treasury ? availTreasury - treasury : 0n;
+                    availBurn     = availBurn     > burn     ? availBurn - burn         : 0n;
+                }
+            }
+            results.push(res);
+        }
         return results;
     }
     applyBlock(block) {

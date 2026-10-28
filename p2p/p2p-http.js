@@ -216,7 +216,9 @@ class P2PHttpServer extends EventEmitter {
             res.json({
                 nodeId:    this._nodeId,
                 height:    this.blockchain.height,
-                peers:     this.getPeers(),
+                // Do NOT expose peer URLs publicly (network-topology leak). Sync only
+                // needs our height; the full list stays on the admin-gated /peers route.
+                peerCount: this.peers.size,
                 chainId:   require("../config").CHAIN_ID,
             });
         });

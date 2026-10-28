@@ -8,7 +8,7 @@ We still take security seriously and welcome responsible disclosure.
 Please report security issues privately, **not** as public GitHub issues:
 
 - Open a private advisory: `Security → Advisories → New draft advisory`
-- Or email: Info@sepantatoken.com
+- Or email: security@spncoin.example
 
 Include: a description, steps to reproduce, affected version/commit, and
 impact. We aim to acknowledge reports within **72 hours**.

@@ -11,7 +11,7 @@
   <meta name="description" content="Claim airdropped SPN Coin to your wallet.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sepanta (SPN) — Claim Airdrop</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/elliptic.min.js"></script>
 <script src="/token-sign.js?v=99"></script>
 <script src="csrf-fetch.js?v=25"></script>
   <script src="i18n.js?v=34" defer></script>
@@ -51,6 +51,7 @@ button.secondary:hover{background:rgba(0,204,255,.08)}
 .eligible .amt{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--grn)}
 .step{color:var(--txt3);font-size:11px;font-family:'JetBrains Mono',monospace;margin-bottom:4px}
 </style>
+<style>/* Round password mask dots */ input[type=password]{-webkit-text-security:disc;font-family:'Segoe UI',Tahoma,Geneva,Verdana,system-ui,sans-serif;letter-spacing:3px}</style>
 </head>
 <body>
 <div class="wrap">
@@ -60,9 +61,9 @@ button.secondary:hover{background:rgba(0,204,255,.08)}
   <div class="card">
     <div class="step">STEP 1 — check eligibility</div>
     <label for="airdropId">Airdrop ID</label>
-    <input id="airdropId" placeholder="the airdrop you want to claim from" / aria-label="the airdrop you want to claim from">
+    <input id="airdropId" placeholder="the airdrop you want to claim from" />
     <label for="address">Your address</label>
-    <input id="address" placeholder="SPN… address" / aria-label="SPN… address">
+    <input id="address" placeholder="SPN… address" />
     <button class="secondary" id="check">Check eligibility</button>
 
     <div class="eligible" id="eligible">
@@ -77,7 +78,7 @@ button.secondary:hover{background:rgba(0,204,255,.08)}
   <div class="card" id="claimCard" style="display:none">
     <div class="step">STEP 2 — claim</div>
     <label for="pk">Your private key <span style="text-transform:none">(64-hex, signs locally)</span></label>
-    <input id="pk" type="password" placeholder="private key hex" autocomplete="off" / aria-label="private key hex">
+    <input id="pk" type="password" placeholder="private key hex" autocomplete="off" />
     <div class="warn">🔒 The key is used only in your browser to sign the claim. It is never sent to the server.</div>
     <button id="claim">Sign &amp; claim</button>
     <div class="result" id="claimResult"></div>

@@ -27,7 +27,13 @@ function buildTemplate(blockchain, mempool) {
     const tip        = blockchain.tip;
     const height     = blockchain.height + 1;
     const difficulty = blockchain.getNextDifficulty ? blockchain.getNextDifficulty() : tip.difficulty;
-    const bits       = (typeof blockchain.getNextTarget === 'function') ? targetToBits(blockchain.getNextTarget()) : Block.diffToBits(difficulty);
+    // Use the SAME canonical target->bits encoder the solo miner and the consensus
+    // difficulty check use (targetToBits), so a stratum-built block's bits match
+    // expectedTargetAt exactly. diffToBits (via float difficulty) can round to a
+    // slightly different compact value and be rejected by the consensus check.
+    const bits       = (typeof blockchain.getNextTarget === 'function')
+        ? targetToBits(blockchain.getNextTarget())
+        : Block.diffToBits(difficulty);
     const sel        = mempool.selectForBlock(900_000, 2999);
     const totalFees  = BigInt(sel.totalFees || 0n);
     // BIP-113 safe base time: strictly after median-time-past and the tip.

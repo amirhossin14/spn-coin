@@ -24,7 +24,7 @@
 'use strict';
 
 const crypto = require('crypto');
-const { sha256, sign, verify } = require('../blockchain/crypto');
+const { sha256, sign, verify, publicKeyToAddress } = require('../blockchain/crypto');
 const { CHAIN_ID } = require('../config');
 
 // Recursively sorts object keys at EVERY depth (must match public/token-sign.js
@@ -98,11 +98,21 @@ function extendTokenLayer(tokens) {
         if (!op || !op.sig || !op.type) return 'malformed op';
         if (Number(op.chainId) !== Number(CHAIN_ID)) return 'wrong chain id';
         const issuerSigned = op.type !== 'burn';
-        const pub = issuerSigned ? op.issuerPubKey : op.holderPubKey;
+        const pub     = issuerSigned ? op.issuerPubKey : op.holderPubKey;
+        const claimed = issuerSigned ? op.issuer       : op.holder;
         if (!pub) return 'missing pubkey';
         let ok = false;
         try { ok = verify(pub, opHash(op), op.sig); } catch { ok = false; }
-        return ok ? null : 'bad signature';
+        if (!ok) return 'bad signature';
+        // CRITICAL: bind the signing key to the claimed address, exactly like the
+        // core tokens.js _verify. Without this an attacker could present their own
+        // key while claiming a victim's issuer/holder address and steal ownership,
+        // burn balances, or freeze/re-meta tokens they do not own.
+        let derived;
+        try { derived = [publicKeyToAddress(pub, false), publicKeyToAddress(pub, true)]; }
+        catch { return 'bad pubkey'; }
+        if (!derived.includes(claimed)) return 'signer is not the issuer/holder';
+        return null;
     };
 
     const origApplyOp = tokens.applyOp.bind(tokens);

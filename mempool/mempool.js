@@ -37,7 +37,7 @@ class Mempool {
         // Validate against UTXO set. Coinbase maturity is judged against the
         // NEXT block height (where this tx would be mined), not height 0.
         const txObj = tx instanceof Transaction ? tx : Object.assign(new Transaction({}), tx);
-        const { valid, errors } = txObj.validate(utxoSet, blockHeight, { mempool: true });
+        const { valid, errors } = txObj.validate(utxoSet, blockHeight, {});
         if (!valid) return { ok: false, error: errors.join('; ') };
 
         // Check for conflicts with other mempool transactions
@@ -58,12 +58,21 @@ class Mempool {
         if (this.txs.size >= MAX_MEMPOOL_TXS)
             return { ok: false, error: `Mempool is full (${MAX_MEMPOOL_TXS} tx limit)` };
 
-        // Record the entry
+        // Record the entry.
+        // SECURITY: use the VALIDATED fee (inputs − outputs), computed by validate()
+        // onto `txObj`, never the caller-declared `tx.fee`. For a plain-object tx,
+        // `txObj` is a separate object, so trusting `tx.fee` would let an attacker
+        // declare a huge fee (with a tiny real fee) to jump the block-selection
+        // queue AND inflate selectForBlock().totalFees — which makes the pool build
+        // a coinbase above the consensus cap, so every solved block is rejected
+        // ("Coinbase reward too large"). entry.fee is what drives fee-rate sorting
+        // and the block template, so fixing it here closes the whole path.
+        const realFee = (typeof txObj.fee === 'bigint') ? txObj.fee : BigInt(txObj.fee || 0);
         const entry = {
             tx,
             size:    txSize,
-            fee:     BigInt(tx.fee || 0),
-            feeRate: txSize > 0 ? Number(BigInt(tx.fee || 0)) / txSize : 0,
+            fee:     realFee,
+            feeRate: txSize > 0 ? Number(realFee) / txSize : 0,
             addedAt: Date.now(),
         };
 

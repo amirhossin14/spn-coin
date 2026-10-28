@@ -14,7 +14,7 @@
       explore: 'Explore', company: 'Company', resources: 'Resources',
       dashboard: 'Dashboard', explorer: 'Explorer', wallet: 'Wallet', createCoin: 'Create Coin', myWallet: 'My Wallet',
       about: 'About', contact: 'Contact', docs: 'Docs', terms: 'Terms & Conditions',
-      analytics: 'Analytics', radar: 'Threat Radar', faucet: 'Testnet Faucet', apidocs: 'API Docs',
+      analytics: 'Analytics', radar: 'Threat Radar', faucet: 'Testnet Faucet', apidocs: 'API Docs', status: 'Network Status',
       rights: 'All rights reserved.', built: 'Built for learning blockchain technology.',
       lang: 'Language', theme: 'Theme', toggleTheme: 'Toggle light / dark mode',
       lightMode: 'Light', darkMode: 'Dark',
@@ -24,7 +24,7 @@
       explore: 'کاوش', company: 'شرکت', resources: 'منابع',
       dashboard: 'داشبورد', explorer: 'کاوشگر', wallet: 'کیف پول', createCoin: 'ساخت کوین', myWallet: 'کیف پول من',
       about: 'درباره ما', contact: 'تماس با ما', docs: 'مستندات', terms: 'قوانین و مقررات',
-      analytics: 'تحلیل‌ها', radar: 'رادار تهدید', faucet: 'شیر تست‌نت', apidocs: 'مستندات API',
+      analytics: 'تحلیل‌ها', radar: 'رادار تهدید', faucet: 'شیر تست‌نت', apidocs: 'مستندات API', status: 'وضعیت شبکه',
       rights: 'تمام حقوق محفوظ است.', built: 'ساخته‌شده برای یادگیری فناوری بلاکچین.',
       lang: 'زبان', theme: 'پوسته', toggleTheme: 'تغییر حالت روشن / تاریک',
       lightMode: 'روشن', darkMode: 'تاریک',
@@ -126,6 +126,7 @@
         '<div><h4>' + t('resources') + '</h4>' +
           '<a href="analytics">' + t('analytics') + '</a>' +
           '<a href="radar">' + t('radar') + '</a>' +
+          '<a href="/status">' + t('status') + '</a>' +
           '<a href="/apidocs">' + t('apidocs') + '</a>' +
           '<a href="/faucet">' + t('faucet') + '</a>' +
         '</div>' +
@@ -155,7 +156,11 @@
       btn.id = 'spn-totop';
       btn.setAttribute('aria-label', 'Back to top');
       btn.innerHTML = '↑';
-      btn.style.cssText = 'position:fixed;bottom:22px;inset-inline-end:92px;width:46px;height:46px;' +
+      // Stack the "back to top" button ABOVE the AI bubble (same corner) instead of
+      // beside it, so the two floating controls form a neat vertical stack and no
+      // longer crowd/overlap the footer's language switcher. 29px right-offset
+      // centres the 46px button over the 60px AI bubble; 90px bottom clears it.
+      btn.style.cssText = 'position:fixed;bottom:90px;inset-inline-end:29px;width:46px;height:46px;' +
         'border-radius:50%;border:1px solid rgba(240,165,0,.3);background:rgba(14,20,27,.9);' +
         'backdrop-filter:blur(8px);color:#f0a500;font-size:20px;font-weight:700;cursor:pointer;' +
         'display:flex;align-items:center;justify-content:center;line-height:0;' +

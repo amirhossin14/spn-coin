@@ -96,7 +96,7 @@ a{color:inherit;text-decoration:none}
 .back:hover{color:var(--gold)}
 .metalink{display:inline-flex;align-items:center;gap:5px;color:var(--cyn);font-size:12.5px;margin-right:14px}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/elliptic.min.js"></script>
 <script src="token-sign.js?v=99"></script>
 <script src="wallet-session.js?v=2"></script>
 <script src="ui-utils.js?v=25"></script>
@@ -106,12 +106,13 @@ a{color:inherit;text-decoration:none}
 <script src="/anti-phishing.js?v=1" defer></script>
   <script src="footer.js?v=35" defer></script>
   <script src="ui-prefs.js?v=25" defer></script>
+<style>/* Round password mask dots */ input[type=password]{-webkit-text-security:disc;font-family:'Segoe UI',Tahoma,Geneva,Verdana,system-ui,sans-serif;letter-spacing:3px}</style>
 </head>
 <body>
 <div class="wrap">
 
   <div class="search">
-    <input id="si" type="text" placeholder="Token ID or symbol…" onkeydown="if(event.key==='Enter')go()" aria-label="Token ID or symbol…">
+    <input id="si" type="text" placeholder="Token ID or symbol…" onkeydown="if(event.key==='Enter')go()">
     <button onclick="go()">View</button>
   </div>
 
@@ -136,7 +137,7 @@ a{color:inherit;text-decoration:none}
     <!-- wallet connect -->
     <div class="wallet-bar" id="walletBar">
       <div class="status"><span class="dot"></span><span id="wStatus">Wallet locked</span></div>
-      <input id="wKey" type="password" placeholder="private key (hex) — unlocks in your browser only" autocomplete="off" aria-label="private key (hex) — unlocks in your browser only">
+      <input id="wKey" type="password" placeholder="private key (hex) — unlocks in your browser only" autocomplete="off">
       <button id="wUnlock" onclick="unlockWallet()">Unlock</button>
       <div class="mybal" id="myBal" style="display:none"></div>
     </div>

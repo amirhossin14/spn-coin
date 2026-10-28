@@ -49,13 +49,19 @@
   .ch h3{margin:0;font-size:15px;font-weight:800}
   .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink2);border:1px solid var(--line);border-radius:10px;padding:12px 20px;font-size:13px;font-weight:600;z-index:99;opacity:0;transition:.3s;pointer-events:none}
   .toast.show{opacity:1}
-  .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
+  /* align-items:flex-start + overflow + margin:auto on the box: a short modal is
+     centred vertically, a tall one pins to the top and the overlay scrolls — so the
+     header (with the ✕ close button) is always reachable instead of being pushed
+     off-screen when the content is taller than the viewport. */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding:20px;z-index:50;overflow-y:auto}
   .modal.show{display:flex}
-  .modal-box{background:var(--ink);border:1px solid var(--line);border-radius:16px;padding:24px;width:100%;max-width:440px}
+  .modal-box{background:var(--ink);border:1px solid var(--line);border-radius:16px;padding:24px;width:100%;max-width:440px;margin:auto}
   .qr-box{background:#fff;padding:16px;border-radius:12px;display:inline-block;margin:12px auto}
   a.link{color:var(--gold);text-decoration:none}
   input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
   input[type=number]{-moz-appearance:textfield;appearance:textfield}
+  /* Round password mask dots (the webfont renders them square otherwise). */
+  input[type=password]{-webkit-text-security:disc;font-family:'Segoe UI',Tahoma,Geneva,Verdana,system-ui,sans-serif;letter-spacing:3px}
 </style>
 </head>
 <body>
@@ -71,7 +77,7 @@
       <p style="color:var(--mut);font-size:13px;margin-top:0" data-i18n>A saved wallet was found on this browser. Enter your password to unlock it.</p>
       <label for="unlockPass">Password</label>
       <div style="position:relative">
-        <input id="unlockPass" type="password" placeholder="Your wallet password" autocomplete="current-password" style="padding-right:44px" / aria-label="Your wallet password">
+        <input id="unlockPass" type="password" placeholder="Your wallet password" autocomplete="current-password" style="padding-right:44px" />
         <button type="button" id="unlockEye" aria-label="Show/hide password"
                 onclick="var i=document.getElementById('unlockPass');var s=i.type==='password';i.type=s?'text':'password';this.textContent=s?'🙈':'👁';"
                 style="position:absolute;top:50%;right:8px;transform:translateY(-50%);background:none;border:none;padding:4px;font-size:16px;cursor:pointer;line-height:1">👁</button>
@@ -91,9 +97,9 @@
     <div class="card">
       <div class="ch"><h3>♻️ Restore existing wallet</h3></div>
       <label for="restoreInput">Recovery phrase (12 or 24 words)</label>
-      <input id="restoreInput" placeholder="word1 word2 word3 …" autocomplete="off" / aria-label="word1 word2 word3 …">
+      <input id="restoreInput" placeholder="word1 word2 word3 …" autocomplete="off" />
       <label for="restorePass" style="margin-top:12px">Set a password (required — to unlock faster next time) *</label>
-      <input id="restorePass" type="password" placeholder="Min 12 chars, 3 of 4 types" autocomplete="new-password" oninput="showPwHint('restorePass','restorePwHint')" / aria-label="Min 12 chars, 3 of 4 types">
+      <input id="restorePass" type="password" placeholder="Min 12 chars, 3 of 4 types" autocomplete="new-password" oninput="showPwHint('restorePass','restorePwHint')" />
       <div id="restorePwHint" style="font-size:11.5px;color:var(--mut);margin-top:5px;line-height:1.7"></div>
       <button class="btn-ghost" id="btnRestore" style="width:100%;margin-top:12px">Restore wallet</button>
     </div>
@@ -110,7 +116,7 @@
       <div class="seed-grid" id="seedGrid"></div>
       <button class="btn-ghost" id="btnCopySeed" style="width:100%;margin-bottom:10px">📋 Copy phrase</button>
       <label for="newWalletPass" style="margin-top:6px">🔑 Set a password (required — to unlock this wallet faster next time) *</label>
-      <input id="newWalletPass" type="password" placeholder="Min 12 chars, 3 of 4 types" autocomplete="new-password" oninput="showPwHint('newWalletPass','newPwHint')" / aria-label="Min 12 chars, 3 of 4 types">
+      <input id="newWalletPass" type="password" placeholder="Min 12 chars, 3 of 4 types" autocomplete="new-password" oninput="showPwHint('newWalletPass','newPwHint')" />
       <div id="newPwHint" style="font-size:11.5px;color:var(--mut);margin-top:5px;line-height:1.7"></div>
       <div class="warn-box" style="margin-top:12px">
         📝 <b data-i18n>Save BOTH in a safe place:</b><br>
@@ -140,12 +146,12 @@
     </div>
 
     <div class="card">
-      <div class="ch"><h3>🪙 My Tokens</h3><button class="btn-ghost" id="btnRefresh" style="padding:6px 12px;font-size:12px" aria-label="Refresh">🔄</button></div>
+      <div class="ch"><h3>🪙 My Tokens</h3><button class="btn-ghost" id="btnRefresh" style="padding:6px 12px;font-size:12px">🔄</button></div>
       <div id="tokenList"><div style="padding:24px;text-align:center;color:var(--mut)">Loading…</div></div>
     </div>
 
     <div class="card">
-      <div class="ch"><h3>🔑 کلید خصوصی / Private Key</h3></div>
+      <div class="ch"><h3>🔑 کلید خصوصی / Private Key</h3><button class="btn-ghost" id="btnWalletSettings" title="تنظیمات کیف‌پول / Wallet settings" style="padding:6px 12px;font-size:16px">⚙</button></div>
       <div style="font-size:12.5px;color:var(--mut);line-height:1.7;margin-bottom:12px">
         این کلید کنترل کامل کیف‌پول را می‌دهد — هیچ‌وقت آن را به کسی نده و در جای امن نگه‌دار.
         برای ارسال از صفحه‌ی <b>Send</b>، کلید <b>DER</b> (شروع با 3081) را کپی کن و در فیلد Private Key بگذار.
@@ -169,11 +175,11 @@
 <!-- Send modal -->
 <div class="modal" id="sendModal">
   <div class="modal-box">
-    <div class="ch"><h3>↑ Send SPN</h3><button class="btn-ghost" style="padding:6px 12px" onclick="closeModal('sendModal')" aria-label="Close">✕</button></div>
+    <div class="ch"><h3>↑ Send SPN</h3><button class="btn-ghost" style="padding:6px 12px" onclick="closeModal('sendModal')">✕</button></div>
     <label for="sendTo">Recipient address</label>
-    <input id="sendTo" placeholder="SPN1…" autocomplete="off" / aria-label="SPN1…">
+    <input id="sendTo" placeholder="SPN1…" autocomplete="off" />
     <label for="sendAmt" style="margin-top:12px">Amount (SPN)</label>
-    <input id="sendAmt" type="number" placeholder="0.00" min="0" step="0.00000001" / aria-label="0.00">
+    <input id="sendAmt" type="number" placeholder="0.00" min="0" step="0.00000001" />
     <div id="sendMsg" style="font-size:12px;margin-top:10px"></div>
     <button class="btn-gold" id="btnSendGo" style="margin-top:14px">Send</button>
   </div>
@@ -182,7 +188,7 @@
 <!-- Receive modal -->
 <div class="modal" id="receiveModal">
   <div class="modal-box" style="text-align:center">
-    <div class="ch" style="text-align:left"><h3>↓ Receive SPN</h3><button class="btn-ghost" style="padding:6px 12px" onclick="closeModal('receiveModal')" aria-label="Close">✕</button></div>
+    <div class="ch" style="text-align:left"><h3>↓ Receive SPN</h3><button class="btn-ghost" style="padding:6px 12px" onclick="closeModal('receiveModal')">✕</button></div>
     <p style="color:var(--mut);font-size:13px">Share this address to receive SPN or tokens.</p>
     <div class="qr-box" id="qrBox"></div>
     <div class="mono" id="recvAddr" style="font-size:12px;word-break:break-all;margin-top:12px;color:var(--txt)"></div>
@@ -190,16 +196,57 @@
   </div>
 </div>
 
+<!-- Wallet settings modal (gear) -->
+<div class="modal" id="settingsModal">
+  <div class="modal-box">
+    <div class="ch"><h3>⚙ تنظیمات کیف‌پول / Wallet Settings</h3><button class="btn-ghost" style="padding:6px 12px" onclick="closeModal('settingsModal')">✕</button></div>
+
+    <!-- Change password -->
+    <h4 style="margin:6px 0 8px;font-size:14px">🔑 تغییر پسورد / Change password</h4>
+    <label for="cpOld">پسورد فعلی / Current password</label>
+    <input id="cpOld" type="password" autocomplete="current-password" />
+    <label for="cpNew" style="margin-top:10px">پسورد جدید / New password</label>
+    <input id="cpNew" type="password" autocomplete="new-password" oninput="showPwHint('cpNew','cpHint');updateCpMatch()" />
+    <div id="cpHint" style="margin:6px 0"></div>
+    <div id="cpMatch" style="margin:4px 0 2px"></div>
+    <label for="cpNew2" style="margin-top:4px">تکرار پسورد جدید / Confirm new password</label>
+    <input id="cpNew2" type="password" autocomplete="new-password" oninput="updateCpMatch()" />
+    <div id="cpMsg" style="font-size:12px;margin-top:8px"></div>
+    <button class="btn-gold" id="btnChangePw" style="margin-top:10px;width:100%">تغییر پسورد</button>
+
+    <hr style="border:none;border-top:1px solid var(--line);margin:18px 0" />
+
+    <!-- Show recovery phrase -->
+    <h4 style="margin:0 0 8px;font-size:14px">📝 نمایش ۱۲ کلمه / Recovery phrase</h4>
+    <div style="font-size:12px;color:var(--mut);line-height:1.7;margin-bottom:10px">
+      ۱۲ کلمه کنترلِ کاملِ کیف‌پول را می‌دهد — هیچ‌وقت آن را به کسی نده و از آن اسکرین‌شات نگیر. برای نمایش، پسوردِ کیف‌پولت را وارد کن.
+    </div>
+    <input id="rpPass" type="password" autocomplete="current-password" placeholder="پسورد کیف‌پول / Wallet password" />
+    <button class="btn-ghost" id="btnShowPhrase" style="margin-top:10px;width:100%">👁 نمایش ۱۲ کلمه</button>
+    <div id="rpMsg" style="font-size:12px;margin-top:8px"></div>
+    <div id="rpBox" class="hidden" style="margin-top:12px">
+      <div class="seed-grid" id="rpGrid"></div>
+      <div id="rpTimer" style="font-size:11px;color:var(--mut);text-align:center;margin-top:4px"></div>
+      <button class="btn-ghost" id="btnHidePhrase" style="width:100%;margin-top:8px">🙈 پنهان کردن</button>
+    </div>
+
+    <hr style="border:none;border-top:1px solid var(--line);margin:18px 0" />
+    <div style="font-size:11.5px;color:var(--mut);line-height:1.7">
+      🔒 برای امنیت، کیف‌پول بعد از چند دقیقه بی‌کاری به‌طور خودکار قفل می‌شود. کلیدِ خصوصی و ۱۲ کلمه هیچ‌وقت به سرور نمی‌روند و فقط رمزنگاری‌شده روی همین مرورگر ذخیره می‌شوند.
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/elliptic.min.js"></script>
 <script src="/csrf-fetch.js?v=25"></script>
 <script src="/i18n.js?v=34" defer></script>
 <script src="/nav.js?v=40" defer></script><script src="/ai-bubble.js?v=5" defer></script>
 <script src="/anti-phishing.js?v=1" defer></script>
 <script src="/footer.js?v=35" defer></script>
 <script src="/wallet-session.js?v=2"></script>
-<script src="/keystore-browser.js?v=2"></script>
+<script src="/keystore-browser.js?v=3"></script>
 <script src="/token-sign.js?v=99"></script>
 <script src="/hd-wallet-wordlist.js?v=1"></script>
 <script src="/hd-wallet.js?v=1"></script>
@@ -231,7 +278,7 @@ function showPwHint(inputId, hintId){
     var u=[['second',60],['minute',60],['hour',24],['day',365],['year',100],['century',1000]],v=s,n='second';
     for(var i=0;i<u.length;i++){n=u[i][0]; if(v<u[i][1])break; v/=u[i][1];}
     if(n==='century'&&v>=10)return'centuries'; v=Math.round(v); return v+' '+n+(v!==1?'s':'');})(secs);
-  function row(ok,txt){ return '<span style="color:'+(ok?'#26d07c':'var(--mut,#8a97b8)')+'">'+(ok?'\u2713':'\u25cb')+' '+txt+'</span>'; }
+  function row(ok,txt){ return '<span style="color:'+(ok?'#26d07c':'var(--mut,#8a97b8)')+'">'+(ok?'✓':'○')+' '+txt+'</span>'; }
   el.innerHTML =
     '<div style="display:flex;align-items:center;gap:8px;margin:2px 0 6px">'
     + '<div style="flex:1;height:7px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden">'
@@ -240,12 +287,13 @@ function showPwHint(inputId, hintId){
     + '<div style="color:var(--mut,#8a97b8);font-size:11px;margin-bottom:6px">Estimated time to crack: <b style="color:var(--txt,#eaf0fb)">'+crack+'</b></div>'
     + '<div style="display:flex;flex-wrap:wrap;gap:4px 12px">'
     + row(pw.length>=12,'At least 12 characters')
-    + row(low,'A lowercase letter (a\u2013z)')
-    + row(up,'An uppercase letter (A\u2013Z)')
-    + row(num,'A number (0\u20139)')
-    + row(sym,'A symbol (@ # ! $ \u2026)')
+    + row(low,'A lowercase letter (a–z)')
+    + row(up,'An uppercase letter (A–Z)')
+    + row(num,'A number (0–9)')
+    + row(sym,'A symbol (@ # ! $ …)')
     + '</div>';
 }
+
 
 // Validate wallet password strength. Returns an error string, or '' if valid.
 // Rules: >= 8 chars, at least one letter, one number, one special character.
@@ -256,6 +304,7 @@ function checkPasswordStrength(pw) {
   if (/(.)\1\1/.test(pw))     return 'Do not repeat the same character 3+ times in a row.';
   return '';
 }
+
 function show(v){ ['setupView','seedView','walletView'].forEach(x=>$(x).classList.toggle('hidden', x!==v)); }
 // Once a wallet is saved on THIS browser, hide "Create new wallet" — the user
 // can only Login. (They can still make another wallet via "Use a different wallet".)
@@ -318,7 +367,7 @@ $('btnRestore').addEventListener('click', async ()=>{
     // If a password was given, save an encrypted copy so next time the user can
     // just enter the password (needs a secure context: https or localhost).
     if (pw && window.SPNKeystore && window.isSecureContext !== false && window.crypto?.subtle) {
-      try { await window.SPNKeystore.save(d.privateKey, pw, d.address); toast('Wallet saved — use your password next time'); }
+      try { await window.SPNKeystore.save(d.privateKey, pw, d.address, m); toast('Wallet saved — use your password next time'); }
       catch(e){ console.warn('save failed:', e); }
     }
     enterWallet(d.address);
@@ -349,7 +398,7 @@ $('btnSeedDone').addEventListener('click', async ()=>{
   // If a password was set, save an encrypted copy so next time the user can
   // just click "Login to wallet" and enter this password.
   if (pw && window.SPNKeystore && window.isSecureContext !== false && window.crypto?.subtle) {
-    try { await window.SPNKeystore.save(d.priv, pw, d.addr); toast('Wallet saved — use your password next time'); }
+    try { await window.SPNKeystore.save(d.priv, pw, d.addr, pendingMnemonic); toast('Wallet saved — use your password next time'); }
     catch(e){ console.warn('save failed:', e); }
   }
   pendingMnemonic = null;
@@ -395,7 +444,7 @@ async function unlockAndSave(priv, addr, mnemonic){
     if (window.SPNKeystore && secureCtx && hasSubtle) {
       const pw = prompt('Set a password to save this wallet encrypted in your browser (leave empty to skip):');
       if (pw && pw.length >= 8) {
-        try { await window.SPNKeystore.save(priv, pw, addr); toast('Wallet saved (encrypted)'); }
+        try { await window.SPNKeystore.save(priv, pw, addr, mnemonic); toast('Wallet saved (encrypted)'); }
         catch (e) { console.warn('keystore save failed:', e); toast('Could not save (wallet still open)'); }
       }
     }
@@ -601,6 +650,112 @@ $('btnForget').addEventListener('click', ()=>{
   syncSetupView();
   toast('Saved wallet removed from this browser');
 });
+
+// ══════════════════════════════════════════════════════════════
+//  WALLET SETTINGS (⚙): change password · show recovery phrase
+// ══════════════════════════════════════════════════════════════
+// Live "passwords match" indicator for the Change-password form. Pure UX — it
+// reveals no secret; it only tells the user the confirm must equal the new password
+// and turns green once they do. Server/keystore still enforce the match on submit.
+function updateCpMatch(){
+  const el=$('cpMatch'); if(!el) return;
+  const a=($('cpNew')||{}).value||'', b=($('cpNew2')||{}).value||'';
+  // Render as a checklist row (○ / ✓) in the SAME style as the password rules above.
+  const ok = !!b && a===b;
+  el.innerHTML = '<span style="color:'+(ok?'#26d07c':'var(--mut,#8a97b8)')+'">'
+    + (ok?'✓':'○') + ' New passwords match</span>';
+}
+let _rpTimer=null, _rpCountdown=null;
+function hidePhrase(){
+  const box=$('rpBox'); if(box) box.classList.add('hidden');
+  const g=$('rpGrid'); if(g) g.innerHTML='';
+  if(_rpTimer){ clearTimeout(_rpTimer); _rpTimer=null; }
+  if(_rpCountdown){ clearInterval(_rpCountdown); _rpCountdown=null; }
+}
+
+if($('btnWalletSettings')) $('btnWalletSettings').addEventListener('click', ()=>{
+  ['cpOld','cpNew','cpNew2','rpPass'].forEach(id=>{ const e=$(id); if(e) e.value=''; });
+  $('cpHint').innerHTML=''; $('cpMsg').textContent=''; $('rpMsg').textContent='';
+  updateCpMatch();
+  hidePhrase();
+  const hasKs = !!(window.SPNKeystore && window.SPNKeystore.has());
+  // Password change / phrase view need a saved, encrypted keystore on this browser.
+  $('btnChangePw').disabled = !hasKs;
+  if(!hasKs){ $('cpMsg').style.color='var(--mut)'; $('cpMsg').textContent='روی این مرورگر کیف‌پولِ ذخیره‌شده‌ای نیست (با ۱۲ کلمه + پسورد ذخیره کن تا این بخش فعال شود).'; }
+  $('settingsModal').classList.add('show');
+});
+
+// Change password → re-encrypt the keystore.
+if($('btnChangePw')) $('btnChangePw').addEventListener('click', async ()=>{
+  const msg=$('cpMsg'); msg.style.color='var(--mut)';
+  const oldP=$('cpOld').value||'', nw=$('cpNew').value||'', nw2=$('cpNew2').value||'';
+  if(!window.SPNKeystore || !window.SPNKeystore.has()){ msg.style.color='var(--red)'; msg.textContent='روی این مرورگر کیف‌پولی ذخیره نشده.'; return; }
+  if(!oldP){ msg.style.color='var(--red)'; msg.textContent='پسورد فعلی را وارد کن.'; return; }
+  const err=checkPasswordStrength(nw); if(err){ msg.style.color='var(--red)'; msg.textContent=err; return; }
+  if(nw!==nw2){ msg.style.color='var(--red)'; msg.textContent='پسورد جدید و تکرارش یکی نیست.'; return; }
+  if(nw===oldP){ msg.style.color='var(--red)'; msg.textContent='پسورد جدید باید با پسورد فعلی فرق کند.'; return; }
+  const btn=$('btnChangePw'); btn.disabled=true; msg.textContent='در حال تغییر…';
+  try{
+    await window.SPNKeystore.changePassword(oldP, nw);
+    msg.style.color='var(--grn)'; msg.textContent='✓ پسورد با موفقیت تغییر کرد.';
+    toast('پسورد کیف‌پول تغییر کرد');
+    $('cpOld').value=''; $('cpNew').value=''; $('cpNew2').value=''; $('cpHint').innerHTML='';
+  }catch(e){
+    msg.style.color='var(--red)';
+    msg.textContent = /wrong password/i.test(e.message||'') ? 'پسورد فعلی اشتباه است.' : ('خطا: '+(e.message||e));
+  }finally{ btn.disabled=false; }
+});
+
+// Show recovery phrase (password-gated, masked, auto-hide after 45s).
+if($('btnShowPhrase')) $('btnShowPhrase').addEventListener('click', async ()=>{
+  const msg=$('rpMsg'); msg.style.color='var(--mut)';
+  const pw=$('rpPass').value||'';
+  if(!window.SPNKeystore){ msg.style.color='var(--red)'; msg.textContent='keystore در دسترس نیست.'; return; }
+  if(!window.SPNKeystore.has()){ msg.style.color='var(--red)'; msg.textContent='روی این مرورگر کیف‌پولی ذخیره نشده.'; return; }
+  if(!pw){ msg.style.color='var(--red)'; msg.textContent='پسوردت را وارد کن.'; return; }
+  msg.textContent='…';
+  try{
+    const phrase = await window.SPNKeystore.unlockMnemonic(pw);
+    if(!phrase){ msg.style.color='var(--red)'; msg.textContent='۱۲ کلمه برای این کیف‌پول ذخیره نشده (قبل از این قابلیت ساخته شده). از نسخهٔ کاغذیِ ۱۲ کلمه‌ات استفاده کن.'; return; }
+    msg.textContent=''; $('rpPass').value='';
+    const words=phrase.trim().split(/\s+/);
+    $('rpGrid').innerHTML = words.map((w,i)=>'<div class="seed-word"><b>'+(i+1)+'</b>'+esc(w)+'</div>').join('');
+    $('rpBox').classList.remove('hidden');
+    let left=45;
+    const paint=()=>{ if($('rpTimer')) $('rpTimer').textContent='به‌طور خودکار بعد از '+left+' ثانیه پنهان می‌شود'; };
+    paint();
+    _rpCountdown=setInterval(()=>{ left--; paint(); if(left<=0){ clearInterval(_rpCountdown); _rpCountdown=null; } },1000);
+    _rpTimer=setTimeout(hidePhrase, 45000);
+  }catch(e){
+    msg.style.color='var(--red)';
+    msg.textContent = /wrong password/i.test(e.message||'') ? 'پسورد اشتباه است.' : ('خطا: '+(e.message||e));
+  }
+});
+if($('btnHidePhrase')) $('btnHidePhrase').addEventListener('click', hidePhrase);
+// Hide the phrase if the user clicks the backdrop to close the settings modal.
+(function(){ const m=$('settingsModal'); if(m) m.addEventListener('click', e=>{ if(e.target===m) hidePhrase(); }); })();
+
+// ── Auto-lock after inactivity ──
+(function(){
+  const IDLE_MS = 5*60*1000;   // 5 minutes
+  let t=null;
+  function doAutoLock(){
+    if(window.WalletSession && window.WalletSession.isUnlocked()){
+      window.WalletSession.lock();
+      hidePhrase();
+      try{ closeModal('settingsModal'); closeModal('sendModal'); closeModal('receiveModal'); }catch(e){}
+      syncSetupView(); show('setupView');
+      toast('برای امنیت، کیف‌پول به‌خاطر بی‌کاری قفل شد');
+    }
+    t=null;
+  }
+  function reset(){ if(t) clearTimeout(t); t=setTimeout(doAutoLock, IDLE_MS); }
+  ['click','keydown','mousemove','touchstart','scroll'].forEach(ev=>
+    document.addEventListener(ev, ()=>{ if(window.WalletSession && window.WalletSession.isUnlocked()) reset(); }, {passive:true}));
+  if(window.WalletSession && window.WalletSession.onChange){
+    window.WalletSession.onChange((unlocked)=>{ if(unlocked) reset(); else if(t){ clearTimeout(t); t=null; } });
+  }
+})();
 </script>
 </body>
 </html>

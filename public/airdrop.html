@@ -11,7 +11,7 @@
   <meta name="description" content="Claim your SPN Coin airdrop via Merkle proof distribution.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sepanta (SPN) — Airdrop</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/elliptic/6.5.4/elliptic.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/elliptic.min.js"></script>
 <script src="/token-sign.js?v=99"></script>
 <script src="csrf-fetch.js?v=25"></script>
   <script src="i18n.js?v=34" defer></script>
@@ -47,6 +47,7 @@ button:hover{background:#33ffa0}button:disabled{opacity:.5;cursor:wait}
 .summary{display:flex;gap:16px;margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
 .summary b{color:var(--grn)}
 </style>
+<style>/* Round password mask dots */ input[type=password]{-webkit-text-security:disc;font-family:'Segoe UI',Tahoma,Geneva,Verdana,system-ui,sans-serif;letter-spacing:3px}</style>
 </head>
 <body>
 <div class="wrap">
@@ -55,18 +56,18 @@ button:hover{background:#33ffa0}button:disabled{opacity:.5;cursor:wait}
 
   <div class="card">
     <label for="tokenId">Token ID</label>
-    <input id="tokenId" placeholder="the token you are airdropping" / aria-label="the token you are airdropping">
+    <input id="tokenId" placeholder="the token you are airdropping" />
 
     <label for="from">Your address (holder / issuer)</label>
-    <input id="from" placeholder="SPN… (must hold enough of the token)" / aria-label="SPN… (must hold enough of the token)">
+    <input id="from" placeholder="SPN… (must hold enough of the token)" />
 
     <label for="recips">Recipients — one per line: <span style="text-transform:none">address,amount</span></label>
-    <textarea id="recips" placeholder="SPN1BAbc...,100&#10;SPN1BXyz...,250&#10;SPN1BQwe...,50" aria-label="SPN1BAbc...,100&#10;SPN1BXyz...,250&#10;SPN1BQwe...,50"></textarea>
+    <textarea id="recips" placeholder="SPN1BAbc...,100&#10;SPN1BXyz...,250&#10;SPN1BQwe...,50"></textarea>
     <div class="hint">Each line: an address, a comma, and the amount. Blank lines are ignored.</div>
     <div class="summary" id="summary"></div>
 
     <label for="pk">Your private key <span style="text-transform:none">(64-hex, signs locally)</span></label>
-    <input id="pk" type="password" placeholder="private key hex" autocomplete="off" / aria-label="private key hex">
+    <input id="pk" type="password" placeholder="private key hex" autocomplete="off" />
     <div class="warn">🔒 The key is used only in your browser to sign the airdrop. It is never sent to the server.</div>
 
     <button id="send">Sign &amp; send airdrop</button>

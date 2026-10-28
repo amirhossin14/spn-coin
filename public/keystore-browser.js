@@ -68,8 +68,18 @@
       } catch (e) { return null; }
     },
 
+    // Is a recovery phrase stored alongside the key for this wallet?
+    hasMnemonic: function () {
+      try { var o = JSON.parse(localStorage.getItem(LS_KEY)); return !!(o && o.mct && o.miv); }
+      catch (e) { return false; }
+    },
+
     // Encrypt the private key with the password and persist the ciphertext.
-    save: async function (privHex, password, address) {
+    // `mnemonic` (optional) is the 12-word recovery phrase; when given it is
+    // encrypted with the SAME password-derived key (separate IV) and stored as
+    // ciphertext only, so the user can view it later from wallet settings. It is
+    // never stored in plaintext and never leaves the browser.
+    save: async function (privHex, password, address, mnemonic) {
       privHex = (privHex || '').trim();
       // Accept both a 32-byte raw secp256k1 key (64 hex) AND the DER/PKCS8
       // encoding this wallet actually produces (~270 hex). The keystore stores
@@ -87,7 +97,7 @@
         { name: 'AES-GCM', iv: iv }, key, hex2buf(privHex),
       );
       var record = {
-        v: 2,
+        v: 3,
         address: address || '',
         salt: b64(salt),
         iv: b64(iv),
@@ -96,7 +106,68 @@
         kdf: 'PBKDF2-SHA256-' + PBKDF2_ITERS,
         cipher: 'AES-GCM-256',
       };
+      // Optionally encrypt the recovery phrase with the same key (separate IV).
+      if (mnemonic && typeof mnemonic === 'string' && mnemonic.trim()) {
+        var miv = crypto.getRandomValues(new Uint8Array(12));
+        var mct = await crypto.subtle.encrypt(
+          { name: 'AES-GCM', iv: miv }, key, enc.encode(mnemonic.trim()),
+        );
+        record.miv = b64(miv);
+        record.mct = b64(mct);
+      }
       localStorage.setItem(LS_KEY, JSON.stringify(record));
+      return true;
+    },
+
+    // Decrypt and return the stored recovery phrase (12 words). Returns '' when
+    // no phrase was stored for this wallet (e.g. a keystore saved before this
+    // feature existed). Throws on a wrong password.
+    unlockMnemonic: async function (password) {
+      var o;
+      try { o = JSON.parse(localStorage.getItem(LS_KEY)); } catch (e) { o = null; }
+      if (!o) throw new Error('No saved wallet.');
+      if (!o.mct || !o.miv) return '';
+      var iters = o.iterations || 250000;
+      var key = await deriveKey(password, unb64(o.salt), iters);
+      try {
+        var pt = await crypto.subtle.decrypt(
+          { name: 'AES-GCM', iv: unb64(o.miv) }, key, unb64(o.mct),
+        );
+        return new TextDecoder().decode(pt);
+      } catch (e) {
+        throw new Error('Wrong password.');
+      }
+    },
+
+    // Re-encrypt the keystore (private key + recovery phrase, if present) with a
+    // NEW password. The old password must decrypt the current record first, so a
+    // wrong current password throws and nothing is changed.
+    changePassword: async function (oldPassword, newPassword) {
+      if (!newPassword || newPassword.length < 8)
+        throw new Error('New password must be at least 8 characters.');
+      var o;
+      try { o = JSON.parse(localStorage.getItem(LS_KEY)); } catch (e) { o = null; }
+      if (!o) throw new Error('No saved wallet.');
+      var iters = o.iterations || 250000;
+      var oldKey = await deriveKey(oldPassword, unb64(o.salt), iters);
+      var privHex, mnemonic = '';
+      try {
+        var pt = await crypto.subtle.decrypt(
+          { name: 'AES-GCM', iv: unb64(o.iv) }, oldKey, unb64(o.ct),
+        );
+        privHex = buf2hex(pt);
+      } catch (e) {
+        throw new Error('Wrong password.');
+      }
+      if (o.mct && o.miv) {
+        try {
+          var mp = await crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv: unb64(o.miv) }, oldKey, unb64(o.mct),
+          );
+          mnemonic = new TextDecoder().decode(mp);
+        } catch (e) { mnemonic = ''; }
+      }
+      await SPNKeystore.save(privHex, newPassword, o.address, mnemonic || undefined);
       return true;
     },
 

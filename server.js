@@ -48,6 +48,31 @@ const { metrics, httpMetricsMiddleware, metricsHandler, bindBlockchain } = requi
 // ── Database ───────────────────────────────────────────────────
 const { initDB, LogRepo, KYC, FeeRepo, pool: dbPool, bindBlockchain: bindDB } = require('./db/state');
 
+// ── GeoIP (offline) ────────────────────────────────────────────
+// geoip-lite runs fully on this server — no IP ever leaves the box.
+// Loaded defensively so a missing package never crashes the node.
+let geoip = null;
+try { geoip = require('geoip-lite'); }
+catch { console.warn('⚠️  [GeoIP] geoip-lite not installed — audit logs will show IP only.'); }
+
+// Look up "City, Country" for an IP. Strips IPv6-mapped IPv4 (::ffff:1.2.3.4)
+// and returns null for private/local/unknown addresses.
+// Only hex digits, dots and colons can appear in an IPv4/IPv6 literal. The
+// 45-char cap and this whitelist mean a crafted/over-long string can never
+// reach geoip-lite's ip-address parser (neutralises the ReDoS/parse CVEs in
+// that transitive dep regardless of its version).
+const _IP_RE = /^[0-9a-fA-F:.]{1,45}$/;
+function geoLookup(ip) {
+    if (!geoip || !ip) return null;
+    try {
+        const clean = String(ip).replace(/^::ffff:/, '').trim();
+        if (!_IP_RE.test(clean)) return null;
+        const g = geoip.lookup(clean);
+        if (!g) return null;
+        return { country: g.country || '', city: g.city || '' };
+    } catch { return null; }
+}
+
 // ── Config ─────────────────────────────────────────────────────
 const { COIN, NETWORK } = require('./config');
 
@@ -329,13 +354,6 @@ app.use((req, res, next) => {
     next();
 });
 
-// P2P block messages carry full blocks, which can exceed the default 100kb as
-// the chain grows (Bitcoin-style blocks reach multiple MB). Parse the P2P
-// endpoint with a higher limit BEFORE the global parser so blocks keep
-// propagating/syncing at scale. express.json skips a body already parsed, so
-// the global 100kb parser below still governs every other route.
-app.use('/api/p2p/message', express.json({ limit: '6mb' }));
-
 app.use(express.json({ limit: '100kb' }));
 
 // Return a clean 400 for malformed JSON instead of a 500 that could leak
@@ -448,7 +466,7 @@ app.get(/\.html$/i, (req, res, next) => {
 // RFC 9116 — security.txt (served explicitly since static skips dotfiles).
 const SECURITY_TXT = (() => {
     try { return require('fs').readFileSync(path.join(__dirname, 'public', '.well-known', 'security.txt'), 'utf8'); }
-    catch (e) { return 'Contact: mailto:Info@sepantatoken.com\n'; }
+    catch (e) { return 'Contact: mailto:security@spncoin.example\n'; }
 })();
 app.get(['/.well-known/security.txt', '/security.txt'], (req, res) => {
     res.type('text/plain').send(SECURITY_TXT);
@@ -590,6 +608,21 @@ function auth(perm) {
         jwtMiddleware(false),
         (req, res, next) => {
             if (req.user) {
+                // A JWT carries a role/identity snapshot valid up to ~15 min. Re-check
+                // the LIVE account on every request so a user who was just deactivated
+                // or deleted loses access immediately, instead of lingering until the
+                // token expires. (Role DEMOTION is already enforced by hasPerm, which
+                // reads the current role; this adds the active gate and makes it apply
+                // to perm-less routes too.)
+                // NOTE: we intentionally do NOT block on `lockedUntil` here. Lockout is
+                // a LOGIN throttle (5 failed logins). Enforcing it on an already-issued
+                // token would let anyone lock out a logged-in admin just by failing
+                // their login 5× — a repeatable DoS. Active/deleted still revoke now.
+                const fresh = ac.getUserById(req.user.id);
+                if (!fresh || fresh.active === false) {
+                    return res.status(401).json({ error: 'Account is inactive', code: 'ACCOUNT_INACTIVE' });
+                }
+                req.user.role = fresh.role;   // trust the live role, not the token snapshot
                 if (perm && !ac.hasPerm(req.user, perm))
                     return res.status(403).json({ error: 'Permission denied', required: perm });
                 return next();
@@ -609,8 +642,24 @@ async function log(req, action, details = {}) {
         ip:        req.ip,
         path:      req.path,
         userAgent: (req.headers && req.headers['user-agent']) || '',
+        referer:   (req.headers && (req.headers.referer || req.headers.origin)) || '',
         details,
     }).catch(() => {});
+}
+
+// Best-effort "where did this come from" from the Referer/Origin header. Not
+// authoritative (a crafted client can spoof or omit it) — a login that lands
+// here as "API / Direct" for an admin account is itself worth a second look.
+function loginSource(ref) {
+    if (!ref) return 'API / Direct';
+    let p = String(ref);
+    try { p = new URL(ref).pathname; } catch { /* not a full URL — use as-is */ }
+    p = p.toLowerCase();
+    if (p.includes('/admin'))    return 'Admin Panel';
+    if (p.includes('/mywallet') || p.includes('/wallet')) return 'Wallet';
+    if (p.includes('/send'))     return 'Send';
+    if (p === '/' || p === '')   return 'Home';
+    return p.slice(0, 40);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -696,6 +745,18 @@ window.onload = function () {
 </body></html>`);
 });
 
+// Cached DB health so /api/health (and the public /status page) can show the
+// database state WITHOUT making /health do a blocking query on every hit.
+// 'off' = no external DB configured (in-memory mode); 'up'/'down' = live ping.
+let _dbHealth = dbPool ? 'checking' : 'off';
+if (dbPool) {
+    const _pingDb = () => dbPool.query('SELECT 1')
+        .then(() => { _dbHealth = 'up'; })
+        .catch(() => { _dbHealth = 'down'; });
+    _pingDb();
+    setInterval(_pingDb, 30_000).unref();
+}
+
 app.get('/api/health', (req, res) => res.json({
     status:  'ok',
     version: COIN.VERSION,
@@ -703,6 +764,7 @@ app.get('/api/health', (req, res) => res.json({
     peers:   p2p.peerCount(),
     miners:  stratum.getStats().authorized,
     mempool: mempool.size(),
+    db:      _dbHealth,
     chainId: CHAIN_ID,
     network: CHAIN_ID === 1 ? 'mainnet' : 'testnet',
     uptime:  Math.floor(process.uptime()),
@@ -750,7 +812,7 @@ app.get('/api/monitor/alerts', (req, res) => {
     res.json({ active: [] });
 });
 
-app.get('/api/admin/system-metrics', auth('view:dashboard'), (req, res) => {
+app.get('/api/admin/system-metrics', auth('admin:users'), (req, res) => {
     const os = require('os');
     const mem = process.memoryUsage();
     const totalMem = os.totalmem(), freeMem = os.freemem();
@@ -1063,7 +1125,7 @@ authRouter.use(limiters.auth.middleware());
 // Roles that MUST enroll in two-factor auth. Until they do, login yields only a
 // restricted "pending-2FA" token (see middleware/jwt.js) that can reach nothing
 // but the 2FA-setup endpoints.
-const TWO_FA_REQUIRED_ROLES = ['admin', 'miner', 'viewer', 'trader', 'developer'];
+const TWO_FA_REQUIRED_ROLES = ['admin', 'moderator', 'auditor', 'miner', 'viewer', 'trader', 'developer'];
 
 authRouter.post('/login', limiters.login.middleware(), body({ username: V.username, password: V.password }), async (req, res) => {
     const { username, password, totp } = req.body;
@@ -1170,8 +1232,8 @@ authRouter.post('/change-password', jwtMiddleware(), async (req, res) => {
     const { oldPassword, newPassword } = req.body;
     if (!oldPassword || !newPassword)
         return res.status(400).json({ error: 'Both oldPassword and newPassword are required' });
-    if (newPassword.length < 12)
-        return res.status(400).json({ error: 'New password must be at least 12 characters' });
+    if (newPassword.length < 8)
+        return res.status(400).json({ error: 'New password must be at least 8 characters' });
     const u = ac.getUserById(req.user.id);
     if (!u) return res.status(404).json({ error: 'User not found' });
     const test = ac.login({ username: u.username, password: oldPassword, ip: req.ip });
@@ -1278,7 +1340,7 @@ app.post('/api/tx/submit-signed', limiters.api.middleware(), async (req, res) =>
     try {
         const txObj = Object.assign(new Transaction({}), tx);
         const { valid, errors } = txObj.validate
-            ? txObj.validate(blockchain.utxoSet, blockchain.height, { mempool: true })
+            ? txObj.validate(blockchain.utxoSet, blockchain.height, {})
             : { valid: true, errors: [] };
         if (!valid) return res.status(400).json({ error: (errors || ['invalid signature']).join('; ') });
         const r = mempool.add(txObj, blockchain.utxoSet, blockchain.height + 1);
@@ -1754,10 +1816,20 @@ app.delete('/api/admin/apikeys/:id',   auth('admin:apikeys'), (req, res) =>
 app.get('/api/admin/logs', auth('admin:logs'), async (req, res) => {
     try {
         const { limit = 200, username, action, role } = req.query;
-        const logs = await LogRepo.list({
+        const raw = await LogRepo.list({
             username, action, role, limit: Math.min(+limit, 1000),
         }).catch(() => ac.getLogs(+limit, { username, action, role }));
-        res.json(logs);
+        // Normalise both shapes: { logs: [...] } (DB/state) or [...] (fallback).
+        const list = Array.isArray(raw) ? raw : (raw.logs || []);
+        // Enrich with offline geo (old + new rows) and surface the stored
+        // User-Agent from details.ua so the frontend can show it in a tooltip.
+        const logs = list.map(l => ({
+            ...l,
+            geo: geoLookup(l.ip),
+            ua:  (l.details && l.details.ua)  || '',
+            src: loginSource(l.details && l.details.ref),
+        }));
+        res.json({ logs });
     } catch (e) { console.error('[logs] error:', e.message); res.status(500).json({ error: 'Internal error' }); }
 });
 

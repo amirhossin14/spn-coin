@@ -53,7 +53,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .tb-send:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(240,165,0,.35)}
 
 /* LOGIN OVERLAY */
-#loginOverlay{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px}
+#loginOverlay{position:fixed;inset:0;z-index:100;background:rgba(5,7,13,.96);backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:center;padding:20px}
 .login-box{position:relative;background:var(--c1);border:1px solid var(--bd2);border-radius:16px;width:100%;max-width:400px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.6),0 0 70px rgba(245,179,1,.08);animation:bIn .4s cubic-bezier(.22,1,.36,1)}
 .login-box::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#f5b301,#f7c948,#f5b301);z-index:2}
 .lb-brand{display:flex;align-items:center;gap:12px}
@@ -206,6 +206,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   <script src="footer.js?v=35" defer></script>
   <script src="ui-prefs.js?v=25" defer></script>
   <script src="ui-utils.js?v=25"></script>
+<style>/* Round password mask dots */ input[type=password]{-webkit-text-security:disc;font-family:'Segoe UI',Tahoma,Geneva,Verdana,system-ui,sans-serif;letter-spacing:3px}</style>
 </head>
 <body>
 
@@ -227,7 +228,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
       <div id="credFields">
         <label class="lbl">USERNAME</label>
         <input class="inp" id="lUser" type="text" placeholder="admin" autocomplete="username"
-               onkeydown="if(event.key==='Enter')doLogin()" aria-label="admin">
+               onkeydown="if(event.key==='Enter')doLogin()">
         <label class="lbl">PASSWORD</label>
         <input class="inp" id="lPass" type="password" placeholder="••••••••" autocomplete="current-password"
                onkeydown="if(event.key==='Enter')doLogin()">
@@ -237,12 +238,12 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
         <div style="text-align:center;font-size:15px;font-weight:800;margin-bottom:4px">Two-Factor Authentication</div>
         <label class="lbl" style="text-align:center;display:block;margin-bottom:10px">Enter the 6-digit code from your Authenticator app</label>
         <div class="otp-row" id="l2faRow" data-target="l2fa" data-onfull="doLogin">
-          <input class="oi" maxlength="1" data-i="0" inputmode="numeric" autocomplete="one-time-code" oninput="otpSync(this)" onkeydown="otpKey(event,this)" aria-label="Verification code, digit 1 of 6">
-          <input class="oi" maxlength="1" data-i="1" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)" aria-label="Verification code, digit 2 of 6">
-          <input class="oi" maxlength="1" data-i="2" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)" aria-label="Verification code, digit 3 of 6">
-          <input class="oi" maxlength="1" data-i="3" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)" aria-label="Verification code, digit 4 of 6">
-          <input class="oi" maxlength="1" data-i="4" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)" aria-label="Verification code, digit 5 of 6">
-          <input class="oi" maxlength="1" data-i="5" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)" aria-label="Verification code, digit 6 of 6">
+          <input class="oi" maxlength="1" data-i="0" inputmode="numeric" autocomplete="one-time-code" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+          <input class="oi" maxlength="1" data-i="1" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+          <input class="oi" maxlength="1" data-i="2" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+          <input class="oi" maxlength="1" data-i="3" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+          <input class="oi" maxlength="1" data-i="4" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
+          <input class="oi" maxlength="1" data-i="5" inputmode="numeric" oninput="otpSync(this)" onkeydown="otpKey(event,this)">
         </div>
         <input type="hidden" id="l2fa">
         <div style="text-align:center;margin-top:10px"><a href="#" onclick="back2fa();return false" style="color:var(--gold,#f5b301);font-size:12px;text-decoration:none">← Back to login</a></div>
@@ -302,7 +303,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   <div class="card">
     <div class="ch">
       <div class="ct"><span class="ctd"></span>My Tokens</div>
-      <button onclick="loadMyTokens()" style="background:var(--c2);color:var(--sub);border:1px solid var(--bd);padding:5px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer" aria-label="Refresh">🔄</button>
+      <button onclick="loadMyTokens()" style="background:var(--c2);color:var(--sub);border:1px solid var(--bd);padding:5px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">🔄</button>
     </div>
     <div id="tokenList">
       <div style="padding:32px;text-align:center;color:var(--mut)">Loading tokens…</div>
@@ -313,7 +314,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   <div class="card">
     <div class="ch">
       <div class="ct"><span class="ctd"></span>Transaction History</div>
-      <button onclick="loadTxHistory()" style="background:var(--c2);color:var(--sub);border:1px solid var(--bd);padding:5px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer" aria-label="Refresh">🔄</button>
+      <button onclick="loadTxHistory()" style="background:var(--c2);color:var(--sub);border:1px solid var(--bd);padding:5px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">🔄</button>
     </div>
     <div id="txList">
       <div style="padding:32px;text-align:center;color:var(--mut)">Loading transactions...</div>
@@ -354,7 +355,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
         <code id="twofaSecret" style="display:block;word-break:break-all;background:rgba(255,255,255,.05);padding:8px 10px;border-radius:8px;font-size:12px"></code>
         <p style="font-size:13px;color:var(--txt);margin:14px 0 6px"><b>2.</b> Enter the 6-digit code to confirm:</p>
         <input class="inp" id="twofaConfirmCode" type="text" inputmode="numeric" placeholder="123456"
-               style="max-width:220px" onkeydown="if(event.key==='Enter')confirm2fa()" aria-label="123456">
+               style="max-width:220px" onkeydown="if(event.key==='Enter')confirm2fa()">
         <div style="margin-top:12px;display:flex;gap:10px">
           <button class="btn-hero btn-send" id="btnConfirm2fa" onclick="confirm2fa()">Confirm & Enable</button>
           <button class="btn-hero" style="background:rgba(255,255,255,.06);color:var(--mut)" onclick="cancel2faSetup()">Cancel</button>
@@ -375,7 +376,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   <div class="modal">
     <div class="mhd">
       <div class="mttl">↓ Receive SPN</div>
-      <button class="mclose" onclick="closeRecv()" aria-label="Close">✕</button>
+      <button class="mclose" onclick="closeRecv()">✕</button>
     </div>
     <div class="mbdy">
       <div class="qr-wrap">
@@ -994,7 +995,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") closeRecv();
     </div>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="ai-status">Online</div>
-      <button class="ai-close" onclick="aiToggle()" aria-label="Close">✕</button>
+      <button class="ai-close" onclick="aiToggle()">✕</button>
     </div>
   </div>
 
@@ -1024,7 +1025,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") closeRecv();
     <textarea class="ai-input" id="aiInput" placeholder="Ask anything about SPN Coin..."
       rows="1" maxlength="2000"
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend()}"
-      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'" aria-label="Ask anything about SPN Coin..."></textarea>
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
     <button class="ai-send" id="aiSendBtn" onclick="aiSend()" title="Send">
       <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
         <path d="M2 8l12-6-6 12V9L2 8z" fill="white"/>
