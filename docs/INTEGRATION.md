@@ -1,47 +1,47 @@
-# SPN Coin — اتصال ماژول‌های بیت‌کوینی به هسته
+# SPN Coin — Connecting the Bitcoin Modules to the Core
 
-ماژول‌های بیت‌کوینی که قبلاً ساخته شدند، حالا در **مسیر واقعی اجماع** فعال شده‌اند
-(نه فقط کتابخانه). این کار توسط `bitcoin/integrate.js` انجام می‌شود که در `server.js`
-هنگام راه‌اندازی فراخوانی می‌گردد.
+The Bitcoin modules that were built earlier are now active on the **real consensus path**
+(not just as a library). This is handled by `bitcoin/integrate.js`, which is called from `server.js`
+during startup.
 
-## چه چیزی فعال شد
+## What was activated
 
-۱. **Mempool فعال با fee-rate + RBF + CPFP**
-   یک FeeMempool سایه در کنار mempool اصلی نگه داشته می‌شود؛ انتخاب تراکنش برای بلوک
-   (`getTopN`) حالا از الگوریتم آگاه به vsize و CPFP استفاده می‌کند و تخمین کارمزد
-   (`estimateFeeRate`) در دسترس است.
+1. **Active mempool with fee-rate + RBF + CPFP**
+   A shadow FeeMempool is maintained alongside the main mempool; block transaction selection
+   (`getTopN`) now uses a vsize- and CPFP-aware algorithm, and fee estimation
+   (`estimateFeeRate`) is available.
 
-۲. **SegWit در استخراج بلوک**
-   هر بلوکِ استخراج‌شده یک witness commitment در coinbase می‌گیرد.
+2. **SegWit in block mining**
+   Every mined block gets a witness commitment in its coinbase.
 
-۳. **اعتبارسنجی witness در پذیرش بلوک**
-   `addBlock` هر بلوک ورودی که commitment دارد را بررسی می‌کند؛ commitment نامعتبر
-   باعث رد بلوک می‌شود.
+3. **Witness validation on block acceptance**
+   `addBlock` checks every incoming block that has a commitment; an invalid commitment
+   causes the block to be rejected.
 
-۴. **buildLocator برای همگام‌سازی headers-first**
-   به بلاک‌چین اضافه شد تا SyncManager بتواند locator بسازد.
+4. **buildLocator for headers-first synchronization**
+   Added to the blockchain so that the SyncManager can build a locator.
 
-## ایمنی
+## Safety
 
-هر قلاب (hook) در try/catch است و در صورت هر خطا به **رفتار اصلی** برمی‌گردد. یعنی
-فعال‌کردن یکپارچه‌سازی هرگز نمی‌تواند استخراج یا اعتبارسنجی بلوک را بشکند. تست end-to-end
-روی زنجیره‌ی واقعی نشان داد بلوک‌ها درست استخراج و پذیرفته می‌شوند و ارتفاع زنجیره
-درست رشد می‌کند.
+Every hook is wrapped in try/catch and falls back to the **original behavior** on any error. This means
+enabling the integration can never break block mining or validation. An end-to-end test
+on a real chain showed that blocks are mined and accepted correctly and that the chain height
+grows correctly.
 
-## کنترل
+## Control
 
 ```bash
-BITCOIN_INTEGRATE=0    # غیرفعال‌کردن کامل یکپارچه‌سازی (بازگشت به رفتار قدیم)
-MIN_RELAY_RATE=1       # حداقل نرخ کارمزد (sat/vB) برای mempool
+BITCOIN_INTEGRATE=0    # fully disable the integration (revert to the old behavior)
+MIN_RELAY_RATE=1       # minimum fee rate (sat/vB) for the mempool
 ```
 
-## تست
+## Testing
 
 ```bash
-npx jest test/integrate.test.js   # ۷ تست یکپارچه‌سازی
-npx jest test/bitcoin.test.js     # ۱۶ تست قابلیت‌های بیت‌کوینی
-npx jest test/network.test.js     # ۱۱ تست شبکه
-# مجموعاً ۳۴ تست، همه پاس
+npx jest test/integrate.test.js   # 7 integration tests
+npx jest test/bitcoin.test.js     # 16 Bitcoin capability tests
+npx jest test/network.test.js     # 11 network tests
+# 34 tests total, all passing
 ```
 
 *© 2026 SPN Coin Project.*

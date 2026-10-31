@@ -1,99 +1,99 @@
-# اتصال دامنه به سرور — راهنمای کامل
+# Connecting a Domain to the Server — Complete Guide
 # Connecting Your Domain to the Server
 
-این راهنما نشان می‌دهد چطور دامنه‌ات (مثلاً spnchain.com) را به سرور VPS وصل کنی
-تا کاربران بتوانند با https://spnchain.com به نود SPN دسترسی داشته باشند.
+This guide shows how to connect your domain (e.g., spnchain.com) to your VPS server
+so users can reach the SPN node at https://spnchain.com.
 
-پیش‌نیاز:
-  - یک VPS با IP عمومی (مثلاً از Hetzner) — فرض: 203.0.113.50
-  - یک دامنه (مثلاً spnchain.com)
-  - پروژه‌ی SPN روی سرور نصب شده و با npm start اجرا می‌شود
+Prerequisites:
+  - A VPS with a public IP (e.g., from Hetzner) — assume: 203.0.113.50
+  - A domain (e.g., spnchain.com)
+  - The SPN project installed on the server and running with npm start
 
 ═══════════════════════════════════════════════════════════════════════
-  دو روش وجود دارد — روش ۱ (Cloudflare) بسیار ساده‌تر و امن‌تر است
+  There are two methods — Method 1 (Cloudflare) is much simpler and safer
 ═══════════════════════════════════════════════════════════════════════
 
 
 ╔═════════════════════════════════════════════════════════════════════╗
-║  روش ۱ — با Cloudflare (توصیه‌شده ⭐)                                ║
-║  ساده، رایگان، با HTTPS خودکار و محافظت DDoS                        ║
+║  Method 1 — With Cloudflare (recommended ⭐)                         ║
+║  Simple, free, with automatic HTTPS and DDoS protection             ║
 ╚═════════════════════════════════════════════════════════════════════╝
 
-با این روش، Cloudflare بین کاربر و سرورت می‌نشیند:
-  کاربر → Cloudflare (HTTPS + محافظت) → سرور تو
+With this method, Cloudflare sits between the user and your server:
+  user → Cloudflare (HTTPS + protection) → your server
 
-مزیت: HTTPS رایگان و خودکار، مخفی ماندن IP سرورت، محافظت DDoS رایگان.
-
-
-── قدم ۱: دامنه را به Cloudflare اضافه کن ──
-  1. در cloudflare.com ثبت‌نام کن (رایگان)
-  2. دکمه "Add a site" → دامنه‌ات را وارد کن (spnchain.com)
-  3. پلن Free را انتخاب کن
-  4. Cloudflare دو تا "Nameserver" به تو می‌دهد (مثل xxx.ns.cloudflare.com)
+Advantage: free and automatic HTTPS, keeping your server's IP hidden, free DDoS protection.
 
 
-── قدم ۲: Nameserver ها را در جای خرید دامنه تنظیم کن ──
-  1. به سایتی که دامنه را خریدی برو (Namecheap و...)
-  2. بخش "Nameservers" یا "DNS" را پیدا کن
-  3. Nameserver های Cloudflare را جایگزین کن
-  4. (این تغییر ممکن است چند ساعت طول بکشد)
+── Step 1: Add the domain to Cloudflare ──
+  1. Sign up at cloudflare.com (free)
+  2. "Add a site" button → enter your domain (spnchain.com)
+  3. Choose the Free plan
+  4. Cloudflare gives you two "Nameservers" (like xxx.ns.cloudflare.com)
 
 
-── قدم ۳: رکورد DNS بساز (دامنه → IP سرور) ──
-  در داشبورد Cloudflare، بخش DNS → Add record:
+── Step 2: Set the nameservers at your domain registrar ──
+  1. Go to the site where you bought the domain (Namecheap, etc.)
+  2. Find the "Nameservers" or "DNS" section
+  3. Replace them with Cloudflare's nameservers
+  4. (This change may take a few hours)
+
+
+── Step 3: Create a DNS record (domain → server IP) ──
+  In the Cloudflare dashboard, DNS section → Add record:
 
   Type:   A
-  Name:   @                    (یعنی خود spnchain.com)
-  IPv4:   203.0.113.50         (IP سرور VPS تو)
-  Proxy:  🟠 Proxied (روشن)     ← مهم: این محافظت را فعال می‌کند
+  Name:   @                    (meaning spnchain.com itself)
+  IPv4:   203.0.113.50         (your VPS server's IP)
+  Proxy:  🟠 Proxied (on)       ← important: this enables protection
 
-  یک رکورد دیگر برای www:
+  Another record for www:
   Type:   A
   Name:   www
   IPv4:   203.0.113.50
   Proxy:  🟠 Proxied
 
 
-── قدم ۴: SSL را روی Full بگذار ──
-  در Cloudflare → SSL/TLS → Overview:
-  حالت را روی "Full" بگذار (یا "Flex" اگر سرورت HTTPS ندارد)
+── Step 4: Set SSL to Full ──
+  In Cloudflare → SSL/TLS → Overview:
+  Set the mode to "Full" (or "Flex" if your server does not have HTTPS)
 
 
-── قدم ۵: سرورت را روی پورت 3000 اجرا کن ──
-  روی سرور:
+── Step 5: Run your server on port 3000 ──
+  On the server:
       ACCESS_KEY=... JWT_SECRET=... PORT=3000 npm start
 
-  (بهتر: از فایل .env استفاده کن که secret ها را دارد)
+  (Better: use a .env file that holds the secrets)
 
-  تمام! حالا https://spnchain.com به سرورت وصل است.
+  Done! Now https://spnchain.com is connected to your server.
 
 
 ═══════════════════════════════════════════════════════════════════════
 
 
 ╔═════════════════════════════════════════════════════════════════════╗
-║  روش ۲ — بدون Cloudflare (Nginx + Let's Encrypt)                    ║
-║  کنترل کامل‌تر، اما پیچیده‌تر                                        ║
+║  Method 2 — Without Cloudflare (Nginx + Let's Encrypt)              ║
+║  More complete control, but more complex                            ║
 ╚═════════════════════════════════════════════════════════════════════╝
 
-با این روش، Nginx روی سرورت به‌عنوان "reverse proxy" کار می‌کند و
-گواهی SSL رایگان از Let's Encrypt می‌گیرد.
+With this method, Nginx runs on your server as a "reverse proxy" and
+gets a free SSL certificate from Let's Encrypt.
 
 
-── قدم ۱: رکورد DNS (در جای خرید دامنه) ──
-  Type: A | Name: @   | Value: 203.0.113.50 (IP سرورت)
+── Step 1: DNS record (at your domain registrar) ──
+  Type: A | Name: @   | Value: 203.0.113.50 (your server's IP)
   Type: A | Name: www | Value: 203.0.113.50
 
 
-── قدم ۲: Nginx و Certbot نصب کن (روی سرور اوبونتو) ──
+── Step 2: Install Nginx and Certbot (on an Ubuntu server) ──
       sudo apt update
       sudo apt install nginx certbot python3-certbot-nginx -y
 
 
-── قدم ۳: تنظیم Nginx ──
-  فایل بساز:  sudo nano /etc/nginx/sites-available/spnchain
+── Step 3: Configure Nginx ──
+  Create a file:  sudo nano /etc/nginx/sites-available/spnchain
 
-  محتوا:
+  Contents:
       server {
           server_name spnchain.com www.spnchain.com;
 
@@ -109,82 +109,82 @@
           }
       }
 
-  فعالش کن:
+  Enable it:
       sudo ln -s /etc/nginx/sites-available/spnchain /etc/nginx/sites-enabled/
       sudo nginx -t
       sudo systemctl reload nginx
 
 
-── قدم ۴: گواهی SSL رایگان بگیر ──
+── Step 4: Get a free SSL certificate ──
       sudo certbot --nginx -d spnchain.com -d www.spnchain.com
 
-  Certbot خودکار HTTPS را تنظیم می‌کند و هر ۹۰ روز تمدید می‌کند.
+  Certbot automatically configures HTTPS and renews it every 90 days.
 
 
-── قدم ۵: سرورت را اجرا کن ──
+── Step 5: Run your server ──
       PORT=3000 npm start
 
 
 ═══════════════════════════════════════════════════════════════════════
-  فایروال — پورت‌هایی که باید باز باشند
+  Firewall — ports that must be open
 ═══════════════════════════════════════════════════════════════════════
 
-روی سرور اوبونتو (با ufw):
-      sudo ufw allow 22        # SSH (برای مدیریت سرور)
+On an Ubuntu server (with ufw):
+      sudo ufw allow 22        # SSH (for server management)
       sudo ufw allow 80        # HTTP
       sudo ufw allow 443       # HTTPS
-      sudo ufw allow 8333      # P2P (ارتباط بین نودها)
-      sudo ufw allow 3333      # Stratum (استخراج) — فقط اگر ماینر خارجی داری
+      sudo ufw allow 8333      # P2P (communication between nodes)
+      sudo ufw allow 3333      # Stratum (mining) — only if you have an external miner
       sudo ufw enable
 
-نکته: پورت 3000 را از بیرون باز نکن! فقط Nginx/Cloudflare به آن دسترسی دارد.
+Note: Do not open port 3000 to the outside! Only Nginx/Cloudflare has access to it.
 
 
 ═══════════════════════════════════════════════════════════════════════
-  نگه داشتن سرور روشن (حتی بعد از بستن ترمینال)
+  Keeping the server running (even after closing the terminal)
 ═══════════════════════════════════════════════════════════════════════
 
-با npm start، اگر ترمینال را ببندی سرور می‌خوابد. برای همیشه‌روشن بودن:
+With npm start, if you close the terminal the server goes to sleep. To stay always on:
 
-روش ساده (PM2):
+Simple method (PM2):
       npm install -g pm2
       pm2 start server.js --name spn-node
       pm2 save
-      pm2 startup           # تا بعد از ری‌استارت سرور هم خودکار روشن شود
+      pm2 startup           # so it also starts automatically after a server restart
 
-دستورات مفید PM2:
-      pm2 logs spn-node     # دیدن لاگ‌ها
-      pm2 restart spn-node  # ری‌استارت
-      pm2 stop spn-node     # توقف
-
-
-═══════════════════════════════════════════════════════════════════════
-  تست نهایی
-═══════════════════════════════════════════════════════════════════════
-
-  1. مرورگر → https://spnchain.com
-  2. باید داشبورد SPN باز شود با قفل سبز (HTTPS) 🔒
-  3. https://spnchain.com/explorer.html → کاوشگر
-  4. https://spnchain.com/admin.html → پنل ادمین
+Useful PM2 commands:
+      pm2 logs spn-node     # view logs
+      pm2 restart spn-node  # restart
+      pm2 stop spn-node     # stop
 
 
 ═══════════════════════════════════════════════════════════════════════
-  ⚠️  مهم: دامنه‌ات را در ALLOWED_ORIGINS بگذار
+  Final test
 ═══════════════════════════════════════════════════════════════════════
 
-در حالت production، پروژه فقط به origin های شناخته‌شده جواب می‌دهد.
-حتماً در فایل .env این را اضافه کن (وگرنه بعضی درخواست‌ها بلاک می‌شوند):
+  1. Browser → https://spnchain.com
+  2. The SPN dashboard should open with a green lock (HTTPS) 🔒
+  3. https://spnchain.com/explorer.html → the explorer
+  4. https://spnchain.com/admin.html → the admin panel
+
+
+═══════════════════════════════════════════════════════════════════════
+  ⚠️  Important: put your domain in ALLOWED_ORIGINS
+═══════════════════════════════════════════════════════════════════════
+
+In production mode, the project only responds to known origins.
+Be sure to add this to the .env file (otherwise some requests will be blocked):
 
     ALLOWED_ORIGINS=https://spnchain.com,https://www.spnchain.com
 
-(دامنه‌ی واقعی خودت را بگذار)
+(use your own real domain)
 
 
 ═══════════════════════════════════════════════════════════════════════
-  نکته‌ی مهم برای موقعیت تو (تحریم)
+  An important note for your situation (sanctions)
 ═══════════════════════════════════════════════════════════════════════
 
-  - دامنه و VPS را شریک اماراتی‌ات بگیرد (پرداخت با کارت اماراتی)
-  - Cloudflare معمولاً برای مدیریت از ایران مشکلی ندارد، اما اگر مسدود شد،
-    از طریق شریک اماراتی یا VPN مدیریت کن
-  - IP سرور را با کسی به اشتراک نگذار (Cloudflare آن را مخفی می‌کند)
+  - Have your UAE partner obtain the domain and VPS (paying with a UAE card)
+  - Cloudflare usually has no issue being managed from Iran, but if it gets blocked,
+    manage it through your UAE partner or a VPN
+  - Do not share the server IP with anyone (Cloudflare hides it)

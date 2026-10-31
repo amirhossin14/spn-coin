@@ -1,37 +1,37 @@
-# موتور Script بومی — ارتقا
+# Native Script Engine — Upgrade
 
-راهِ اصولیِ «قرارداد هوشمند» در مدل UTXO، غنی‌سازی زبان Script است (نه EVM).
-موتور از یک ماشین پشته‌ایِ سادهٔ P2PKH/multisig/timelock به یک زبان شرطیِ
-واقعی ارتقا یافت.
+The principled way to do "smart contracts" in the UTXO model is to enrich the Script language
+(not EVM). The engine was upgraded from a simple P2PKH/multisig/timelock stack machine to a real
+conditional language.
 
-## چه اضافه شد
-- **شاخه‌بندی شرطی:** `OP_IF` / `OP_NOTIF` / `OP_ELSE` / `OP_ENDIF` (با پشتهٔ
-  اجرا و بررسی توازن). این پایهٔ هر قرارداد چندمسیره است.
-- **توابع هش:** `OP_SHA256`, `OP_HASH256` (علاوه بر `OP_HASH160`).
-- **Timelock نسبی (BIP-112):** `OP_CHECKSEQUENCEVERIFY` (CSV) — خرج فقط پس از
-  گذشتِ n بلاک/ثانیه از عمرِ خروجی.
-- **`OP_SWAP`** و اصلاحات پشته.
+## What was added
+- **Conditional branching:** `OP_IF` / `OP_NOTIF` / `OP_ELSE` / `OP_ENDIF` (with an
+  execution stack and balance checking). This is the foundation of any multi-path contract.
+- **Hash functions:** `OP_SHA256`, `OP_HASH256` (in addition to `OP_HASH160`).
+- **Relative timelock (BIP-112):** `OP_CHECKSEQUENCEVERIFY` (CSV) — spendable only after
+  n blocks/seconds have passed since the output's creation.
+- **`OP_SWAP`** and stack fixes.
 
-## قراردادهای آماده (builders)
-- **HTLC (قرارداد قفل‌شده با هش و زمان):** پایهٔ اتمیک‌سواپ و کانال‌های پرداخت.
+## Ready-made contracts (builders)
+- **HTLC (Hash Time-Locked Contract):** the basis of atomic swaps and payment channels.
   ```js
   const lock   = script.build.htlc(sha256(preimage), recipientPub, funderPub, timeout);
-  const claim  = script.build.htlcClaim(sig, preimage);  // مسیر برداشت با افشای preimage
-  const refund = script.build.htlcRefund(sig);           // مسیر بازگشت پس از timeout
+  const claim  = script.build.htlcClaim(sig, preimage);  // claim path revealing the preimage
+  const refund = script.build.htlcRefund(sig);           // refund path after timeout
   ```
 - **Relative timelock:** `script.build.csv(sequence, innerScript)`
-- (موجود از قبل) `p2pkh`, `multisig(m,n)`, `timelock` (CLTV مطلق)
+- (already existing) `p2pkh`, `multisig(m,n)`, `timelock` (absolute CLTV)
 
-## اتصال به زنجیره
-`utxo/utxo.js` هنگام اعتبارسنجی، `sigHash` (با chainId برای ضدِ replay)،
-`lockContext` (برای CLTV) و `sequenceContext` (برای CSV) را به موتور پاس می‌دهد،
-پس این قراردادها روی تراکنش‌های واقعی هم اجرا می‌شوند.
+## Connection to the chain
+During validation, `utxo/utxo.js` passes `sigHash` (with chainId for replay protection),
+`lockContext` (for CLTV), and `sequenceContext` (for CSV) to the engine,
+so these contracts also run on real transactions.
 
-## راستی‌آزمایی
-تست‌شده: claimِ HTLC با preimageِ درست (و ردِ preimage/امضای غلط)، refund قبل/بعد
-از timeout، CSV با عمرِ کافی/ناکافی، ردِ `OP_IF` نامتوازن، و سالم‌ماندنِ
-multisig/P2PKH. **۵۵ تست پاس، lint بدون خطا.**
+## Verification
+Tested: HTLC claim with the correct preimage (and rejection of a wrong preimage/signature), refund before/after
+the timeout, CSV with sufficient/insufficient age, rejection of an unbalanced `OP_IF`, and
+multisig/P2PKH staying intact. **55 tests passing, lint with no errors.**
 
-> یادآوری: این «قرارداد هوشمند» به سبک UTXO است (شرط‌های خرج)، نه ماشین حالتِ
-> عمومی مثل EVM. برای قراردادهای دلخواهِ turing-complete، مسیر درست همان
-> استقرار روی زنجیرهٔ EVM است (`contracts/`).
+> Reminder: this "smart contract" is UTXO-style (spending conditions), not a general
+> state machine like EVM. For arbitrary turing-complete contracts, the right path is
+> deployment on an EVM chain (`contracts/`).

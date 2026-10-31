@@ -1,55 +1,55 @@
-# SPN Coin — قابلیت‌های بیت‌کوینی اضافه‌شده
+# SPN Coin — Added Bitcoin-Style Features
 
-این سند هشت قابلیت بیت‌کوین‌مانند که به پروژه اضافه شد را توضیح می‌دهد. همه در پوشه‌ی `bitcoin/` (و `wallet/hd-account.js`) قرار دارند، به‌صورت افزودنی و بدون دستکاری کد اصلی، و با ۱۶ تست jest تأیید شده‌اند (`test/bitcoin.test.js`).
+This document explains eight Bitcoin-like features added to the project. They all live in the `bitcoin/` directory (and `wallet/hd-account.js`), as additions without modifying the core code, and are verified by 16 jest tests (`test/bitcoin.test.js`).
 
-## ۱. SegWit — جداسازی امضا (`bitcoin/segwit.js`)
-- `txid` بدون witness محاسبه می‌شود → **رفع malleability** (تغییرپذیری تراکنش).
-- `wtxid` با witness محاسبه می‌شود.
-- **Witness commitment** در coinbase: ریشه‌ی مرکل همه‌ی wtxidها، تا witness هم توسط PoW تعهد شود.
+## 1. SegWit — Witness Separation (`bitcoin/segwit.js`)
+- `txid` is computed without the witness → **malleability fix** (transaction malleability).
+- `wtxid` is computed with the witness.
+- **Witness commitment** in the coinbase: the Merkle root of all wtxids, so that the witness is also committed to by PoW.
 
-## ۲. کارمزد بر اساس نرخ (`bitcoin/feerate.js`)
-- محاسبه‌ی `vsize` (virtual size) با **تخفیف witness** (وزن = base×۳ + total، طبق BIP-141).
-- نرخ کارمزد = ساتوشی بر بایت مجازی (sat/vB).
-- تخمین‌گر کارمزد بر اساس محتوای اخیر mempool.
+## 2. Fee Rate-Based Fees (`bitcoin/feerate.js`)
+- Computes `vsize` (virtual size) with a **witness discount** (weight = base×3 + total, per BIP-141).
+- Fee rate = satoshis per virtual byte (sat/vB).
+- A fee estimator based on recent mempool contents.
 
-## ۳. Mempool پیشرفته + انتخاب تراکنش (`bitcoin/feemempool.js`)
-- **انتخاب برای بلوک** به‌صورت حریصانه بر اساس نرخ کارمزد ancestor.
-- **Eviction**: وقتی حافظه پر می‌شود، کم‌کارمزدترین بسته‌ها حذف و min-fee پویا بالا می‌رود.
-- **min-relay-fee پویا** که با پرشدن mempool افزایش می‌یابد (ضد اسپم).
+## 3. Advanced Mempool + Transaction Selection (`bitcoin/feemempool.js`)
+- **Block selection** greedily based on ancestor fee rate.
+- **Eviction**: when memory fills up, the lowest-fee packages are removed and the dynamic min-fee rises.
+- **Dynamic min-relay-fee** that increases as the mempool fills (anti-spam).
 
-## ۴. RBF و CPFP (`bitcoin/feemempool.js`)
-- **RBF (BIP-125)**: تراکنش جایگزین باید هم کارمزد مطلق و هم نرخ بالاتری از همه‌ی تراکنش‌های متعارض داشته باشد.
-- **CPFP**: فرزند پرکارمزد، والد کم‌کارمزد را با خودش وارد بلوک می‌کند (بر اساس نرخ بسته).
+## 4. RBF and CPFP (`bitcoin/feemempool.js`)
+- **RBF (BIP-125)**: the replacement transaction must have both a higher absolute fee and a higher rate than all conflicting transactions.
+- **CPFP**: a high-fee child pulls a low-fee parent into the block with it (based on package rate).
 
-## ۵. Compact Blocks (`bitcoin/compactblock.js`)
-- انتقال بلوک با **shortID شش‌بایتی** به‌جای کل تراکنش‌ها (BIP-152).
-- بازسازی بلوک از mempool گیرنده و درخواست فقط تراکنش‌های缺 (missing).
-- کاهش چشمگیر تأخیر انتشار بلوک (کاهش orphan).
+## 5. Compact Blocks (`bitcoin/compactblock.js`)
+- Block transfer using a **six-byte shortID** instead of full transactions (BIP-152).
+- Reconstructs the block from the recipient's mempool and requests only the missing transactions.
+- Dramatically reduces block propagation latency (reduces orphans).
 
-## ۶. HD Wallet کامل BIP-32/44 (`wallet/hd-account.js`)
-- ساختار **account** کامل: `m/44'/coin'/account'/change/index`.
-- جداسازی زنجیره‌ی **external (دریافت)** و **internal (تغییر/change)**.
-- **کشف با gap-limit**: اسکن آدرس‌ها تا ۲۰ آدرس بلااستفاده‌ی پیاپی، برای بازیابی کامل کیف پول.
-- کشف چند account.
+## 6. Full BIP-32/44 HD Wallet (`wallet/hd-account.js`)
+- Full **account** structure: `m/44'/coin'/account'/change/index`.
+- Separation of the **external (receive)** and **internal (change)** chains.
+- **Discovery with gap-limit**: scans addresses up to 20 consecutive unused addresses, for full wallet recovery.
+- Multi-account discovery.
 
-## ۷. Bloom Filter و SPV (`bitcoin/spv.js`)
-- **Bloom filter (BIP-37)**: کیف پول سبک فیلتر آدرس‌هایش را می‌فرستد.
-- **اثبات مرکل (SPV)**: نود فقط تراکنش‌های منطبق + اثبات حضورشان در بلوک را می‌فرستد؛ کیف سبک بدون دانلود کل بلوک، حضور را با هدر (که با PoW معتبر است) تأیید می‌کند.
+## 7. Bloom Filter and SPV (`bitcoin/spv.js`)
+- **Bloom filter (BIP-37)**: a light wallet sends a filter of its addresses.
+- **Merkle proof (SPV)**: the node sends only the matching transactions + proof of their presence in the block; the light wallet confirms presence using the header (which is valid by PoW) without downloading the entire block.
 
-## ۸. Coin Selection پیشرفته (`bitcoin/coinselect.js`)
-- **Branch and Bound**: یافتن مجموعه‌ی دقیق UTXO بدون خروجی change (ارزان‌تر، خصوصی‌تر).
-- **Knapsack** به‌عنوان fallback با change.
-- **آگاه از کارمزد**: ارزش مؤثر هر coin = ارزش − (بایت ورودی × نرخ کارمزد)؛ coinهای dust حذف می‌شوند.
+## 8. Advanced Coin Selection (`bitcoin/coinselect.js`)
+- **Branch and Bound**: finding an exact set of UTXOs with no change output (cheaper, more private).
+- **Knapsack** as a fallback with change.
+- **Fee-aware**: the effective value of each coin = value − (input bytes × fee rate); dust coins are removed.
 
 ---
 
-## تست
+## Testing
 ```bash
-npx jest test/bitcoin.test.js     # ۱۶ تست این ماژول‌ها
-npx jest test/network.test.js     # ۱۱ تست شبکه‌ی مرحله‌ی قبل
+npx jest test/bitcoin.test.js     # 16 tests for these modules
+npx jest test/network.test.js     # 11 network tests from the previous stage
 ```
 
-## نکته
-این‌ها پیاده‌سازی‌های **مدل درست و کارکردی** روی فرمت JSON پروژه هستند — همان خواص امنیتی بیت‌کوین (رفع malleability، تخفیف witness، ضد اسپم و...) را دارند، ولی به سریال‌سازی دقیق دودویی بیت‌کوین وابسته نیستند. برای اتصال کامل به مسیر اجماع (مثلاً استفاده‌ی واقعی از witness commitment در اعتبارسنجی بلوک)، گام بعدی وصل‌کردن این ماژول‌ها به `blockchain/blockchain.js` است.
+## Note
+These are **correct, functional model** implementations on the project's JSON format — they have the same Bitcoin security properties (malleability fix, witness discount, anti-spam, etc.), but do not depend on Bitcoin's exact binary serialization. To fully wire them into the consensus path (for example, actually using the witness commitment in block validation), the next step is to connect these modules to `blockchain/blockchain.js`.
 
 *© 2026 SPN Coin Project.*

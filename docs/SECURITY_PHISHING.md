@@ -1,95 +1,94 @@
-# راهنمای امنیت در برابر فیشینگ و مهندسی اجتماعی
 # Security Guide: Phishing & Social Engineering
 
-خطرناک‌ترین حمله‌ها آن‌هایی نیستند که به کد حمله می‌کنند — آن‌هایی هستند که
-به «انسان» حمله می‌کنند. این راهنما تو و کاربرانت را محافظت می‌کند.
+The most dangerous attacks are not the ones that target code — they are the ones that
+target the *human*. This guide protects you and your users.
 
 ═══════════════════════════════════════════════════════════════════════
-  بخش ۱ — محافظت از خودت (مالک پروژه)
+  PART 1 — Protecting Yourself (The Project Owner)
 ═══════════════════════════════════════════════════════════════════════
 
-## کلید خصوصی premine (۱ میلیون SPN) — مهم‌ترین دارایی تو
+## Premine Private Key (1 Million SPN) — Your Most Important Asset
 
-⚠️  این کلید = دسترسی کامل به ۱ میلیون SPN.
+⚠️  This key = full access to 1 million SPN.
 
-قوانین طلایی:
-  1. هرگز، تحت هیچ شرایطی، کلید خصوصی را به کسی نده — حتی «شریک»، «صرافی»،
-     یا «پشتیبانی». هیچ سرویس واقعی هرگز کلید خصوصی نمی‌خواهد.
-  2. کلید را آفلاین نگه دار (روی کاغذ یا یک USB جدا) — نه در ایمیل، نه در
-     پیام، نه در فضای ابری.
-  3. اگر لازم شد کلید را جابه‌جا کنی، هرگز از طریق پیام/ایمیل نفرست.
+Golden rules:
+  1. Never, under any circumstances, give the private key to anyone — not a "partner",
+     not an "exchange", not "support". No legitimate service ever asks for a private key.
+  2. Keep the key offline (on paper or a dedicated USB) — not in email, not in a
+     message, not in the cloud.
+  3. If you must move the key, never send it via message/email.
 
-## حملات دیپ‌فیک (Deepfake) — تهدید جدید AI
+## Deepfake Attacks — The New AI Threat
 
-هوش مصنوعی می‌تواند صدا و تصویر را جعل کند. یعنی:
-  - ممکن است یک تماس تصویری بگیری که «شبیه» شریک اماراتی‌ات است، اما جعلی باشد
-  - ممکن است یک پیام صوتی بشنوی که «شبیه» صدای آشناست
+AI can fake voices and video. That means:
+  - You might receive a video call that "looks like" your Emirati partner, but is fake
+  - You might hear a voice message that "sounds like" a familiar voice
 
-دفاع:
-  - برای هر درخواست حساس (انتقال پول، دادن دسترسی)، از یک راه دوم تأیید بگیر
-    (مثلاً یک کلمه‌ی رمز از قبل توافق‌شده با شریکت)
-  - هرگز فقط بر اساس یک تماس یا پیام، کار حساس انجام نده
+Defense:
+  - For any sensitive request (transferring money, granting access), get a second
+    confirmation through another channel (for example, a passphrase agreed on in advance
+    with your partner)
+  - Never perform a sensitive action based on a single call or message alone
 
-## نشانه‌های فیشینگ که باید بشناسی
+## Phishing Signs You Must Recognize
 
-🚩 «فوری است! همین حالا کلیدت را بده وگرنه حسابت بسته می‌شود»
-   → فشار زمانی = کلاهبرداری
+🚩 "It's urgent! Give me your key right now or your account will be closed"
+   → Time pressure = scam
 
-🚩 یک لینک که «شبیه» سایت رسمی است اما آدرسش کمی فرق دارد
-   (مثلاً spnchaln.com به‌جای spnchain.com — دقت کن به حروف!)
-   → همیشه آدرس را دقیق چک کن
+🚩 A link that "looks like" the official site but has a slightly different address
+   (for example, spnchaln.com instead of spnchain.com — watch the letters!)
+   → Always check the address carefully
 
-🚩 ایمیلی از «پشتیبانی» که رمز یا کلید می‌خواهد
-   → پشتیبانی واقعی هرگز رمز نمی‌خواهد
+🚩 An email from "support" asking for your password or key
+   → Real support never asks for a password
 
 
 ═══════════════════════════════════════════════════════════════════════
-  بخش ۲ — محافظت از کاربرانت
+  PART 2 — Protecting Your Users
 ═══════════════════════════════════════════════════════════════════════
 
-پروژه‌ات از قبل این محافظت‌ها را دارد (اضافه‌شده):
+Your project already has these protections built in (added):
 
-  ✅ هشدار دامنه‌ی جعلی — اگر سایت روی دامنه‌ی غیررسمی باز شود، به کاربر
-     هشدار قرمز نشان می‌دهد
-  ✅ ضد clickjacking — صفحه در iframe سایت دیگر باز نمی‌شود
-  ✅ هشدار کلید خصوصی — وقتی کاربر روی فیلد کلید کلیک می‌کند، یادآوری می‌شود
-     که کلیدش را به کسی ندهد
-  ✅ کلید در مرورگر می‌ماند — هرگز به سرور فرستاده نمی‌شود
+  ✅ Fake domain warning — if the site opens on an unofficial domain, it shows the user
+     a red warning
+  ✅ Anti-clickjacking — the page will not open inside another site's iframe
+  ✅ Private key warning — when a user clicks the key field, they are reminded not to
+     give their key to anyone
+  ✅ Key stays in the browser — it is never sent to the server
 
-## کاری که تو باید بکنی:
+## What You Need to Do:
 
-1. آدرس رسمی را همه‌جا اعلام کن
-   وقتی دامنه‌ی نهایی (مثلاً spnchain.com) را گرفتی، آن را در
-   public/anti-phishing.js در لیست OFFICIAL_HOSTS اضافه کن:
+1. Announce the official address everywhere
+   Once you have obtained your final domain (for example, spnchain.com), add it to the
+   OFFICIAL_HOSTS list in public/anti-phishing.js:
 
        var OFFICIAL_HOSTS = [
          'localhost', '127.0.0.1',
-         'spnchain.com', 'www.spnchain.com'   // ← دامنه واقعی‌ات
+         'spnchain.com', 'www.spnchain.com'   // ← your real domain
        ];
 
-   این باعث می‌شود اگر کسی یک کلون جعلی بسازد، کاربران هشدار ببینند.
+   This ensures that if someone builds a fake clone, users will see a warning.
 
-2. کاربران را آموزش بده
-   در کانال رسمی‌ات (تلگرام/سایت) بنویس:
-   «آدرس رسمی ما فقط spnchain.com است. ما هرگز کلید خصوصی یا رمز
-    شما را نمی‌خواهیم. به هیچ لینک دیگری اعتماد نکنید.»
+2. Educate your users
+   On your official channel (Telegram/website), write:
+   "Our only official address is spnchain.com. We will never ask for your private key
+    or password. Do not trust any other link."
 
-3. کانال‌های رسمی را واضح اعلام کن
-   کاربران باید بدانند کدام تلگرام/توییتر/ایمیل رسمی است، تا جعلی‌ها را
-   تشخیص دهند.
+3. Clearly announce your official channels
+   Users must know which Telegram/Twitter/email is official, so they can identify fakes.
 
 
 ═══════════════════════════════════════════════════════════════════════
-  بخش ۳ — چک‌لیست سریع
+  PART 3 — Quick Checklist
 ═══════════════════════════════════════════════════════════════════════
 
-  □ کلید premine آفلاین و امن است
-  □ 2FA روی حساب ادمین فعال است
-  □ دامنه‌ی رسمی در anti-phishing.js تنظیم شده
-  □ کلمه‌ی رمز تأیید با شریک اماراتی توافق شده (ضد دیپ‌فیک)
-  □ کاربران درباره‌ی آدرس رسمی و «هرگز کلید نده» آگاه شده‌اند
-  □ ADMIN_ALLOWED_IPS تنظیم شده (اگر IP ثابت داری)
+  □ Premine key is offline and secure
+  □ 2FA is enabled on the admin account
+  □ Official domain is configured in anti-phishing.js
+  □ A confirmation passphrase is agreed with the Emirati partner (anti-deepfake)
+  □ Users are aware of the official address and the "never give out your key" rule
+  □ ADMIN_ALLOWED_IPS is configured (if you have a static IP)
 
 
-یادت باشد: قوی‌ترین دیوار امنیتی، آگاهی توست. هیچ کدی نمی‌تواند جای
-هوشیاری انسانی را بگیرد.
+Remember: the strongest security wall is your own awareness. No code can replace
+human vigilance.

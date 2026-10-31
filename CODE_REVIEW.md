@@ -1,30 +1,30 @@
-# بازبینی کد و امنیت — گزارش
+# Code and Security Review — Report
 
-یک بازبینیِ کاملِ کدی که تا اینجا ساختیم انجام شد. وضعیت کلی **سالم** است؛
-چند مورد سخت‌سازی رفع شد.
+A full review of the code we have built so far was performed. The overall status is **healthy**;
+a few hardening items were addressed.
 
-## ✅ آنچه از قبل خوب بود
-- هدرهای امنیتی حاضرند: `X-Content-Type-Options: nosniff`, `X-Frame-Options`,
-  `Content-Security-Policy`, و `Strict-Transport-Security`.
-- CORS در production فقط به `ALLOWED_ORIGINS` محدود است (تأیید شد: origin ناشناس
-  بازتاب نمی‌شود).
-- رمزنگاری استاندارد (secp256k1، TOTP طبق RFC، keystore v3، Replay protection با
-  chainId)، قفلِ حساب پس از تلاش‌های ناموفق، JWT، 2FA، و IDS/IPS.
-- بدون secretِ هاردکد، بدون `eval`/`new Function`، بدون تزریق آشکار.
+## ✅ What was already good
+- Security headers are present: `X-Content-Type-Options: nosniff`, `X-Frame-Options`,
+  `Content-Security-Policy`, and `Strict-Transport-Security`.
+- In production, CORS is restricted to `ALLOWED_ORIGINS` only (confirmed: an unknown origin
+  is not reflected).
+- Standard cryptography (secp256k1, RFC-compliant TOTP, keystore v3, replay protection with
+  chainId), account lockout after failed attempts, JWT, 2FA, and IDS/IPS.
+- No hardcoded secrets, no `eval`/`new Function`, no obvious injection.
 
-## 🔧 رفع‌شده در این بازبینی
-1. **نشتِ پیام خطای داخلی (Information Disclosure):** سه endpoint پیام خطای خام
-   (`e.message`) را در پاسخ ۵۰۰/۵۰۳ به کلاینت می‌فرستادند (مسیرهای mine, logs,
-   ai). حالا خطا سمت‌سرور لاگ می‌شود و به کلاینت پیام عمومی داده می‌شود.
-2. **نبودِ هندلرهای سطح‌پروسه:** برای پایداریِ یک نودِ بلندمدت، هندلرهای
-   `unhandledRejection` و `uncaughtException` اضافه شدند (لاگ + خاموشیِ تمیز
-   به‌جای ماندن در وضعیت نامعین).
+## 🔧 Fixed in this review
+1. **Internal error message leak (Information Disclosure):** three endpoints were sending the raw
+   error message (`e.message`) in their 500/503 response to the client (the mine, logs,
+   and ai routes). Now the error is logged server-side and a generic message is returned to the client.
+2. **Missing process-level handlers:** for the stability of a long-running node, `unhandledRejection`
+   and `uncaughtException` handlers were added (log + clean shutdown
+   instead of remaining in an undefined state).
 
-## یادداشت‌ها (بدون نیاز به تغییر)
-- در حالت غیرِproduction، CORS برای سهولتِ توسعه هر origin را بازتاب می‌دهد؛ این
-  فقط در dev است و در production غیرفعال می‌شود.
-- چند `catch {}`ِ best-effort در مسیرهای ارسال سوکت/DB وجود دارد که عمداً خطا را
-  خفه می‌کنند (رفتار درست برای آن نقاط).
+## Notes (no changes needed)
+- In non-production mode, CORS reflects any origin for development convenience; this
+  is in dev only and is disabled in production.
+- There are a few best-effort `catch {}` blocks in the socket/DB send paths that intentionally
+  swallow errors (the correct behavior for those points).
 
-## راستی‌آزمایی نهایی
-`npm test` → **۵۵ تست پاس**، `npm run lint` بدون خطا، بوتِ production سالم.
+## Final verification
+`npm test` → **55 tests passing**, `npm run lint` with no errors, production boot healthy.

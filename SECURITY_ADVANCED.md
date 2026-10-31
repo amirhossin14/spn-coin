@@ -1,51 +1,50 @@
-# ارتقاهای امنیتی پیشرفته
+# Advanced Security Enhancements
 
-از لیست درخواستی، مواردی که **با معماری UTXO/PoW این زنجیره سازگارند** پیاده و
-تست شدند. مواردِ مدلِ حسابی/EVM و PoS عمداً پیاده نشدند (توضیح در انتها).
+From the requested list, the items that **are compatible with this chain's UTXO/PoW architecture** were implemented and
+tested. The account-model/EVM and PoS items were intentionally not implemented (explanation at the end).
 
-## ✅ پیاده و تست‌شده
+## ✅ Implemented and tested
 
-### 1) Chain ID و Replay Protection
-هر امضای ورودی حالا به `chainId` گره خورده است (`utxo/utxo.js → sigMessage`).
-یعنی تراکنشی که برای این زنجیره امضا شده، روی زنجیرهٔ دیگر (یا فورک/رِبرند با
-شناسهٔ متفاوت) قابل بازپخش (replay) نیست.
-- ✅ تست: خرج روی زنجیرهٔ خودی معتبر، همان امضا روی chainId دیگر **رد** می‌شود.
+### 1) Chain ID and Replay Protection
+Every input signature is now bound to the `chainId` (`utxo/utxo.js → sigMessage`).
+This means a transaction signed for this chain cannot be replayed on another chain (or a fork/rebrand with
+a different identifier).
+- ✅ Test: a spend on the native chain is valid, but the same signature is **rejected** on a different chainId.
 
-### 2) Persistent Audit Log (ضدِدستکاری)
-لاگ حسابرسی حالا **زنجیرهٔ هش** است: هر رکورد `prevHash` و `hash` دارد، پس هر
-ویرایش/حذف/درج، زنجیره را می‌شکند. تابع `verifyAuditLog()` و endpoint
-`GET /api/security/audit-verify` صحت را بررسی می‌کنند.
-- ✅ تست: دستکاری یا حذف هر سطر تشخیص داده می‌شود.
+### 2) Persistent Audit Log (tamper-proof)
+The audit log is now a **hash chain**: each record has a `prevHash` and a `hash`, so any
+edit/deletion/insertion breaks the chain. The `verifyAuditLog()` function and the
+`GET /api/security/audit-verify` endpoint check its integrity.
+- ✅ Test: tampering with or deleting any row is detected.
 
-### 3) P2P Reputation و Sybil Protection
-ماژول `p2p/reputation.js`: امتیازدهی به هر peer (رفتار خوب↑، تخلف↓)، بنِ خودکارِ
-peerهای بدرفتار، و **محدودیت اتصال per-IP** + سقف کل peerها (مقاومت در برابر Sybil).
-به `p2p.js` وصل شد (گیت اتصال ورودی، ثبت/حذف، پاداش/جریمه روی بلاک معتبر/نامعتبر).
-آمار: `GET /api/security/peers`.
-- ✅ تست: اتصال چندگانه از یک IP بلاک می‌شود؛ بلاک‌های نامعتبرِ مکرر → بنِ peer.
+### 3) P2P Reputation and Sybil Protection
+The `p2p/reputation.js` module: scoring for each peer (good behavior↑, violations↓), automatic banning of
+misbehaving peers, and a **per-IP connection limit** + a cap on total peers (resistance against Sybil attacks).
+Wired into `p2p.js` (inbound connection gate, register/remove, reward/penalty on valid/invalid blocks).
+Stats: `GET /api/security/peers`.
+- ✅ Test: multiple connections from one IP are blocked; repeated invalid blocks → peer ban.
 
-### 4) Web3 Keystore استاندارد (v3)
-ماژول `wallet/keystore.js`: فرمت استاندارد Secret Storage اتریوم/Web3
-(scrypt KDF + AES-128-CTR + Keccak-256 MAC) که geth/MetaMask/web3.js می‌خوانند.
-کلید خام ۳۲ بایتی secp256k1 را ذخیره می‌کند. متدهای `wallet.toKeystore(pw)` و
+### 4) Standard Web3 Keystore (v3)
+The `wallet/keystore.js` module: the standard Ethereum/Web3 Secret Storage format
+(scrypt KDF + AES-128-CTR + Keccak-256 MAC) readable by geth/MetaMask/web3.js.
+It stores the raw 32-byte secp256k1 key. Methods `wallet.toKeystore(pw)` and
 `Wallet.fromKeystore(json, pw)`.
-- ✅ تست: رفت‌وبرگشت رمزنگاری/رمزگشایی؛ رمز اشتباه با بررسی MAC رد می‌شود.
+- ✅ Test: encryption/decryption round-trip; a wrong password is rejected via the MAC check.
 
-## ⚠️ تکمیل‌شده روی زیرساخت موجود
-- **RPC Security**: به‌علاوهٔ rate-limit و JWT، حالا IDS/IPS کامل هم روی همهٔ
-  مسیرها اعمال می‌شود (نسخهٔ قبلی).
-- **Mining Pool Security**: Stratum از قبل banlist دارد؛ با reputation و IDS/IPS
-  تقویت شد.
+## ⚠️ Completed on top of existing infrastructure
+- **RPC Security**: in addition to rate-limiting and JWT, full IDS/IPS is now applied to all
+  routes (previous version).
+- **Mining Pool Security**: Stratum already had a banlist; it was reinforced with reputation and IDS/IPS.
 
-## ❌ عمداً پیاده نشد (ناسازگاری معماری — نه نقص)
-- **EVM/Contract VM، Contract Storage، State/Receipt Root، Account Nonce**:
-  این‌ها مفاهیم مدلِ **حسابی/EVM** (اتریوم) هستند. این زنجیره **UTXO** است؛
-  «قرارداد» بومی‌اش موتور **Script** (multisig/timelock) است و برای EVM هم یک
-  ERC-20 واقعی در `contracts/` وجود دارد. افزودن EVM جعلی، بی‌کیفیت و گمراه‌کننده بود.
-- **Validator Slashing**: مفهوم **Proof-of-Stake** است؛ این زنجیره PoW است و
-  امنیتش از قدرت هش می‌آید، نه stake. Slashing این‌جا معنا ندارد.
-- **Ledger/Trezor**: به سخت‌افزار فیزیکی و پروتکل دستگاه نیاز دارد؛ بدون دستگاه
-  قابل پیاده‌سازی/تست معتبر نیست (فقط آداپتور می‌شد گذاشت).
+## ❌ Intentionally not implemented (architectural mismatch — not a defect)
+- **EVM/Contract VM, Contract Storage, State/Receipt Root, Account Nonce**:
+  these are concepts of the **account/EVM model** (Ethereum). This chain is **UTXO**;
+  its native "contract" is the **Script** engine (multisig/timelock), and for EVM there is also a
+  real ERC-20 in `contracts/`. Adding a fake EVM would be low-quality and misleading.
+- **Validator Slashing**: this is a **Proof-of-Stake** concept; this chain is PoW and
+  its security comes from hash power, not stake. Slashing has no meaning here.
+- **Ledger/Trezor**: requires physical hardware and the device protocol; without a device it
+  cannot be meaningfully implemented/tested (only an adapter could be added).
 
-## راستی‌آزمایی کلی
-`npm test` → **۵۰ تست پاس**، `npm run lint` بدون خطا، سرور سالم بوت می‌شود.
+## Overall verification
+`npm test` → **50 tests pass**, `npm run lint` with no errors, the server boots cleanly.

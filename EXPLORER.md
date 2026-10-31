@@ -1,33 +1,33 @@
-# The Assay — اکسپلورر SPN Coin
+# The Assay — SPN Coin Explorer
 
-یک داشبورد اکسپلورر برای بلاکچین خودت (نه کپی TronScan) با هویت بصری کاملاً متفاوت:
-**«ضرابخانه / گواهی خلوص» (Assay)** — پس‌زمینهٔ نفتیِ عمیق، لهجهٔ برنجی طلایی
-(چون یک «سکه» است)، تایپوگرافی گواهی‌گونه (سریف Fraunces + مونوی JetBrains برای
-داده‌ها)، و یک **مُهر ضرابخانه (mint seal)** با نقش گیوشهٔ حکاکی‌شده که ارتفاع
-بلاک فعلی را مثل قالب سکه نشان می‌دهد.
+An explorer dashboard for your own blockchain (not a TronScan clone) with a completely distinct visual
+identity: **"Mint / Certificate of Purity" (Assay)** — a deep petroleum background, a golden brass
+accent (because it is a "coin"), certificate-like typography (Fraunces serif + JetBrains mono for
+data), and a **mint seal** engraved with a guilloché motif that shows the current block
+height like a coin die.
 
-## دسترسی
-پس از اجرای نود:
+## Access
+After running the node:
 ```
-http://localhost:3000/explorer        (یا /explorer.html)
+http://localhost:3000/explorer        (or /explorer.html)
 ```
-فایل: `public/explorer.html` (خودِ نود آن را سرو می‌کند؛ نیازی به build ندارد).
+File: `public/explorer.html` (the node itself serves it; no build is needed).
 
-## به بلاکچین تو وصل است
-همهٔ داده از APIهای عمومی نودِ خودت می‌آید و هر ۱۲ ثانیه تازه می‌شود:
+## Connected to your blockchain
+All data comes from your own node's public APIs and refreshes every 12 seconds:
 - `/api/health`, `/api/stats`, `/api/coin-info`
 - `/api/blocks`, `/api/block/:ref`, `/api/tx/:txid`, `/api/address/:addr`, `/api/search/:q`
 
-## چه چیزی نشان می‌دهد
-- مُهر ارتفاع بلاک زنده + وضعیت شبکه (mainnet/testnet، سلامت، peers).
-- عرضهٔ در گردش (با احتساب halving)، سختی + bits، **الگوریتم PoW** (sha256d/scrypt)،
-  پاداش بلاک، اندازهٔ mempool، peers.
-- آخرین بلاک‌ها و آخرین تراکنش‌ها (mint/transfer)، با کلیک برای جزئیات.
-- نمودار «آهنگ بلاک» (تراکنش در هر بلاک) که با SVG دستی کشیده شده (بدون کتابخانه).
-- جستجوی ارتفاع/هش بلاک/txid/آدرس با کارت جزئیات درون‌صفحه.
+## What it shows
+- A live block-height seal + network status (mainnet/testnet, health, peers).
+- Circulating supply (accounting for halving), difficulty + bits, **PoW algorithm** (sha256d/scrypt),
+  block reward, mempool size, peers.
+- Latest blocks and latest transactions (mint/transfer), clickable for details.
+- A "block tempo" chart (transactions per block) drawn with hand-made SVG (no library).
+- Search by height/block hash/txid/address with an in-page detail card.
 
-## افزوده‌های جانبی
-- endpoint `/api/stats` حالا `powAlgorithm` را هم برمی‌گرداند.
-- مسیر تمیز `/explorer` اضافه شد.
+## Side additions
+- The `/api/stats` endpoint now also returns `powAlgorithm`.
+- A clean `/explorer` route was added.
 
-فقط-خواندنی است و هیچ کلیدی نگه نمی‌دارد.
+It is read-only and holds no keys.

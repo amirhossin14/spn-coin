@@ -1,84 +1,85 @@
-# SPN Coin — گزارش Self-Audit و آمادگی تولید
+# SPN Coin — Self-Audit and Production Readiness Report
 
-> این یک **خود-ارزیابی** است، نه حسابرسی مستقل. صادقانه نوشته شده تا نقشه‌ی
-> راه واقعی رسیدن به «آماده‌ی تولید» را نشان دهد. **تا قبل از حسابرسی مستقل،
-> این نرم‌افزار را با پول واقعی استفاده نکنید.**
+> This is a **self-assessment**, not an independent audit. It is written honestly to
+> show the realistic roadmap to becoming "production ready". **Until an independent
+> audit is complete, do not use this software with real money.**
 
-تاریخ: ۱۴۰۵ / 2026 · نسخه‌ی هسته: 6.x · ~۱۶٬۰۰۰ خط کد در ۷۸ فایل
-
----
-
-## ۱. خلاصه‌ی وضعیت
-
-| حوزه | وضعیت | یادداشت |
-|------|-------|---------|
-| صحت هسته (consensus) | ✅ قوی | ۷۳ تست هسته، شامل ۱۲ تست consensus-critical |
-| قابلیت‌ها | ✅ کامل | ۳۰ تست یکپارچگی end-to-end، همه سبز |
-| امنیت اپلیکیشن | ✅ خوب | امضای سمت کلاینت، DDoS، TLS، hardening ورودی |
-| وابستگی‌ها | ✅ تمیز | فقط ۲ آسیب‌پذیری low در `npm audit` |
-| حسابرسی مستقل | ❌ انجام نشده | **پیش‌نیاز حیاتی تولید** |
-| تست میدانی شبکه | ⚠️ محدود | نیاز به نودهای مستقل واقعی |
+Date: 1405 / 2026 · Core version: 6.x · ~16,000 lines of code across 78 files
 
 ---
 
-## ۲. چه چیزی خوب است (نقاط قوت اثبات‌شده)
+## 1. Status Summary
 
-- **بدون تورم**: تست مستقیم تأیید می‌کند coinbase نمی‌تواند بیش از reward+fee بسازد.
-- **بدون double-spend**: خرج دوباره‌ی یک UTXO رد می‌شود (تست‌شده).
-- **یکپارچگی مرکل**: دستکاری تراکنش بعد از ساخت بلوک گرفته می‌شود.
-- **قوانین زمان**: timestamp آینده و ≤ MTP (BIP-113) رد می‌شوند.
-- **fork choice**: بر پایه‌ی most-cumulative-work، نه طول زنجیره.
-- **امضای سمت کلاینت**: کلید خصوصی هرگز سرور را نمی‌بیند (نقص بحرانی قبلی رفع شد).
-- **دفاع لایه‌ای**: DDoS guard (اتصال/burst/Slowloris)، rate-limit، IDS/IPS،
-  prototype-pollution guard، HSTS/TLS.
+| Area | Status | Notes |
+|------|--------|-------|
+| Core correctness (consensus) | ✅ Strong | 73 core tests, including 12 consensus-critical tests |
+| Features | ✅ Complete | 30 end-to-end integration tests, all green |
+| Application security | ✅ Good | Client-side signing, DDoS, TLS, input hardening |
+| Dependencies | ✅ Clean | Only 2 low-severity vulnerabilities in `npm audit` |
+| Independent audit | ❌ Not done | **Critical production prerequisite** |
+| Network field testing | ⚠️ Limited | Needs real independent nodes |
 
-## ۳. ریسک‌های شناخته‌شده و کاهش‌شان
+---
 
-| ریسک | شدت | وضعیت |
-|------|-----|-------|
-| کلید خصوصی در سرور | 🔴 بحرانی | ✅ رفع شد (امضای کلاینت) |
-| حمله‌ی حجمی (DDoS) | 🟠 بالا | ✅ کاهش یافت (guard چندلایه) |
-| prototype pollution | 🟠 بالا | ✅ کاهش یافت (bodyGuard) |
-| replay تراکنش | 🟠 بالا | ✅ کاهش یافت (chainId+nonce در امضا) |
-| eclipse/sybil در P2P | 🟡 متوسط | ⚠️ کد کاهش هست، تست میدانی ندارد |
-| حمله‌ی ۵۱٪ | 🟡 ذاتی PoW | ⚠️ فقط با hashrate واقعی کاهش می‌یابد |
+## 2. What Is Good (Proven Strengths)
 
-## ۴. آنچه برای «آماده‌ی تولید» هنوز لازم است
+- **No inflation**: a direct test confirms the coinbase cannot create more than reward+fee.
+- **No double-spend**: spending the same UTXO twice is rejected (tested).
+- **Merkle integrity**: tampering with a transaction after block creation is caught.
+- **Time rules**: future timestamps and ≤ MTP (BIP-113) are rejected.
+- **Fork choice**: based on most-cumulative-work, not chain length.
+- **Client-side signing**: the private key never touches the server (a previous critical flaw was fixed).
+- **Layered defense**: DDoS guard (connection/burst/Slowloris), rate-limit, IDS/IPS,
+  prototype-pollution guard, HSTS/TLS.
 
-این‌ها **با کد پر نمی‌شوند** — به فرایند، زمان و افراد نیاز دارند:
+## 3. Known Risks and Their Mitigation
 
-1. **حسابرسی امنیتی مستقل** توسط یک شرکت تخصصی بلاک‌چین (چند ماه، پیش‌نیاز حیاتی).
-2. **تست‌نت عمومی** با نودهای مستقلِ چند اپراتور، برای ماه‌ها.
-3. **bug bounty** عمومی قبل از mainnet.
-4. **بازبینی اقتصادی/بازی‌نظری** پارامترها (reward، fee، سختی) توسط متخصص.
-5. **برنامه‌ی واکنش به حادثه** و کلید اضطراری/checkpoint در صورت حمله.
-6. **نظارت حقوقی/تطبیق** (بسته به حوزه‌ی قضایی).
+| Risk | Severity | Status |
+|------|----------|--------|
+| Private key on the server | 🔴 Critical | ✅ Fixed (client signing) |
+| Volumetric attack (DDoS) | 🟠 High | ✅ Mitigated (multi-layer guard) |
+| prototype pollution | 🟠 High | ✅ Mitigated (bodyGuard) |
+| Transaction replay | 🟠 High | ✅ Mitigated (chainId+nonce in signature) |
+| eclipse/sybil in P2P | 🟡 Medium | ⚠️ Mitigation code exists, no field testing |
+| 51% attack | 🟡 Inherent to PoW | ⚠️ Only mitigated with real hashrate |
 
-## ۵. چک‌لیست پیش از استقرار (کدنی/عملیاتی)
+## 4. What Is Still Needed to Be "Production Ready"
 
-- [x] همه‌ی تست‌های هسته سبز (`npm test`)
-- [x] همه‌ی تست‌های قابلیت سبز (`npm run test:features`)
-- [x] `npm audit` بدون آسیب‌پذیری high/critical
-- [x] امضای سمت کلاینت (بدون کلید در سرور)
-- [x] DDoS guard فعال
-- [x] TLS/HTTPS پیکربندی‌شده (یا reverse proxy)
-- [x] hardening ورودی (pollution/depth guard)
-- [x] Dockerfile غیر-root با healthcheck
-- [x] graceful shutdown روی SIGTERM/SIGINT
-- [ ] گواهی TLS واقعی از CA (نه self-signed)
-- [ ] `JWT_SECRET`/secretها از vault، نه در کد یا env فایل commit‌شده
-- [ ] پشتیبان‌گیری و بازیابی chain data
-- [ ] مانیتورینگ + alert در محیط واقعی (Prometheus/Grafana)
-- [ ] حسابرسی مستقل انجام‌شده
-- [ ] تست‌نت عمومی چندماهه
+These **cannot be filled by code** — they require process, time, and people:
 
-## ۶. جمع‌بندی صادقانه
+1. **Independent security audit** by a specialized blockchain firm (several months, critical prerequisite).
+2. **Public testnet** with independent nodes from multiple operators, for months.
+3. **Public bug bounty** before mainnet.
+4. **Economic/game-theoretic review** of parameters (reward, fee, difficulty) by an expert.
+5. **Incident response plan** and an emergency key/checkpoint in case of attack.
+6. **Legal/compliance oversight** (depending on jurisdiction).
 
-از نظر **کیفیت کد، معماری، و پوشش تست**، این پروژه در سطح بالایی است — تقریباً
-هر چیزی که یک بلاک‌چین بیت‌کوینی مدرن در کد نیاز دارد را دارد و اثبات‌شده است.
+## 5. Pre-Deployment Checklist (Code/Operational)
 
-اما «کد کامل» با «آماده‌ی نگهداری پول واقعی» یکی نیست. فاصله‌ی باقی‌مانده،
-**اعتماد** است — و اعتماد فقط با حسابرسی مستقل، اجرای واقعی طولانی، و زمان
-ساخته می‌شود. این دقیقاً همان مسیری است که هر بلاک‌چین جدی باید طی کند.
+- [x] All core tests green (`npm test`)
+- [x] All feature tests green (`npm run test:features`)
+- [x] `npm audit` with no high/critical vulnerabilities
+- [x] Client-side signing (no key on the server)
+- [x] DDoS guard enabled
+- [x] TLS/HTTPS configured (or reverse proxy)
+- [x] Input hardening (pollution/depth guard)
+- [x] Non-root Dockerfile with healthcheck
+- [x] Graceful shutdown on SIGTERM/SIGINT
+- [ ] Real TLS certificate from a CA (not self-signed)
+- [ ] `JWT_SECRET`/secrets from a vault, not in code or a committed env file
+- [ ] Backup and recovery of chain data
+- [ ] Monitoring + alerting in a real environment (Prometheus/Grafana)
+- [ ] Independent audit completed
+- [ ] Multi-month public testnet
 
-*این گزارش صادقانه و محافظه‌کارانه نوشته شده تا از تصمیم‌های پرریسک جلوگیری کند.*
+## 6. Honest Conclusion
+
+In terms of **code quality, architecture, and test coverage**, this project is at a high
+level — it has, and has proven, nearly everything a modern Bitcoin-style blockchain needs
+in code.
+
+But "complete code" is not the same as "ready to hold real money". The remaining gap is
+**trust** — and trust is built only through an independent audit, long real-world
+operation, and time. This is exactly the path every serious blockchain must travel.
+
+*This report is written honestly and conservatively to prevent high-risk decisions.*

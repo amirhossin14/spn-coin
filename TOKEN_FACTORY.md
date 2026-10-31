@@ -1,41 +1,41 @@
-# سرویس پولیِ ساخت توکن + صفحهٔ وب
+# Paid Token Creation Service + Web Page
 
-هرکسی می‌تواند با **پرداخت هزینه** (به SPN) کوین/توکنِ خودش را بسازد — با آدرس و
-کلید خودش. هزینه **روی زنجیره اجبار** می‌شود: عملیاتِ صدور فقط وقتی اعمال می‌گردد
-که تراکنشِ حاملش، هزینهٔ صدور را به آدرسِ **خزانه (treasury)** پرداخت کرده باشد.
+Anyone can create their own coin/token by **paying a fee** (in SPN) — with their own address and
+key. The fee is **enforced on-chain**: an issuance operation is only applied when
+the transaction carrying it has paid the issuance fee to the **treasury** address.
 
-## صفحهٔ وب
+## Web page
 ```
-http://localhost:3000/tokens      (فایل: public/token-factory.html)
+http://localhost:3000/tokens      (file: public/token-factory.html)
 ```
-فرمِ ساخت توکن (نام/نماد/اعشار/عرضه/کلید)، نمایش هزینه و خزانه، فهرست توکن‌ها،
-و هشدار امنیتیِ واضح دربارهٔ کلید. با همان هویتِ بصریِ اکسپلورر.
+A token creation form (name/symbol/decimals/supply/key), display of the fee and treasury, a list of tokens,
+and a clear security warning about the key. With the same visual identity as the explorer.
 
-## پیکربندی
+## Configuration
 ```bash
-TOKEN_ISSUANCE_FEE=10000000000   # هزینهٔ صدور به ساتوشی (پیش‌فرض ۱۰۰ SPN)
-TREASURY_ADDRESS=SPN1...         # مقصد هزینه (پیش‌فرض: کیف‌پول نود)
+TOKEN_ISSUANCE_FEE=10000000000   # issuance fee in satoshi (default 100 SPN)
+TREASURY_ADDRESS=SPN1...         # fee destination (default: node wallet)
 ```
-اگر خزانه تنظیم نشود، صدور رایگان است؛ نودِ در حال اجرا همیشه خزانه را (روی
-کیف‌پول اپراتور) تنظیم می‌کند، پس هزینه اجبار می‌شود.
+If the treasury is not set, issuance is free; a running node always sets the treasury (to the
+operator's wallet), so the fee is enforced.
 
 ## API
-- `GET  /api/tokens/fee-info`  → مبلغ هزینه + آدرس خزانه
-- `POST /api/tokens/create`    → بدنه: `{ name, symbol, decimals, supply, privateKey }`
-  - کلیدِ کاربر، عملیاتِ صدور (issuer = آدرسِ کاربر) را امضا و هزینه را از موجودیِ
-    او پرداخت می‌کند. کلِ عرضه به آدرسِ خودِ کاربر ضرب می‌شود.
-- (اپراتور) `POST /api/tokens/issue` و `/api/tokens/transfer` با کیف‌پول نود.
+- `GET  /api/tokens/fee-info`  → the fee amount + treasury address
+- `POST /api/tokens/create`    → body: `{ name, symbol, decimals, supply, privateKey }`
+  - The user's key signs the issuance operation (issuer = the user's address) and pays the fee from their
+    balance. The entire supply is minted to the user's own address.
+- (operator) `POST /api/tokens/issue` and `/api/tokens/transfer` with the node wallet.
 
-## امنیت
-- صدور با کلیدِ صادرکننده امضا می‌شود؛ کلید باید به آدرسِ ادعاشده هش شود.
-- هزینه به‌صورت **اتمیک** با صدور گره خورده (اگر هزینه پرداخت نشود، توکن ساخته نمی‌شود).
-- ضدِ replay (nonce+chainId)، ردِ overspend و صدور تکراری.
-- ⚠️ در `create`، کلید خصوصی به نود فرستاده می‌شود تا امضا/پرداخت انجام شود؛ فقط
-  روی نودی که به آن **اعتماد داری** (ترجیحاً نودِ خودت) استفاده کن. برای محیط
-  تولیدی، امضای سمت‌کاربر توصیه می‌شود.
+## Security
+- Issuance is signed with the issuer's key; the key must hash to the claimed address.
+- The fee is bound **atomically** to issuance (if the fee is not paid, the token is not created).
+- Anti-replay (nonce+chainId), rejection of overspend and duplicate issuance.
+- ⚠️ In `create`, the private key is sent to the node so signing/payment can happen; use it only
+  on a node you **trust** (preferably your own node). For a production environment,
+  client-side signing is recommended.
 
-## راستی‌آزمایی
-- ✅ صدور **بدون** پرداخت هزینه روی زنجیره رد می‌شود.
-- ✅ صدور **با** پرداخت هزینه موفق است؛ توکن به آدرسِ کاربرِ ثالث ضرب می‌شود و خزانه
-  هزینه را دریافت می‌کند.
-- **۵۸ تست پاس، lint بدون خطا، سرور سالم بوت می‌شود، صفحهٔ `/tokens` با HTTP 200.**
+## Verification
+- ✅ Issuance **without** paying the fee is rejected on-chain.
+- ✅ Issuance **with** the fee paid succeeds; the token is minted to a third-party user's address and the treasury
+  receives the fee.
+- **58 tests pass, lint with no errors, the server boots cleanly, the `/tokens` page returns HTTP 200.**

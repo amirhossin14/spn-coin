@@ -1,207 +1,207 @@
-# SPN Coin — قابلیت‌های جدید (توکن، ادمین، مانیتورینگ)
+# SPN Coin — New Features (Tokens, Admin, Monitoring)
 
-سه بخش با قابلیت‌های واقعی و متصل به بک‌اند تقویت شدند. همه با تست تأیید شده‌اند
-(۹ تست توکن + ۹ تست مانیتورینگ/features، به‌علاوه تست HTTP in-process).
+Three areas were enhanced with real, backend-connected capabilities. All are verified by tests
+(9 token tests + 9 monitoring/features tests, plus an in-process HTTP test).
 
-## ۱) ساخت توکن/کوین  (`tokens/token-extensions.js`)
-- **burn** — سوزاندن دائمی توکن (کاهش عرضه)
-- **freeze / unfreeze** — انجماد یک آدرس توسط صادرکننده (انتقال از/به آن مسدود می‌شود)
-- **transfer-owner** — انتقال مالکیت (issuer) توکن به آدرس دیگر
-- **set-meta** — متادیتا: لوگو، توضیحات، وب‌سایت، توییتر، تلگرام
-- **distribution()** — توزیع هولدرها (برای نمودار دایره‌ای/میله‌ای)
-- **search()** — جستجو و فیلتر توکن‌ها (بر اساس نام/سمبل/نوع، مرتب‌سازی)
-- endpointها: `/api/tokens/:id/meta`, `/api/tokens/:id/distribution`, `/api/tokens/search`
-- همه‌ی opهای جدید امضاشده و replay-protected (سمت کلاینت امضا می‌شوند)
+## 1) Token/Coin Creation  (`tokens/token-extensions.js`)
+- **burn** — permanently burn a token (reduce supply)
+- **freeze / unfreeze** — freezing of an address by the issuer (transfers to/from it are blocked)
+- **transfer-owner** — transfer token ownership (issuer) to another address
+- **set-meta** — metadata: logo, description, website, Twitter, Telegram
+- **distribution()** — holder distribution (for pie/bar charts)
+- **search()** — search and filter tokens (by name/symbol/type, with sorting)
+- endpoints: `/api/tokens/:id/meta`, `/api/tokens/:id/distribution`, `/api/tokens/search`
+- all new ops are signed and replay-protected (signed client-side)
 
-## ۲) مانیتورینگ  (`monitor/monitor.js` + صفحه `public/monitor.html`)
-- **سلامت سیستم**: CPU، حافظه، heap، uptime، پلتفرم (`/api/monitor/health`)
-- **نمودارهای زنده**: سری‌های زمانی CPU، حافظه، ارتفاع، peers، mempool، فاصله بلوک،
-  سختی (`/api/monitor/metrics`)
-- **موتور هشدار**: قواعد آستانه‌ای (CPU>90، حافظه>92، heap>1GB، بدون peer، سیل mempool)
-  با raise/clear خودکار و تاریخچه (`/api/monitor/alerts`)
-- صفحه‌ی `/monitor.html` با نمودار SVG زنده و کارت‌های سلامت، رفرش هر ۵ ثانیه
+## 2) Monitoring  (`monitor/monitor.js` + the `public/monitor.html` page)
+- **System health**: CPU, memory, heap, uptime, platform (`/api/monitor/health`)
+- **Live charts**: time series for CPU, memory, height, peers, mempool, block interval,
+  difficulty (`/api/monitor/metrics`)
+- **Alert engine**: threshold rules (CPU>90, memory>92, heap>1GB, no peers, mempool flood)
+  with automatic raise/clear and history (`/api/monitor/alerts`)
+- the `/monitor.html` page with live SVG charts and health cards, refreshing every 5 seconds
 
-## ۳) پنل ادمین  (`monitor/features.js`)
-- **کنترل نود**: وضعیت نود، روشن/خاموش‌کردن ماینینگ (`/api/admin/node/status`, `/mining`)
-- **مدیریت peer/بن**: مشاهده، بن و رفع‌بن IP (`/api/admin/peers/bans|ban|unban`)
-- **خروجی گرفتن**: export توکن‌ها/peerها/هشدارها به JSON یا CSV (`/api/admin/export/:what`)
+## 3) Admin Panel  (`monitor/features.js`)
+- **Node control**: node status, turning mining on/off (`/api/admin/node/status`, `/mining`)
+- **Peer/ban management**: view, ban, and unban IPs (`/api/admin/peers/bans|ban|unban`)
+- **Export**: export tokens/peers/alerts to JSON or CSV (`/api/admin/export/:what`)
 
-## فعال‌سازی و کنترل
-همه از `server.js` به‌صورت خودکار و امن نصب می‌شوند (`installFeatures`). غیرفعال‌سازی:
+## Enabling and Control
+All are installed automatically and safely from `server.js` (`installFeatures`). To disable:
 ```
 FEATURES=0
 ```
 
-## تست
+## Testing
 ```
-npx jest test/token-ext.test.js   # ۹ تست
-npx jest test/monitor.test.js     # ۹ تست
-```
-
-## ۴) آدرس اختصاصی کوین  (`tokens/coin-address.js`)
-- **آدرس مشتق‌شده‌ی خودکار**: هنگام ساخت هر کوین، یک آدرس اختصاصی (deterministic،
-  از روی tokenId + issuer) محاسبه و در متادیتای کوین ثبت می‌شود.
-  همه‌ی نودها همان آدرس را بازتولید می‌کنند (مثل روح contract address).
-- **کیف اختصاصی**: `generateCoinWallet()` یک کلید تازه‌ی قابل‌خرج برای treasury/deployer.
-- **آدرس vanity**: تولید آدرسی که با یک پیشوند دلخواه شروع شود — هم به‌صورت
-  in-browser (کلید هرگز فاش نمی‌شود) در صفحه‌ی ساخت کوین، هم endpoint سرور.
-- endpointها: `/api/tokens/:id/address`, `/api/address/vanity`, `/api/util/pubkey-to-address`
-- UI: بخش «Generate vanity address» در صفحه‌ی ساخت کوین + نمایش آدرس اختصاصی در نتیجه.
-
-## تست (به‌روز شده)
-```
-npx jest test/coin-address.test.js   # ۶ تست
-# مجموع همه‌ی سوییت‌های جدید: ۶۲ تست، همه پاس
+npx jest test/token-ext.test.js   # 9 tests
+npx jest test/monitor.test.js     # 9 tests
 ```
 
-## ۵) ایردراپ (Airdrop)  (`tokens/airdrop.js`)
-دو مدل ایردراپ، هر دو امضاشده و replay-protected:
+## 4) Dedicated Coin Address  (`tokens/coin-address.js`)
+- **Automatic derived address**: when any coin is created, a dedicated address (deterministic,
+  derived from tokenId + issuer) is computed and recorded in the coin's metadata.
+  All nodes reproduce the same address (like the spirit of a contract address).
+- **Dedicated wallet**: `generateCoinWallet()` creates a fresh spendable key for the treasury/deployer.
+- **Vanity address**: generate an address that starts with a chosen prefix — both in-browser
+  (the key is never exposed) on the coin-creation page, and via a server endpoint.
+- endpoints: `/api/tokens/:id/address`, `/api/address/vanity`, `/api/util/pubkey-to-address`
+- UI: a "Generate vanity address" section on the coin-creation page + display of the dedicated address in the result.
 
-**الف) ایردراپ گروهی (batch)** — صادرکننده یک op امضا می‌کند که شامل چندین
-(آدرس، مقدار) است؛ موجودی‌ها اتمیک جابه‌جا می‌شوند. مناسب لیست‌های کوچک/مشخص.
+## Testing (updated)
+```
+npx jest test/coin-address.test.js   # 6 tests
+# Total across all new suites: 62 tests, all passing
+```
 
-**ب) ایردراپ claim با مرکل** — صادرکننده به ریشه‌ی مرکل لیست دریافت‌کنندگان
-تعهد می‌کند و کل مبلغ را escrow می‌کند. دریافت‌کنندگان بعداً با یک claim امضاشده
-و **مرکل‌پروف** واجد شرایط بودن خود را ثابت می‌کنند؛ هر آدرس دقیقاً یک بار.
-مقیاس‌پذیر برای لیست‌های بزرگ (فقط ریشه روی زنجیره است).
+## 5) Airdrop  (`tokens/airdrop.js`)
+Two airdrop models, both signed and replay-protected:
 
-- امنیت: replay رد می‌شود، آدرس غیرواجد شرایط نمی‌تواند claim کند،
-  فقط issuer می‌تواند airdrop بسازد، آدرس frozen مسدود است، escrow دقیق.
-- endpointها: `/api/tokens/:id/airdrops`, `/api/airdrops/:id`, `/api/airdrops/:id/claimed/:addr`
-- claim/create از طریق `/api/tokens/submit-signed` (امضای سمت کلاینت)
-- UI: صفحه‌ی `/airdrop.html` برای ایردراپ گروهی با امضای درون‌مرورگری
-- تست: `test/airdrop.test.js` — ۱۰ تست (شامل مرکل‌پروف و escrow)
+**a) Batch airdrop** — the issuer signs a single op containing multiple
+(address, amount) pairs; balances are moved atomically. Suitable for small/fixed lists.
 
-## ۶) صفحه‌ی Claim (دریافت ایردراپ مرکل)
-گردش کار کامل claim برای کاربران واجد شرایط:
+**b) Merkle claim airdrop** — the issuer commits to the Merkle root of the recipient list
+and escrows the full amount. Recipients later prove their eligibility with a signed claim
+and a **Merkle proof**; each address exactly once.
+Scalable for large lists (only the root is on-chain).
 
-- **انتشار لیست**: صادرکننده لیست کامل دریافت‌کنندگان را ثبت می‌کند
-  (`/api/airdrops/:id/publish`). لیست فقط اگر با ریشه‌ی مرکل روی زنجیره
-  تطابق داشته باشد پذیرفته می‌شود (اعتبارسنجی trustless).
-- **بررسی واجد شرایط بودن**: کاربر آدرسش را وارد می‌کند؛ صفحه پروف و مقدار
-  او را از `/api/airdrops/:id/proof/:address` می‌گیرد.
-- **claim**: op امضاشده‌ی claim در مرورگر ساخته می‌شود و از طریق
-  `/api/tokens/submit-signed` ارسال می‌شود (کلید هرگز فاش نمی‌شود).
-- endpointها: `/api/airdrops/:id/publish`, `/api/airdrops/:id/proof/:address`
-- UI: صفحه‌ی `/claim.html` — دو مرحله‌ای (بررسی واجد شرایط بودن → claim)
-- محافظت: claim تکراری، آدرس غیرواجد شرایط، و لیست نامعتبر همه رد می‌شوند.
+- Security: replay is rejected, an ineligible address cannot claim,
+  only the issuer can create an airdrop, a frozen address is blocked, escrow is exact.
+- endpoints: `/api/tokens/:id/airdrops`, `/api/airdrops/:id`, `/api/airdrops/:id/claimed/:addr`
+- claim/create via `/api/tokens/submit-signed` (client-side signing)
+- UI: the `/airdrop.html` page for batch airdrops with in-browser signing
+- tests: `test/airdrop.test.js` — 10 tests (including Merkle proof and escrow)
 
-## ۷) مقاومت DDoS  (`middleware/ddos-guard.js`)
-یک لایه‌ی جامع محافظت که مکمل rate-limit و netguard موجود است و
-نقاط ضعف واقعی حملات حجمی را پوشش می‌دهد:
+## 6) Claim Page (receiving a Merkle airdrop)
+A complete claim workflow for eligible users:
 
-- **سقف اتصال هم‌زمان per-IP** — جلوگیری از connection flooding
-- **بودجه‌ی جهانی تطبیقی (adaptive)** — وقتی کل نود زیر فشار است،
-  به‌تدریج ترافیک را می‌ریزد؛ ابتدا بدترین شهرت‌ها.
-- **تشخیص burst و بن خودکار** — یک IP که ناگهان صدها درخواست می‌زند
-  بن می‌شود.
-- **محافظت Slowloris** — اتصالات کند که منابع را نگه می‌دارند بسته می‌شوند.
-- **سیستم شهرت با کاهش زمانی (decay)** — خطاکاران تکراری تشدید می‌شوند،
-  رفتار خوب به‌مرور بخشیده می‌شود.
-- **fail-open**: اگر خود guard خطا کند، هرگز ترافیک را نمی‌بندد.
+- **Publishing the list**: the issuer records the full recipient list
+  (`/api/airdrops/:id/publish`). The list is accepted only if it matches the on-chain
+  Merkle root (trustless validation).
+- **Eligibility check**: the user enters their address; the page fetches their proof and amount
+  from `/api/airdrops/:id/proof/:address`.
+- **claim**: a signed claim op is built in the browser and submitted via
+  `/api/tokens/submit-signed` (the key is never exposed).
+- endpoints: `/api/airdrops/:id/publish`, `/api/airdrops/:id/proof/:address`
+- UI: the `/claim.html` page — two steps (eligibility check → claim)
+- Protection: duplicate claims, ineligible addresses, and an invalid list are all rejected.
 
-کنترل: `DDOS_GUARD=0` (غیرفعال)، `DDOS_MAX_CONN_PER_IP`, `DDOS_GLOBAL_SOFT`,
+## 7) DDoS Resistance  (`middleware/ddos-guard.js`)
+A comprehensive protection layer that complements the existing rate-limit and netguard and
+covers real weak points against volumetric attacks:
+
+- **Per-IP concurrent connection cap** — prevents connection flooding
+- **Adaptive global budget** — when the whole node is under pressure,
+  it gradually sheds traffic; the worst reputations first.
+- **Burst detection and automatic ban** — an IP that suddenly fires hundreds of requests
+  is banned.
+- **Slowloris protection** — slow connections that hold resources are closed.
+- **Reputation system with time decay** — repeat offenders escalate,
+  good behavior is forgiven over time.
+- **fail-open**: if the guard itself errors, it never blocks traffic.
+
+Control: `DDOS_GUARD=0` (disable), `DDOS_MAX_CONN_PER_IP`, `DDOS_GLOBAL_SOFT`,
 `DDOS_GLOBAL_HARD`, `DDOS_BURST`, `DDOS_SLOW_MS`, `DDOS_BAN_MS`.
 
-endpointهای ادمین: `/api/admin/ddos/stats`, `/ddos/bans`, `/ddos/ban`,
+Admin endpoints: `/api/admin/ddos/stats`, `/ddos/bans`, `/ddos/ban`,
 `/ddos/unban`, `/ddos/whitelist`.
 
-تست: `test/ddos-guard.test.js` — ۱۰ تست واحد + ۵ تست HTTP واقعی
-(کلاینت سالم در حین حمله بی‌تأثیر می‌ماند). یک باگ واقعی (TDZ در بستن
-اتصال) در این مسیر گرفته و رفع شد.
+Tests: `test/ddos-guard.test.js` — 10 unit tests + 5 real HTTP tests
+(a healthy client stays unaffected during an attack). A real bug (TDZ in connection
+teardown) on this path was caught and fixed.
 
-**همچنین:** webhookها حالا روی رویداد بلوک جدید (mined/received) فعال می‌شوند.
+**Also:** webhooks now fire on the new-block event (mined/received).
 
-## ۸) HTTPS / TLS  (`middleware/tls.js` + `scripts/gen-cert.sh`)
-پشتیبانی کامل از HTTPS برای همه‌ی حالت‌های استقرار:
+## 8) HTTPS / TLS  (`middleware/tls.js` + `scripts/gen-cert.sh`)
+Full HTTPS support for all deployment modes:
 
-- **HTTPS مستقیم در Node** — با تنظیم `TLS_CERT` و `TLS_KEY` (فایل‌های PEM،
-  مثلاً از Let's Encrypt)، نود خودش https سرو می‌کند.
-- **ریدایرکت خودکار HTTP→HTTPS** — با `HTTPS_REDIRECT=1` یک سرور همراه
-  همه‌ی درخواست‌های http را با 301 به https هدایت می‌کند.
-- **HSTS** — روی درخواست‌های امن، هدر `Strict-Transport-Security` فرستاده
-  می‌شود تا مرورگر همیشه HTTPS را اجبار کند.
-- **سازگار با reverse proxy** — با `TRUST_PROXY=1` نود روی HTTP می‌ماند
-  ولی `X-Forwarded-Proto` را می‌خواند و HSTS می‌فرستد (حالت استاندارد تولید).
-- **گواهی self-signed برای توسعه** — `scripts/gen-cert.sh` یک گواهی
-  محلی می‌سازد؛ با `TLS_SELF_SIGNED=1` فعال می‌شود.
-- **WebSocket/Stratum** — چون به همان سرور وصل است، هنگام HTTPS خودکار
-  روی `wss://` کار می‌کند.
-- **fail-safe**: اگر گواهی خوانده نشود، نود به HTTP برمی‌گردد و هرگز در
-  بوت شکست نمی‌خورد.
+- **Direct HTTPS in Node** — by setting `TLS_CERT` and `TLS_KEY` (PEM files,
+  e.g. from Let's Encrypt), the node serves https itself.
+- **Automatic HTTP→HTTPS redirect** — with `HTTPS_REDIRECT=1` a companion server
+  redirects all http requests to https with a 301.
+- **HSTS** — on secure requests, the `Strict-Transport-Security` header is sent
+  so the browser always enforces HTTPS.
+- **Reverse-proxy compatible** — with `TRUST_PROXY=1` the node stays on HTTP
+  but reads `X-Forwarded-Proto` and sends HSTS (the standard production mode).
+- **Self-signed certificate for development** — `scripts/gen-cert.sh` creates a
+  local certificate; enabled with `TLS_SELF_SIGNED=1`.
+- **WebSocket/Stratum** — because it connects to the same server, it automatically works
+  over `wss://` when using HTTPS.
+- **fail-safe**: if the certificate cannot be read, the node falls back to HTTP and never
+  fails to boot.
 
-کنترل: `TLS_CERT`, `TLS_KEY`, `TLS_CA`, `TLS_SELF_SIGNED`, `HTTPS_PORT`,
+Control: `TLS_CERT`, `TLS_KEY`, `TLS_CA`, `TLS_SELF_SIGNED`, `HTTPS_PORT`,
 `HTTPS_REDIRECT`, `TRUST_PROXY`.
 
-تست: `test/tls.test.js` — ۹ تست، شامل راه‌اندازی یک **سرور HTTPS واقعی**
-و سرو یک درخواست https واقعی با گواهی self-signed.
+Tests: `test/tls.test.js` — 9 tests, including bringing up a **real HTTPS server**
+and serving a real https request with a self-signed certificate.
 
-> نکته امنیتی: کلید خصوصی dev (`certs/*.pem`) در `.gitignore` است و در
-> بسته توزیع نمی‌شود. هر کاربر باید گواهی خودش را بسازد یا از CA بگیرد.
+> Security note: the dev private key (`certs/*.pem`) is in `.gitignore` and is not
+> distributed in the package. Every user must create their own certificate or obtain one from a CA.
 
-## ۹) هسته به ۱۰۰٪ — سخت‌شدگی consensus + رفع باگ واقعی
+## 9) Core to 100% — consensus hardening + a real bug fix
 
-### باگ واقعی که پیدا و رفع شد
-در `blockchain/blockchain.js` سه `require()` تنبل (lazy) داخل توابع داغ بود
-(`require('../tokens/tokens')` در constructor و `require('crypto')` در ساخت
-coinbase). این:
-- تست هسته را با jest می‌شکست (require بعد از teardown)،
-- و در تولید هر بار در حلقه‌ی داغ اجرا می‌شد.
-همه به بالای فایل منتقل شدند (هیچ circular dependency واقعی نبود).
+### The real bug that was found and fixed
+In `blockchain/blockchain.js` there were three lazy `require()` calls inside hot functions
+(`require('../tokens/tokens')` in the constructor and `require('crypto')` in coinbase
+construction). This:
+- broke the core test under jest (require after teardown),
+- and in production ran every iteration of the hot loop.
+All were moved to the top of the file (there was no real circular dependency).
 
-### کشف مهم درباره‌ی تست‌ها
-تست هسته (`test/blockchain.test.js`) با **`node:test`** نو  شته شده، نه jest.
-«۲۸ شکستِ» گزارش‌شده در جلسات قبل، شکست واقعی نبود — فقط jest داشت فایلی را
-اجرا می‌کرد که برای runner دیگری بود. با runner درست، **هر ۶۱ تست هسته پاس‌اند.**
+### An important discovery about the tests
+The core test (`test/blockchain.test.js`) is written with **`node:test`**, not jest.
+The "28 failures" reported in earlier sessions were not real failures — jest was simply
+running a file meant for a different runner. With the correct runner, **all 61 core tests pass.**
 
-### تست‌های consensus-critical جدید  (`test/consensus.test.js` — ۱۲ تست)
-سناریوهای بحرانی که قبلاً تست مستقیم نداشتند، حالا اثبات شده‌اند:
-- **عدم تورم**: coinbase بیش از reward+fees رد می‌شود
-- **halving** قطعی
-- مجموع issuance = مجموع پاداش‌ها
-- **double-spend** یک UTXO رد می‌شود
-- **overspend** رد می‌شود
-- **دستکاری merkle** گرفته می‌شود
-- timestamp آینده (>2h) و ≤ MTP (BIP-113) رد می‌شوند
-- fork choice با **most-work**؛ chainWork صعودی
-- validation کل زنجیره + genesis قطعی
+### New consensus-critical tests  (`test/consensus.test.js` — 12 tests)
+Critical scenarios that previously had no direct tests are now proven:
+- **No inflation**: a coinbase exceeding reward+fees is rejected
+- **halving** is deterministic
+- total issuance = total rewards
+- a **double-spend** of a UTXO is rejected
+- **overspend** is rejected
+- **merkle tampering** is caught
+- future timestamps (>2h) and ≤ MTP (BIP-113) are rejected
+- fork choice by **most-work**; chainWork is monotonically increasing
+- full-chain validation + deterministic genesis
 
-### وضعیت نهایی تست هسته
+### Final core test status
 ```
-npm test        → 73/73 پاس  (blockchain + consensus، node:test)
-npm run test:features → jest suites (قابلیت‌ها)
+npm test        → 73/73 pass  (blockchain + consensus, node:test)
+npm run test:features → jest suites (features)
 ```
-هسته حالا از نظر پوشش consensus-critical و صحت، **کامل** است.
+The core is now **complete** in terms of consensus-critical coverage and correctness.
 
-## ۱۰) چهار حوزه به بالاترین حد — سخت‌شدگی نهایی
+## 10) Four Areas to the Highest Level — final hardening
 
-### حوزه‌ی ۱ و ۲: پوشش فنی و قابلیت‌ها → ۱۰۰٪
-- **تست یکپارچگی جامع** (`test/integration-smoke.cjs`): یک سرور express واقعی
-  با blockchain واقعی که **۴۰+ endpoint** را end-to-end می‌سنجد.
-  **۳۰ تست، همه سبز** — اثبات می‌کند همه‌ی قابلیت‌ها واقعاً وصل و زنده‌اند.
+### Areas 1 and 2: technical and feature coverage → 100%
+- **Comprehensive integration test** (`test/integration-smoke.cjs`): a real express server
+  with a real blockchain that exercises **40+ endpoints** end-to-end.
+  **30 tests, all green** — proving all features are truly wired up and live.
 
-### حوزه‌ی ۳: سخت‌شدگی زیرساخت → ۱۰۰٪
-- **`middleware/hardening.js`**: محافظت در سطح محتوا (مکمل DDoS حجمی):
-  - **prototype-pollution guard** (رد `__proto__`/`constructor`/`prototype`)
-  - **محدودیت عمق/اندازه‌ی JSON** (جلوگیری از exhaustion)
-  - **اعتبارسنج‌های میدانی** (address, amount, hash, pubkey) قابل‌ترکیب
-  - **request id** برای ردیابی و بررسی سوءاستفاده
-  - ۱۴ تست، همه سبز.
+### Area 3: infrastructure hardening → 100%
+- **`middleware/hardening.js`**: content-level protection (complementing volumetric DDoS):
+  - **prototype-pollution guard** (rejects `__proto__`/`constructor`/`prototype`)
+  - **JSON depth/size limits** (preventing exhaustion)
+  - **composable field validators** (address, amount, hash, pubkey)
+  - **request id** for tracing and abuse investigation
+  - 14 tests, all green.
 
-### حوزه‌ی ۴: آمادگی تولید → بالاترین حد کدنی
-این حوزه ذاتاً با کد به ۱۰۰ نمی‌رسد (نیاز به حسابرسی انسانی و زمان)، ولی
-artefactهای واقعی production-readiness اضافه شد:
-- **`Dockerfile`** — multi-stage، non-root، tini برای سیگنال، healthcheck.
-- **`docker-compose.yml`** — نود پشت reverse proxy با persistence و cap_drop.
-- **`deploy/Caddyfile`** — TLS خودکار (Let's Encrypt) + هدرهای امنیتی لبه.
-- **`docs/SELF_AUDIT.md`** — گزارش خود-ارزیابی صادقانه + چک‌لیست پیش‌استقرار
-  + فهرست شفاف آنچه هنوز برای تولید لازم است (حسابرسی مستقل، تست‌نت عمومی…).
+### Area 4: production readiness → the highest level achievable in code
+This area inherently cannot reach 100% through code alone (it needs human audit and time), but
+real production-readiness artifacts were added:
+- **`Dockerfile`** — multi-stage, non-root, tini for signals, healthcheck.
+- **`docker-compose.yml`** — the node behind a reverse proxy with persistence and cap_drop.
+- **`deploy/Caddyfile`** — automatic TLS (Let's Encrypt) + edge security headers.
+- **`docs/SELF_AUDIT.md`** — an honest self-assessment report + a pre-deployment checklist
+  + a transparent list of what is still needed for production (independent audit, public testnet…).
 
-### وضعیت نهایی تست
+### Final test status
 ```
-هسته (node:test)        → 73/73
-قابلیت‌ها (jest)         → 100/100
-یکپارچگی (smoke)        → 30/30
+Core (node:test)        → 73/73
+Features (jest)         → 100/100
+Integration (smoke)     → 30/30
 ─────────────────────────────────
-مجموع                   → 203 تست، صفر شکست
+Total                   → 203 tests, zero failures
 ```

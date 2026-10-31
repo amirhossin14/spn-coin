@@ -1,95 +1,94 @@
-# مسیر الف — نقشهٔ راه گام‌به‌گام توکن روی اتریوم / L2
+# Path A — Step-by-Step Roadmap for a Token on Ethereum / L2
 
-هدف: عرضهٔ یک توکن SPN امن روی یک زنجیرهٔ جنگ‌آزموده، به‌جای ساختن L1 از صفر.
-چرا این مسیر؟ امنیت اجماع را از خود شبکه (اتریوم/L2) قرض می‌گیری، پشتیبانی
-صرافی‌ها و کیف‌پول‌ها از روز اول هست، و سطح حملهٔ کد تو به حداقل می‌رسد.
+Goal: launching a secure SPN token on a battle-tested chain, instead of building an L1 from scratch.
+Why this path? You borrow consensus security from the network itself (Ethereum/L2), exchange
+and wallet support is there from day one, and the attack surface of your code is minimized.
 
-> هشدار: من وکیل/مشاور مالی نیستم. قبل از هر **عرضهٔ عمومی** توکن، بخش حقوقی در
-> `docs/PRELAUNCH_CHECKLIST.md` و مشورت با وکیل متخصص رمزارز در بریتانیا الزامی است.
+> Warning: I am not a lawyer/financial advisor. Before any **public offering** of the token, the legal section in
+> `docs/PRELAUNCH_CHECKLIST.md` and consultation with a specialized crypto lawyer in the UK are mandatory.
 
 ---
 
-## مرحلهٔ ۰ — تصمیم‌های پایه (قبل از کد)
+## Step 0 — Foundational Decisions (before code)
 
-- **چرا این توکن وجود دارد؟** اگر فقط «یک توکن دیگر» است، شکست می‌خورد. کاربرد
-  مشخص (utility) را روی کاغذ بیاور.
-- **مدل عرضه:** نسخهٔ ما عرضهٔ **ثابت ۲۱٬۰۰۰٬۰۰۰ SPN** است (بدون mint بعدی).
-  این امن‌ترین و قابل‌اعتمادترین مدل برای یک توکن لانچ است.
-- **زنجیرهٔ هدف:** برای شروع یک **L2** (Base یا Arbitrum) انتخاب کن — کارمزد بسیار
-  کمتر و سرعت بیشتر از اتریوم mainnet، ولی همان امنیت پایه.
-- **مالکیت دارایی:** عرضهٔ اولیه باید به یک **multisig (مثل Gnosis Safe)** برود،
-  نه یک کیف‌پول تکی. این مهم‌ترین تصمیم ضدِ از-دست-رفتن کلید/رگ است.
+- **Why does this token exist?** If it's just "another token," it will fail. Put the clear
+  utility on paper.
+- **Supply model:** our version uses a **fixed supply of 21,000,000 SPN** (no later minting).
+  This is the safest and most trustworthy model for a launch token.
+- **Target chain:** to start, choose an **L2** (Base or Arbitrum) — much lower fees
+  and higher speed than Ethereum mainnet, but the same base security.
+- **Asset ownership:** the initial supply must go to a **multisig (e.g., Gnosis Safe)**,
+  not a single wallet. This is the most important decision against losing a key / a rug.
 
-## مرحلهٔ ۱ — محیط توسعه
+## Step 1 — Development Environment
 
 ```bash
 cd contracts
-cp .env.example .env        # کلیدها را پر کن (هرگز commit نکن)
+cp .env.example .env        # fill in the keys (never commit)
 npm install
 npm run compile
-npm test                    # تست‌های توکن باید سبز شوند
+npm test                    # the token tests must pass
 ```
 
-پروژه از **Hardhat + OpenZeppelin v5** استفاده می‌کند. قرارداد در
-`contracts/contracts/SpnCoinToken.sol` است و فقط روی کد ممیزی‌شدهٔ OZ بنا شده.
+The project uses **Hardhat + OpenZeppelin v5**. The contract is at
+`contracts/contracts/SpnCoinToken.sol` and is built only on audited OZ code.
 
-## مرحلهٔ ۲ — درک طراحی امنیتی قرارداد
+## Step 2 — Understanding the Contract's Security Design
 
-قرارداد عمداً «خسته‌کننده» است — و این خوب است:
-- **بدون `mint()`**: کل عرضه یک‌بار در constructor ساخته می‌شود؛ تورم غیرممکن است.
-- **بدون owner / blacklist / مالیات انتقال / pausable**: هر تابع پرامتیاز، سطح
-  حمله و یک پرچم قرمز برای ممیز/صرافی/کاربر است.
-- **`ERC20Permit` (EIP-2612)**: تأیید بدون گس (gasless approval).
-- **`ERC20Burnable`**: دارنده می‌تواند توکن خودش را بسوزاند.
+The contract is deliberately "boring" — and that is good:
+- **No `mint()`**: the entire supply is created once in the constructor; inflation is impossible.
+- **No owner / blacklist / transfer tax / pausable**: every privileged function is an attack
+  surface and a red flag for an auditor/exchange/user.
+- **`ERC20Permit` (EIP-2612)**: gasless approval.
+- **`ERC20Burnable`**: a holder can burn their own tokens.
 
-اگر بعداً به mint کنترل‌شده نیاز داشتی (مثلاً پاداش staking)، این فایل را **ویرایش
-نکن**؛ یک قرارداد minter **جداگانه، capped و multisig-owned** بساز و آن را
-**ممیزی** کن.
+If you later need controlled minting (e.g., staking rewards), do **not** edit this file;
+build a **separate, capped, multisig-owned** minter contract and **audit** it.
 
-## مرحلهٔ ۳ — استقرار روی testnet
+## Step 3 — Deployment to Testnet
 
-۱. از یک faucet عمومی، ETH تستی بگیر (Sepolia / Base Sepolia / Arbitrum Sepolia).
-۲. آدرس multisig را در `.env` به‌عنوان `RECIPIENT_ADDRESS` بگذار.
+1. From a public faucet, get test ETH (Sepolia / Base Sepolia / Arbitrum Sepolia).
+2. Set the multisig address in `.env` as `RECIPIENT_ADDRESS`.
 
 ```bash
-npm run deploy:baseSepolia      # یا deploy:sepolia / deploy:arbitrumSepolia
+npm run deploy:baseSepolia      # or deploy:sepolia / deploy:arbitrumSepolia
 ```
 
-۳. سورس را روی explorer تأیید (verify) کن تا کاربران بتوانند کد را ببینند:
+3. Verify the source on the explorer so users can see the code:
 
 ```bash
 npx hardhat verify --network baseSepolia <ADDRESS> <RECIPIENT_ADDRESS>
 ```
 
-## مرحلهٔ ۴ — تست واقعی روی testnet
+## Step 4 — Real Testing on Testnet
 
-- انتقال، سوزاندن، و permit را با چند کیف‌پول واقعی (MetaMask) تست کن.
-- توکن را در یک DEX تستی اضافه کن و یک استخر نقدینگی کوچک بساز تا جریان معامله را ببینی.
-- حداقل چند هفته روی testnet بماند تا رفتارش جا بیفتد.
+- Test transfer, burn, and permit with several real wallets (MetaMask).
+- Add the token to a test DEX and create a small liquidity pool to see the trading flow.
+- Keep it on testnet for at least several weeks so its behavior settles.
 
-## مرحلهٔ ۵ — ممیزی امنیتی (قبل از mainnet، بدون استثنا)
+## Step 5 — Security Audit (before mainnet, no exceptions)
 
-- یک **ممیزی مستقل** توسط یک شرکت شناخته‌شده بگیر (هرچند قرارداد ما مینیمال است،
-  ممیزی روی هر چیزی که ارزش واقعی نگه می‌دارد ضروری است).
-- یک برنامهٔ **bug bounty** (مثلاً روی Immunefi) راه بینداز.
-- ابزارهای تحلیل ایستا (Slither) و تست fuzz (در Foundry) را هم اجرا کن.
+- Get an **independent audit** from a well-known firm (even though our contract is minimal,
+  an audit is essential for anything holding real value).
+- Launch a **bug bounty** program (e.g., on Immunefi).
+- Also run static analysis tools (Slither) and fuzz testing (in Foundry).
 
-## مرحلهٔ ۶ — mainnet و راه‌اندازی
+## Step 6 — Mainnet and Launch
 
-- استقرار روی mainnet زنجیرهٔ منتخب، با عرضه به multisig.
-- verify سورس روی explorer.
-- ساخت نقدینگی روی یک DEX معتبر (و در نظر گرفتن **قفل نقدینگی**).
-- انتشار آدرس قرارداد، کد ممیزی‌شده، و گزارش ممیزی به‌صورت عمومی.
-- درخواست لیست‌شدن در سرویس‌های قیمت/داده (مثل CoinGecko) طبق قوانین آن‌ها.
+- Deploy to the mainnet of the chosen chain, with supply sent to the multisig.
+- Verify the source on the explorer.
+- Build liquidity on a reputable DEX (and consider a **liquidity lock**).
+- Publish the contract address, audited code, and audit report publicly.
+- Request listing on price/data services (e.g., CoinGecko) according to their rules.
 
-## نکات «ضدِ کلاهبرداری» که اعتماد می‌سازند
+## "Anti-Scam" Points That Build Trust
 
-- عرضهٔ ثابت و شفاف، بدون mint مخفی.
-- مالکیت دارایی پروژه در multisig با امضاکنندگان شناخته‌شده.
-- قفل/وستینگ توکن‌های تیم به‌صورت زمان‌بندی‌شده و عمومی.
-- سورس verify‌شده + گزارش ممیزی منتشرشده.
-- بدون توابع پرریسک (تغییر مالیات، blacklist، pause خودسرانه).
+- Fixed and transparent supply, with no hidden mint.
+- Project asset ownership in a multisig with known signers.
+- Team token lock/vesting on a scheduled, public basis.
+- Verified source + published audit report.
+- No high-risk functions (changing tax, blacklist, arbitrary pause).
 
 ---
 
-پروندهٔ مرتبط: `docs/PRELAUNCH_CHECKLIST.md` (چک‌لیست کامل پیش از لانچ).
+Related file: `docs/PRELAUNCH_CHECKLIST.md` (the full pre-launch checklist).

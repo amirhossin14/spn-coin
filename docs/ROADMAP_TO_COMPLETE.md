@@ -1,128 +1,128 @@
-# SPN Coin — نقشه راه تکمیل و چک‌لیست رسیدن به بلاک‌چین کامل
+# SPN Coin — Roadmap to Completion and Checklist for a Full Blockchain
 
-> سندی برای رساندن SPN Coin از یک هسته‌ی کارکردی (~۸۰–۸۵٪) به یک شبکه‌ی آماده‌ی تولید.
-> این سند دو بخش دارد: (۱) آنچه در این مرحله اضافه شد، (۲) کارهای باقی‌مانده تا ۱۰۰٪.
+> A document for taking SPN Coin from a functional core (~80–85%) to a production-ready network.
+> This document has two parts: (1) what was added in this stage, (2) the remaining work to reach 100%.
 
 ---
 
-## بخش ۱ — آنچه در این مرحله پیاده‌سازی و اضافه شد
+## Part 1 — What Was Implemented and Added in This Stage
 
-پنج ماژول جدید در پوشه‌ی `p2p/` ساخته شد و به‌صورت امن و اختیاری به سرور وصل شد. همه‌ی این ماژول‌ها با ۱۹ تست واحد و ۸ تست ادغام تأیید شده‌اند و بدون دستکاری کد اصلی کار می‌کنند.
+Five new modules were built in the `p2p/` directory and wired into the server in a safe and optional way. All of these modules are verified by 19 unit tests and 8 integration tests, and they work without modifying the core code.
 
-### ۱.۱ کشف پیشرفته‌ی Peer — `p2p/addrman.js`
-مدیر آدرس الهام‌گرفته از بیت‌کوین:
-- جداسازی جدول «tried» (peerهای تأییدشده) از «new» (شنیده‌شده ولی تأییدنشده).
-- امتیازدهی بر اساس موفقیت/شکست و backoff نمایی برای جلوگیری از تکرار اتصال به peer خراب.
-- پخش اتصال‌ها روی گروه‌های شبکه‌ای (/16) برای مقاومت در برابر **حمله‌ی Eclipse**.
-- قابلیت ذخیره/بازیابی (JSON) تا جدول peerها بعد از ری‌استارت حفظ شود.
+### 1.1 Advanced Peer Discovery — `p2p/addrman.js`
+An address manager inspired by Bitcoin:
+- Separation of the "tried" table (verified peers) from the "new" table (heard of but not yet verified).
+- Scoring based on success/failure and exponential backoff to avoid repeatedly reconnecting to a bad peer.
+- Spreading connections across network groups (/16) for resistance to **Eclipse attacks**.
+- Save/restore capability (JSON) so the peer table survives a restart.
 
-### ۱.۲ محافظت شبکه‌ای در برابر DoS — `p2p/netguard.js`
-- **Rate limiter مبتنی بر token-bucket** برای هر peer و هر نوع پیام (INV، GETDATA، BLOCK و...).
-- **سیستم امتیاز بدرفتاری** (مثل Ban Score بیت‌کوین): هر تخلف امتیاز منفی می‌گیرد؛ در آستانه‌ی ۱۰۰، peer برای ۲۴ ساعت ban می‌شود.
-- کاهش تدریجی امتیاز با رفتار خوب (decay ساعتی) و ذخیره‌ی لیست ban.
+### 1.2 Network DoS Protection — `p2p/netguard.js`
+- **Token-bucket rate limiter** per peer and per message type (INV, GETDATA, BLOCK, etc.).
+- **Misbehavior scoring system** (like Bitcoin's Ban Score): each violation adds a penalty; at the threshold of 100, the peer is banned for 24 hours.
+- Gradual score decay with good behavior (hourly decay) and persistence of the ban list.
 
-### ۱.۳ همگام‌سازی سریع (Headers-First) — `p2p/syncmanager.js`
-- ابتدا فقط زنجیره‌ی هدرها دانلود می‌شود (کوچک، PoW و لینک‌ها اعتبارسنجی می‌شوند).
-- سپس بدنه‌ی بلوک‌ها به‌صورت **موازی و پنجره‌ای** (تا ۱۶ درخواست هم‌زمان) از چند peer گرفته می‌شود.
-- تشخیص و درخواست مجدد بلوک‌های معطل‌مانده (stall) با تایم‌اوت ۳۰ ثانیه.
-- گزارش درصد پیشرفت sync.
+### 1.3 Fast Sync (Headers-First) — `p2p/syncmanager.js`
+- First only the header chain is downloaded (small; PoW and links are validated).
+- Then block bodies are fetched **in parallel, using a sliding window** (up to 16 concurrent requests) from multiple peers.
+- Detection and re-request of stalled blocks with a 30-second timeout.
+- Reporting of sync progress percentage.
 
-### ۱.۴ بهینه‌سازی ذخیره‌سازی — `p2p/pruner.js`
-- **Pruning اختیاری**: بعد از ساخته‌شدن UTXO، بدنه‌ی بلوک‌های قدیمی‌تر از پنجره‌ی نگهداری حذف می‌شود (هدرها می‌مانند). نود آرشیوی می‌تواند همه‌چیز را نگه دارد.
-- **کدک هدر فشرده**: هر هدر به‌جای JSON پرحجم، در ۸۰ بایت دودویی (چیدمان بیت‌کوین) ذخیره/منتقل می‌شود.
+### 1.4 Storage Optimization — `p2p/pruner.js`
+- **Optional pruning**: after the UTXO set is built, the bodies of blocks older than the retention window are deleted (headers remain). An archival node can keep everything.
+- **Compact header codec**: each header is stored/transmitted in 80 binary bytes (Bitcoin layout) instead of bulky JSON.
 
-### ۱.۵ لایه‌ی ادغام — `p2p/net-enhance.js`
-- با یک فراخوانی `enhanceNode(node, opts)` همه‌ی موارد بالا روی نود نصب می‌شود.
-- طراحی «degrade gracefully»: اگر transport فعلی متدی نداشته باشد، آن hook بی‌صدا رد می‌شود (نه crash).
-- حلقه‌ی نگهداری که تعداد اتصال‌ها را بالای حداقل نگه می‌دارد، pruning را اجرا می‌کند و آمار را ادغام می‌کند.
+### 1.5 Integration Layer — `p2p/net-enhance.js`
+- A single call to `enhanceNode(node, opts)` installs all of the above on a node.
+- "Degrade gracefully" design: if the current transport lacks a method, that hook is silently skipped (rather than crashing).
+- A maintenance loop that keeps the number of connections above the minimum, runs pruning, and aggregates statistics.
 
-### فعال‌سازی
-در `server.js` به‌صورت خودکار و امن وصل شده و با متغیرهای محیطی کنترل می‌شود:
+### Activation
+It is wired into `server.js` automatically and safely, and controlled via environment variables:
 
 ```bash
-MIN_PEERS=4        # حداقل تعداد اتصال فعال
-MAX_PEERS=8        # سقف اتصال‌ها
-PRUNE=1            # فعال‌کردن pruning (پیش‌فرض خاموش)
-PRUNE_KEEP=288     # تعداد بلوک کامل نگه‌داشته‌شده
+MIN_PEERS=4        # minimum number of active connections
+MAX_PEERS=8        # connection cap
+PRUNE=1            # enable pruning (default off)
+PRUNE_KEEP=288     # number of full blocks to keep
 ```
 
 ---
 
-## بخش ۲ — چک‌لیست کامل تا ۱۰۰٪
+## Part 2 — Full Checklist to 100%
 
-وضعیت هر مورد: ✅ کامل · 🟡 پایه/ناقص · ⬜ انجام‌نشده
+Status of each item: ✅ complete · 🟡 basic/incomplete · ⬜ not done
 
-### الف) هسته‌ی زنجیره (Consensus & Core)
-- ✅ مدل UTXO با apply/undo
-- ✅ Proof of Work با nBits فشرده
-- ✅ تنظیم سختی (retarget) با clamp چهاربرابری
-- ✅ Halving و پاداش بلوک
-- ✅ درخت مرکل و اثبات مرکل
-- ✅ Chain reorg بر اساس بیشترین کار
-- ✅ موتور اسکریپت (P2PKH، multisig، timelock)
-- 🟡 اعتبارسنجی مستقل هدر (`validateHeader`) — قلاب آماده است، منطق کامل نیاز دارد
-- ⬜ SegWit (جداسازی شاهد امضا) — تغییر بنیادی، اختیاری
-- ⬜ Taproot / امضای Schnorr — پیشرفته، اختیاری
+### A) Chain Core (Consensus & Core)
+- ✅ UTXO model with apply/undo
+- ✅ Proof of Work with compact nBits
+- ✅ Difficulty adjustment (retarget) with 4x clamp
+- ✅ Halving and block reward
+- ✅ Merkle tree and Merkle proofs
+- ✅ Chain reorg based on most work
+- ✅ Script engine (P2PKH, multisig, timelock)
+- 🟡 Standalone header validation (`validateHeader`) — the hook is ready, the full logic is needed
+- ⬜ SegWit (segregated witness) — fundamental change, optional
+- ⬜ Taproot / Schnorr signatures — advanced, optional
 
-### ب) شبکه (Networking)
-- ✅ P2P با سوکت خام + نسخه‌ی HTTP
-- ✅ کشف Peer پیشرفته (این مرحله)
-- ✅ محافظت DoS و ban score (این مرحله)
-- ✅ همگام‌سازی headers-first (این مرحله)
-- 🟡 اتصال به شبکه‌ی واقعی با صدها نود — نیاز به تست میدانی طولانی
-- ⬜ کشف خودکار از طریق DNS seeds
-- ⬜ پشتیبانی از Tor / حریم خصوصی نود
+### B) Networking
+- ✅ P2P over raw sockets + HTTP version
+- ✅ Advanced peer discovery (this stage)
+- ✅ DoS protection and ban score (this stage)
+- ✅ Headers-first synchronization (this stage)
+- 🟡 Connecting to a real network with hundreds of nodes — requires lengthy field testing
+- ⬜ Automatic discovery via DNS seeds
+- ⬜ Tor support / node privacy
 
-### ج) ذخیره‌سازی و مقیاس‌پذیری
-- ✅ Persistence با PostgreSQL
-- ✅ Pruning پایه + کدک هدر فشرده (این مرحله)
-- 🟡 همگام‌سازی سریع اولیه (IBD) — منطق آماده، نیاز به تست در مقیاس
-- ⬜ Fast-sync با snapshot از UTXO
-- ⬜ ایندکس‌گذاری کارآمد برای اکسپلورر در مقیاس بزرگ
+### C) Storage and Scalability
+- ✅ Persistence with PostgreSQL
+- ✅ Basic pruning + compact header codec (this stage)
+- 🟡 Initial Block Download (IBD) — logic ready, needs testing at scale
+- ⬜ Fast-sync with UTXO snapshot
+- ⬜ Efficient indexing for the explorer at large scale
 
-### د) امنیت
-- ✅ JWT، 2FA (TOTP)
-- ✅ IDS/IPS، rate limit، کنترل دسترسی مبتنی بر نقش
-- ✅ KYC پایه
-- 🔴 **امضای سمت سرور** — کلید خصوصی کاربر به سرور فرستاده می‌شود؛ **باید** به امضای سمت کلاینت تغییر کند (بحرانی)
-- ⬜ **حسابرسی امنیتی مستقل (audit)** توسط شرکت تخصصی — پیش‌نیاز نگهداری پول واقعی
-- ⬜ برنامه‌ی Bug Bounty
+### D) Security
+- ✅ JWT, 2FA (TOTP)
+- ✅ IDS/IPS, rate limiting, role-based access control
+- ✅ Basic KYC
+- 🔴 **Server-side signing** — the user's private key is sent to the server; this **must** be changed to client-side signing (critical)
+- ⬜ **Independent security audit** by a specialized firm — a prerequisite for holding real money
+- ⬜ Bug bounty program
 
-### ه) اکوسیستم
-- ✅ اکسپلورر وب، داشبورد، رادار تهدید
-- ✅ کیف پول CLI با HD (BIP39)
-- ✅ لایه‌ی توکن (صدور کوین/توکن)
-- ⬜ کیف پول موبایل (iOS/Android)
-- ⬜ کیف پول مرورگری / افزونه
-- ⬜ یکپارچه‌سازی با صرافی
-- ⬜ SDK و مستندسازی کامل توسعه‌دهنده
-- ⬜ Testnet عمومی پایدار + faucet
+### E) Ecosystem
+- ✅ Web explorer, dashboard, threat radar
+- ✅ CLI wallet with HD (BIP39)
+- ✅ Token layer (coin/token issuance)
+- ⬜ Mobile wallet (iOS/Android)
+- ⬜ Browser wallet / extension
+- ⬜ Exchange integration
+- ⬜ SDK and complete developer documentation
+- ⬜ Stable public testnet + faucet
 
 ---
 
-## بخش ۳ — اولویت‌بندی پیشنهادی (سه فاز)
+## Part 3 — Suggested Prioritization (Three Phases)
 
-**فاز ۱ — امنیت پایه (فوری):**
-1. انتقال امضا به سمت کلاینت (رفع مشکل بحرانی کلید خصوصی).
-2. تکمیل `validateHeader` برای اعتبارسنجی کامل زنجیره‌ی هدر.
-3. راه‌اندازی testnet عمومی برای تست میدانی شبکه‌ی جدید.
+**Phase 1 — Core Security (urgent):**
+1. Move signing to the client side (fix the critical private-key issue).
+2. Complete `validateHeader` for full header-chain validation.
+3. Launch a public testnet for field testing the new network.
 
-**فاز ۲ — بلوغ شبکه:**
-4. DNS seeds برای کشف خودکار.
-5. تست ماژول‌های جدید با ده‌ها نود واقعی.
-6. Fast-sync با snapshot.
+**Phase 2 — Network Maturity:**
+4. DNS seeds for automatic discovery.
+5. Test the new modules with dozens of real nodes.
+6. Fast-sync with snapshot.
 
-**فاز ۳ — آماده‌ی تولید:**
-7. حسابرسی امنیتی مستقل.
+**Phase 3 — Production Ready:**
+7. Independent security audit.
 8. Bug bounty.
-9. اکوسیستم (کیف موبایل، SDK، صرافی).
+9. Ecosystem (mobile wallet, SDK, exchange).
 
 ---
 
-## نکته‌ی مهم امنیتی
+## Important Security Note
 
-مورد 🔴 (امضای سمت سرور) تنها نقص **بحرانی** فعلی است. تا وقتی کلید خصوصی کاربر از دستگاهش خارج می‌شود و به سرور می‌رود، این سیستم نباید با پول واقعی استفاده شود. بقیه‌ی موارد ⬜ برای «کامل بودن» لازم‌اند ولی خطر مستقیم ندارند.
+The 🔴 item (server-side signing) is the only current **critical** flaw. As long as the user's private key leaves their device and is sent to the server, this system must not be used with real money. The rest of the ⬜ items are needed for "completeness" but pose no direct risk.
 
 ---
 
-*© 2026 SPN Coin Project. این سند وضعیت پروژه را در زمان نگارش توصیف می‌کند.*
+*© 2026 SPN Coin Project. This document describes the state of the project at the time of writing.*

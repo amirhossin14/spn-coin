@@ -1,53 +1,53 @@
-# SPN Coin در مقایسه با بیت‌کوین و لایت‌کوین
+# SPN Coin Compared to Bitcoin and Litecoin
 
-ارزیابی صادقانهٔ فنی پس از ارتقاهای v6. هدف این سند، شفاف‌بودن دربارهٔ این است که
-چه چیزی واقعاً «مثل» بیت‌کوین/لایت‌کوین شده و چه چیزی هنوز نه.
+An honest technical assessment after the v6 upgrades. The goal of this document is to be
+transparent about what has actually become "like" Bitcoin/Litecoin and what has not yet.
 
-## ✅ آنچه از نظر معماری مثل بیت‌کوین/لایت‌کوین است
-- مدل **UTXO** (مثل بیت‌کوین).
-- استخراج **Proof-of-Work** با پاداش کوین‌بیس و **halving**.
-- **الگوریتم PoW قابل‌انتخاب**: `sha256d` (بیت‌کوین) یا `scrypt` (لایت‌کوین) —
-  در `config.js` → `BLOCKCHAIN.POW_ALGORITHM`. این دقیقاً تفاوت فنی اصلی لایت‌کوین
-  با بیت‌کوین است.
-- **انتخاب زنجیره بر اساس کار انباشته (cumulative chainwork)** — قانون درست ناکاموتو
-  (نه «طول زنجیره»). یک ضعف امنیتی واقعی رفع شد.
-- تنظیم سختی در پنجرهٔ ۲۰۱۶ بلاکی، درخت **مرکل**، هش هویتی **SHA256d**.
-- آدرس‌ها: **Base58Check** و **bech32** (قابل‌تنظیم)، امضای **secp256k1**.
-- شبکهٔ **P2P** با reorg، **mempool**، و پروتکل **Stratum** برای استخراج استخری.
+## ✅ What Is Architecturally Like Bitcoin/Litecoin
+- **UTXO** model (like Bitcoin).
+- **Proof-of-Work** mining with a coinbase reward and **halving**.
+- **Selectable PoW algorithm**: `sha256d` (Bitcoin) or `scrypt` (Litecoin) —
+  in `config.js` → `BLOCKCHAIN.POW_ALGORITHM`. This is exactly Litecoin's main
+  technical difference from Bitcoin.
+- **Chain selection based on cumulative chainwork** — the correct Nakamoto rule
+  (not "chain length"). A real security weakness was fixed.
+- Difficulty adjustment over a 2016-block window, **Merkle** tree, **SHA256d** identity hash.
+- Addresses: **Base58Check** and **bech32** (configurable), **secp256k1** signatures.
+- **P2P** network with reorg, **mempool**, and the **Stratum** protocol for pool mining.
 
-## ⚠️ ساده‌سازی‌های شناخته‌شده (هنوز در حد تولیدی بیت‌کوین/لایت‌کوین نیست)
-- **سختی درشت‌دانه است**: PoW با شمارش صفرهای ابتدایی هگز بررسی می‌شود؛ هر پله ۱۶×.
-  بیت‌کوین از هدفِ کامل ۲۵۶ بیتی (nBits فشرده) با دانه‌بندی ظریف استفاده می‌کند.
-- **بدون زبان Script کامل**: بیت‌کوین یک زبان اسکریپت (P2PKH/P2SH/multisig/timelock)
-  دارد؛ اینجا انتقال ساده است.
-- **بدون SegWit / Taproot**، بدون sync سرآیند-اول، بدون relay فشردهٔ بلاک.
-- **کیف‌پول HD کامل (BIP32/39/44)** پیاده نشده.
-- نوشته‌شده با **Node.js** (نه C++/Rust)؛ برای یک full-node پرترافیک محدودیت کارایی دارد.
-- **ممیزی امنیتی مستقل نشده** و روی شبکهٔ عمومی پرفشار جنگ‌آزموده نیست.
+## ⚠️ Known Simplifications (Not Yet at Bitcoin/Litecoin Production Level)
+- **Difficulty is coarse-grained**: PoW is checked by counting leading hex zeros; each step is 16×.
+  Bitcoin uses a full 256-bit target (compact nBits) with fine-grained granularity.
+- **No full Script language**: Bitcoin has a scripting language (P2PKH/P2SH/multisig/timelock);
+  here transfers are simple.
+- **No SegWit / Taproot**, no headers-first sync, no compact block relay.
+- A **full HD wallet (BIP32/39/44)** is not implemented.
+- Written in **Node.js** (not C++/Rust); it has performance limits for a high-traffic full node.
+- **Not independently security-audited** and not battle-tested on a high-pressure public network.
 
-## ❌ آنچه هیچ کدی نمی‌سازد (مهم‌ترین بخش)
-ارزش و امنیت بیت‌کوین/لایت‌کوین از این‌ها می‌آید، نه از کدشان:
-- **قدرت هش غیرمتمرکز و عظیم** که حملهٔ ۵۱٪ را غیراقتصادی می‌کند.
-- **اثر شبکه**: میلیون‌ها کاربر، صرافی، کیف‌پول، نقدینگی.
-- **سال‌ها امنیت اقتصادی و اعتماد** (بیت‌کوین از ۲۰۰۹، لایت‌کوین از ۲۰۱۱).
+## ❌ What No Code Can Create (The Most Important Part)
+Bitcoin's/Litecoin's value and security come from these, not from their code:
+- **Decentralized, massive hashpower** that makes a 51% attack uneconomical.
+- **Network effect**: millions of users, exchanges, wallets, liquidity.
+- **Years of economic security and trust** (Bitcoin since 2009, Litecoin since 2011).
 
-> برابریِ ویژگی‌های کد ≠ بیت‌کوین/لایت‌کوین‌شدن. این پروژه پس از v6 یک زنجیرهٔ
-> UTXO-PoW با مفاهیم درست و قابل‌انتخاب (SHA256d/Scrypt) است که برای **یادگیری و
-> یک testnet عمومی** عالی است؛ برای mainnetِ حامل ارزش واقعی، مسیر `docs/PATH_A_ROADMAP.md`
-> (توکن روی زنجیرهٔ موجود) واقع‌بینانه‌تر و امن‌تر است.
+> Code feature parity ≠ becoming Bitcoin/Litecoin. After v6, this project is a
+> UTXO-PoW chain with correct, selectable concepts (SHA256d/Scrypt) that is excellent for
+> **learning and a public testnet**; for a mainnet carrying real value, the
+> `docs/PATH_A_ROADMAP.md` path (a token on an existing chain) is more realistic and safer.
 
-## انتخاب «بیت‌کوین‌گونه» یا «لایت‌کوین‌گونه»
+## Choosing "Bitcoin-like" or "Litecoin-like"
 ```js
 // config.js → BLOCKCHAIN
-POW_ALGORITHM: 'sha256d'   // مثل بیت‌کوین
-// یا
-POW_ALGORITHM: 'scrypt'    // مثل لایت‌کوین
+POW_ALGORITHM: 'sha256d'   // like Bitcoin
+// or
+POW_ALGORITHM: 'scrypt'    // like Litecoin
 ```
-تغییر این مقدار شکنندهٔ اجماع است: `./data` را پاک و روی testnet تازه، جنسیس را
-دوباره ماین کن.
+Changing this value breaks consensus: clear `./data` and, on a fresh testnet, re-mine
+the genesis.
 
-## نقشهٔ بعدی برای نزدیک‌تر شدن (در صورت تمایل)
-۱. هدف ۲۵۶ بیتی واقعی + سختی دانه‌بندی‌ظریف.
-۲. زبان Script حداقلی (P2PKH/multisig/timelock).
-۳. کیف‌پول HD (BIP32/39).
-۴. sync سرآیند-اول و ذخیره‌سازی کارآمد.
+## Next Roadmap to Get Closer (If Desired)
+1. A real 256-bit target + fine-grained difficulty.
+2. A minimal Script language (P2PKH/multisig/timelock).
+3. HD wallet (BIP32/39).
+4. Headers-first sync and efficient storage.

@@ -1,68 +1,64 @@
-# چک‌لیست واقع‌بینانهٔ پیش از لانچ
+# Realistic Pre-Launch Checklist
 
-سندی برای پیش‌بردن کار با تیم و وکیل. هیچ بخشی را قبل از تیک‌خوردن رد نکن.
+A document for driving the work forward with your team and lawyer. Do not skip any section before it is checked off.
 
-> ⚖️ سلب مسئولیت: من وکیل یا مشاور مالی نیستم. موارد حقوقی صرفاً نکات عمومی‌اند و
-> جایگزین مشاورهٔ تخصصی نیستند. در بریتانیا نقض قوانین رمزارز می‌تواند **جرم کیفری**
-> باشد — حتماً قبل از هر عرضهٔ عمومی با وکیل متخصص مشورت کن.
+> ⚖️ Disclaimer: I am not a lawyer or financial advisor. The legal items are merely general notes and are not a substitute for professional advice. In the UK, breaching crypto regulations can be a **criminal offense** — be sure to consult a specialized lawyer before any public offering.
 
 ---
 
-## بخش ۱ — فنی
+## Part 1 — Technical
 
-- [ ] تصمیم نهایی معماری: توکن روی L2/اتریوم (مسیر الف) یا L1 با فریم‌ورک جدی
-      (Cosmos SDK / Substrate). نوشتن L1 از صفر روی Node.js برای mainnet گزینه نیست.
-- [ ] مدل عرضه و توکنومیکس مکتوب و قطعی (عرضهٔ کل، تخصیص تیم، وستینگ، نقدینگی).
-- [ ] قرارداد/پروتکل کامپایل تمیز + تست‌های کامل (واحد + سناریو) سبز.
-- [ ] استقرار و آزمون چندهفته‌ای روی **testnet عمومی** با کاربران واقعی.
-- [ ] سورس قرارداد روی explorer **verify** شده.
-- [ ] کیف‌پول، explorer، و مستندات کاربر آماده.
-- [ ] زیرساخت پایدار: seed nodeها، پایش (Prometheus/Grafana)، پشتیبان‌گیری، هشدار.
-- [ ] طرح پاسخ به حادثه (incident response) و کلید/multisig اضطراری.
+- [ ] Final architecture decision: a token on L2/Ethereum (Path A) or an L1 with a serious framework
+      (Cosmos SDK / Substrate). Writing an L1 from scratch on Node.js for mainnet is not an option.
+- [ ] A written and finalized supply model and tokenomics (total supply, team allocation, vesting, liquidity).
+- [ ] A clean-compiling contract/protocol + complete tests (unit + scenario) all green.
+- [ ] Deployment and multi-week trial on a **public testnet** with real users.
+- [ ] Contract source **verified** on the explorer.
+- [ ] Wallet, explorer, and user documentation ready.
+- [ ] Stable infrastructure: seed nodes, monitoring (Prometheus/Grafana), backups, alerting.
+- [ ] An incident response plan and an emergency key/multisig.
 
-## بخش ۲ — امنیت
+## Part 2 — Security
 
-- [ ] **هیچ رمزنگاری دست‌سازی در mainnet نیست** — فقط کتابخانه‌های ممیزی‌شده.
-- [ ] **ممیزی امنیتی مستقل** توسط شرکت معتبر، با گزارش منتشرشدهٔ عمومی.
-- [ ] تحلیل ایستا (Slither) و تست fuzz اجرا و رفع شده.
-- [ ] دارایی‌های پروژه در **multisig** (مثل Gnosis Safe)، نه کیف‌پول تکی.
-- [ ] کلیدهای خصوصی هرگز در کد/گیت نیست؛ مدیریت کلید و چرخش مکتوب است.
-- [ ] برنامهٔ **bug bounty** (مثلاً Immunefi) فعال.
-- [ ] توابع پرامتیاز به حداقل رسیده؛ هر امتیاز باقی‌مانده توجیه و مستند شده.
-- [ ] قفل/وستینگ نقدینگی و توکن تیم به‌صورت زمان‌بندی‌شده و قابل‌تأیید عمومی.
-- [ ] امنیت سمت سرور (برای faucet/explorer/API): TLS، rate-limit، به‌روزرسانی وابستگی‌ها.
+- [ ] **No hand-rolled cryptography in mainnet** — only audited libraries.
+- [ ] **Independent security audit** by a reputable firm, with a publicly published report.
+- [ ] Static analysis (Slither) and fuzz testing run and remediated.
+- [ ] Project assets in a **multisig** (e.g., Gnosis Safe), not a single wallet.
+- [ ] Private keys never in code/git; key management and rotation documented.
+- [ ] A **bug bounty** program (e.g., Immunefi) active.
+- [ ] Privileged functions minimized; every remaining privilege justified and documented.
+- [ ] Liquidity lock/vesting and team tokens on a scheduled, publicly verifiable basis.
+- [ ] Server-side security (for the faucet/explorer/API): TLS, rate-limiting, dependency updates.
 
-## بخش ۳ — حقوقی و مقرراتی (تمرکز: بریتانیا)
+## Part 3 — Legal and Regulatory (focus: UK)
 
-> بریتانیا تازه یک رژیم مجوزدهی کامل برای رمزارز ساخته است؛ فضای «تقریباً بدون
-> مقررات» در حال بسته‌شدن است.
+> The UK has just built a full licensing regime for crypto; the "almost unregulated" space is closing.
 
-- [ ] **مشاوره با وکیل متخصص رمزارز در بریتانیا — قبل از هر اقدام عمومی.**
-- [ ] تعیین این‌که توکن شما در کدام دستهٔ مقرراتی می‌افتد (utility / security /
-      stablecoin / ...). توجه: «غیرمتمرکز بودن» به‌خودیِ‌خود شما را از مقررات خارج
-      نمی‌کند — FCA صراحتاً همین را گفته است.
-- [ ] بررسی نیاز به **مجوز/authorisation از FCA** تحت رژیم جدید (The Financial
-      Services and Markets Act 2000 (Cryptoassets) Regulations 2026). بازهٔ درخواست
-      از ۳۰ سپتامبر ۲۰۲۶ آغاز شده و اجرای کامل رژیم حدود اکتبر ۲۰۲۷ است؛ این تاریخ‌ها
-      را با وکیل و منابع رسمی FCA به‌روز کن.
-- [ ] رعایت قوانین **financial promotions** (تبلیغ رمزارز به مصرف‌کنندهٔ بریتانیایی
-      قواعد سخت‌گیرانه دارد).
-- [ ] الزامات **AML/KYC** و ثبت‌نام‌های لازم.
-- [ ] اگر stablecoin مدنظر است: در بریتانیا انتشار آن قواعد ویژه و سخت‌تری دارد.
-- [ ] ساختار شرکتی، مالیات، و حوزهٔ قضایی فعالیت مشخص و قانونی.
-- [ ] اسناد حقوقی: شرایط استفاده، سلب مسئولیت‌های ریسک، سیاست حریم خصوصی.
-- [ ] بررسی مقررات هر **حوزهٔ قضایی دیگری** که کاربران هدف در آن هستند (نه فقط بریتانیا).
+- [ ] **Consult a specialized crypto lawyer in the UK — before any public action.**
+- [ ] Determine which regulatory category your token falls into (utility / security /
+      stablecoin / ...). Note: "being decentralized" does not by itself exempt you from regulation
+      — the FCA has said exactly this.
+- [ ] Assess the need for **authorisation from the FCA** under the new regime (The Financial
+      Services and Markets Act 2000 (Cryptoassets) Regulations 2026). The application window
+      opened on 30 September 2026 and full enforcement of the regime is around October 2027; keep
+      these dates updated with your lawyer and official FCA sources.
+- [ ] Comply with **financial promotions** rules (advertising crypto to a UK consumer
+      has strict rules).
+- [ ] **AML/KYC** requirements and necessary registrations.
+- [ ] If a stablecoin is intended: issuing it in the UK has special, stricter rules.
+- [ ] A clear and lawful corporate structure, taxation, and jurisdiction of operation.
+- [ ] Legal documents: terms of use, risk disclaimers, privacy policy.
+- [ ] Review the regulations of every **other jurisdiction** where your target users are (not just the UK).
 
-## بخش ۴ — عملیات و جامعه
+## Part 4 — Operations and Community
 
-- [ ] کانال‌های ارتباطی رسمی و راستی‌آزمایی‌شده (ضدِ جعل و فیشینگ).
-- [ ] طرح شفافیت: انتشار آدرس قرارداد، گزارش ممیزی، و وضعیت قفل‌ها.
-- [ ] طرح مدیریت بحران (مثلاً کشف آسیب‌پذیری پس از لانچ).
-- [ ] انتظارات واقع‌بینانه: اکثریت قاطع توکن‌های جدید شکست می‌خورند؛ نقدینگی، اعتماد و
-      کاربرد واقعی سال‌ها زمان می‌برند.
+- [ ] Official, verified communication channels (anti-spoofing and anti-phishing).
+- [ ] A transparency plan: publishing the contract address, audit report, and lock status.
+- [ ] A crisis management plan (e.g., discovering a vulnerability after launch).
+- [ ] Realistic expectations: the vast majority of new tokens fail; liquidity, trust, and real
+      utility take years.
 
 ---
 
-### خلاصهٔ یک خطی
-«لانچ جدی» بیشتر یک پروژهٔ حقوقی-اقتصادی-تیمی است تا کدنویسی. کد را امن و خسته‌کننده
-نگه دار، ارزش واقعی را قبل از ممیزی و مشاورهٔ حقوقی درگیر نکن.
+### One-Line Summary
+A "serious launch" is more of a legal-economic-team project than a coding one. Keep the code secure and boring, and do not engage real value before an audit and legal counsel.

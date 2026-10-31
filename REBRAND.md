@@ -1,51 +1,51 @@
-# رِبرند: MyCoin → SPN Coin
+# Rebrand: MyCoin → SPN Coin
 
-کل پروژه از MyCoin (MYC) به **SPN Coin (SPN)** تغییر یافت.
+The entire project was changed from MyCoin (MYC) to **SPN Coin (SPN)**.
 
-## چه چیزی عوض شد
-- هویت کوین در `config.js`: نام → `SPN Coin`، نماد → `SPN`، وب‌سایت.
-- **آدرس‌ها**: پیشوند `MYC1`/`MYCt` → `SPN1`/`SPNt`؛ HRP بِک۳۲ `myc`/`tmyc` → `spn`/`tspn`.
-  (نمونه: `SPN1BL2xEkvx...`)
-- همهٔ رشته‌های نمایشی، بنر، UIها (dashboard/wallet/send/miner/explorer/…)، CLI،
-  رجکس‌های اعتبارسنجی آدرس، نام‌های متریک Prometheus (`spncoin_*`)، جدول‌های DB
-  (`spncoin_*`)، نام دیتابیس، اسکریپت‌های testnet، فایل‌های Docker/env، و LICENSE.
-- قرارداد توکن: `MyCoinToken` → `SpnCoinToken` (فایل و کد و package).
-- نام پکیج‌ها: `spn-coin-node`, `spn-coin-token`.
+## What changed
+- The coin identity in `config.js`: name → `SPN Coin`, symbol → `SPN`, website.
+- **Addresses**: prefix `MYC1`/`MYCt` → `SPN1`/`SPNt`; Bech32 HRP `myc`/`tmyc` → `spn`/`tspn`.
+  (example: `SPN1BL2xEkvx...`)
+- All display strings, the banner, the UIs (dashboard/wallet/send/miner/explorer/…), the CLI,
+  the address validation regexes, the Prometheus metric names (`spncoin_*`), the DB tables
+  (`spncoin_*`), the database name, the testnet scripts, the Docker/env files, and the LICENSE.
+- The token contract: `MyCoinToken` → `SpnCoinToken` (file, code and package).
+- Package names: `spn-coin-node`, `spn-coin-token`.
 
-## راستی‌آزمایی
-- ✅ آدرس‌ها اکنون `SPN1...`/`SPNt...` ساخته و اعتبارسنجی می‌شوند.
-- ✅ `/api/coin-info` و `/api/stats` → name `SPN Coin`, symbol `SPN`.
-- ✅ بنر راه‌اندازی: «SPN Coin (SPN) Full Node v6.0.0».
-- ✅ `npm test` → ۲۸ تست پاس، `npm run lint` بدون خطا، سرور سالم بوت می‌شود.
+## Verification
+- ✅ Addresses are now generated and validated as `SPN1...`/`SPNt...`.
+- ✅ `/api/coin-info` and `/api/stats` → name `SPN Coin`, symbol `SPN`.
+- ✅ Startup banner: "SPN Coin (SPN) Full Node v6.0.0".
+- ✅ `npm test` → 28 tests pass, `npm run lint` with no errors, the server boots cleanly.
 
-## ⚠️ مهم: شکنندهٔ اجماع
-تغییر پیشوند/فرمت آدرس، آدرس‌ها و دادهٔ زنجیرهٔ قبلی را نامعتبر می‌کند. قبل از
-اجرا، پوشهٔ `./data` را پاک کن تا زنجیره از جنسیس تازه با هویت SPN ساخته شود.
-
----
-
-## رفع «ارور تغییر هویت» — دیگر نیازی به حذف دستی نیست
-قبلاً تغییر پیشوند/فرمت آدرس باعث می‌شد دادهٔ زنجیرهٔ قدیمی (با هویت MYC) با زنجیرهٔ
-جدید ناسازگار شود. حالا نود این را **خودکار** مدیریت می‌کند:
-
-- موقع راه‌اندازی، یک «اثرانگشت هویت شبکه» (`SYMBOL|prefix|format|pow|chainId`)
-  در دیتابیس ذخیره و بررسی می‌شود.
-- اگر دادهٔ ذخیره‌شده متعلق به هویت دیگری باشد (مثلاً MYC قبل از ریبرند)، نود به‌جای
-  ارور، بلاک‌های قدیمی را به یک جدول آرشیو (`spncoin_blocks_legacy_<زمان>`) منتقل و
-  جدول اصلی را خالی می‌کند، سپس از **جنسیس تازهٔ SPN** شروع می‌کند — بدون از‌دست‌رفتنِ
-  دادهٔ قدیمی و بدون دخالت دستی.
-- در حالت بدون دیتابیس (in-memory) اصلاً دادهٔ کهنه‌ای وجود ندارد و همیشه از جنسیس
-  تازه شروع می‌شود.
-
-> نکتهٔ اصلاحی: persistence این پروژه **دیتابیس‌محور (PostgreSQL)** است، نه فایل
-> `./data`. پس نیازی به پاک‌کردن پوشه‌ای نیست؛ فقط نود را اجرا کن.
+## ⚠️ Important: consensus-breaking
+Changing the address prefix/format invalidates the old addresses and chain data. Before
+running, delete the `./data` folder so the chain is rebuilt from a fresh genesis with the SPN identity.
 
 ---
 
-## افزودن 2FA (Google Authenticator) — امنیت ورود
-احراز هویت دومرحله‌ای مبتنی بر TOTP (سازگار با Google Authenticator) به بک‌اند اضافه شد:
-- ماژول `app/totp.js` (RFC 6238/4226، بدون وابستگی) — تأییدشده با بردارهای رسمی.
-- متدهای `setupTotp`/`confirmTotp`/`disableTotp`/`getTotpStatus` در AccessControl.
-- گیت 2FA در `login` (نیازمند کد معتبر وقتی فعال باشد؛ مقایسهٔ timing-safe).
-- سازگار با UIهای 2FA موجود در `admin.html`/`dashboard.html`.
-- ۳۴ تست پاس، lint بدون خطا.
+## Fixing the "identity change error" — no more manual deletion needed
+Previously, changing the address prefix/format caused the old chain data (with the MYC identity) to be
+incompatible with the new chain. The node now handles this **automatically**:
+
+- At startup, a "network identity fingerprint" (`SYMBOL|prefix|format|pow|chainId`)
+  is stored in the database and checked.
+- If the stored data belongs to a different identity (e.g. MYC before the rebrand), the node, instead of
+  raising an error, moves the old blocks to an archive table (`spncoin_blocks_legacy_<time>`) and
+  empties the main table, then starts from a **fresh SPN genesis** — without losing the
+  old data and without manual intervention.
+- In no-database (in-memory) mode there is no stale data at all and it always starts from a
+  fresh genesis.
+
+> Correction note: this project's persistence is **database-backed (PostgreSQL)**, not the
+> `./data` folder. So there is no folder to delete; just run the node.
+
+---
+
+## Adding 2FA (Google Authenticator) — login security
+TOTP-based two-factor authentication (compatible with Google Authenticator) was added to the backend:
+- The `app/totp.js` module (RFC 6238/4226, dependency-free) — verified with the official test vectors.
+- The `setupTotp`/`confirmTotp`/`disableTotp`/`getTotpStatus` methods in AccessControl.
+- A 2FA gate in `login` (requires a valid code when enabled; timing-safe comparison).
+- Compatible with the existing 2FA UIs in `admin.html`/`dashboard.html`.
+- 34 tests pass, lint with no errors.

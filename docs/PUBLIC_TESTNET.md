@@ -1,21 +1,16 @@
-# راه‌اندازی شبکه آزمایشی عمومی (Public Testnet)
+# Launching a Public Testnet
 
-این سند مسیر واقعی تبدیل SPN Coin از «یک node روی یک سرور» به «یک شبکه
-غیرمتمرکز واقعی» را توضیح می‌دهد. این اولین قدم ضروری برای هر رمزارز
-جدی است.
+This document explains the real path for turning SPN Coin from "a single node on a single server" into "a genuinely decentralized network." This is the first essential step for any serious cryptocurrency.
 
-> ⚠️ صادقانه: این مسیر ماه‌ها تا سال‌ها زمان می‌برد و نیاز به جامعه واقعی
-> دارد. هیچ میان‌بری وجود ندارد. هدف اینجا ساختن یک شبکه آزمایشی شفاف است،
-> نه وعده ارزش مالی.
+> ⚠️ Honestly: this path takes months to years and requires a real community. There are no shortcuts. The goal here is to build a transparent testnet, not to promise financial value.
 
 ---
 
-## مرحله ۱ — راه‌اندازی Seed Node (نود اولیه)
+## Step 1 — Setting Up a Seed Node
 
-یک شبکه غیرمتمرکز به یک «نقطه شروع» نیاز دارد که نودهای جدید بتوانند
-به آن وصل شوند. این «seed node» نام دارد.
+A decentralized network needs a "starting point" that new nodes can connect to. This is called a "seed node."
 
-### روی سرور اول (seed):
+### On the first server (seed):
 ```bash
 # .env
 NODE_ENV=production
@@ -23,93 +18,87 @@ PORT=3000
 CHAIN_ID=3                 # 3 = testnet
 JWT_SECRET=<random>
 JWT_REFRESH_SECRET=<random>
-NODE_SECRET=<shared-secret>   # همه نودهای testnet این را یکسان دارند
-PEER_URLS=                 # seed خودش peer ندارد، بقیه به او وصل می‌شوند
+NODE_SECRET=<shared-secret>   # all testnet nodes share the same value
+PEER_URLS=                 # the seed itself has no peers; others connect to it
 ```
 
 ```bash
 pm2 start server.js --name spncoin-seed
 ```
 
-این سرور باید **همیشه روشن** بماند و یک دامنه ثابت داشته باشد:
-`https://seed1.spncoin-testnet.org` (مثال)
+This server must stay **always on** and have a fixed domain:
+`https://seed1.spncoin-testnet.org` (example)
 
 ---
 
-## مرحله ۱.۵ — تست محلی شبکه (قبل از راه‌اندازی عمومی)
+## Step 1.5 — Local Network Testing (before the public launch)
 
-قبل از اینکه از دیگران بخواهی node اجرا کنند، شبکه را روی کامپیوتر خودت
-با ۳ نود تست کن. ابزارش از قبل آماده است:
+Before asking others to run a node, test the network on your own computer with 3 nodes. The tool is already available:
 
 ```bash
 node testnet/launch.js
 ```
 
-این دستور ۳ نود را همزمان بالا می‌آورد که با هم sync می‌شوند:
+This command brings up 3 nodes simultaneously that sync with each other:
 - node1: http://localhost:3100
 - node2: http://localhost:3200
 - node3: http://localhost:3300
 
-هر ۱۵ ثانیه وضعیت همه نودها (height، difficulty، mempool) چاپ می‌شود.
-اگر هر سه به یک height برسند، یعنی شبکه درست sync می‌کند. ✅
+Every 15 seconds the status of all nodes (height, difficulty, mempool) is printed. If all three reach the same height, the network is syncing correctly. ✅
 
-این بهترین راه برای اطمینان از سلامت P2P **قبل** از دعوت جامعه است.
-
----
-
-## مرحله ۲ — مستندسازی برای جامعه
-
-برای اینکه دیگران node اجرا کنند، باید بدانند چطور. یک مخزن GitHub
-عمومی بساز با:
-
-- کد کامل (همین پروژه)
-- راهنمای نصب ساده
-- آدرس seed node(های) رسمی
-- توضیح شفاف: «این یک testnet آزمایشی است، SPN ارزش مالی ندارد»
+This is the best way to confirm P2P health **before** inviting the community.
 
 ---
 
-## مرحله ۳ — نود دوم و سوم (توسط دیگران)
+## Step 2 — Documentation for the Community
 
-هر کسی که می‌خواهد به شبکه بپیوندد:
+For others to run a node, they need to know how. Create a public GitHub repository with:
+
+- The complete code (this project)
+- A simple installation guide
+- The address(es) of the official seed node(s)
+- A clear statement: "This is an experimental testnet; SPN has no financial value"
+
+---
+
+## Step 3 — The Second and Third Nodes (by others)
+
+Anyone who wants to join the network:
 ```bash
-# .env آن‌ها
+# their .env
 CHAIN_ID=3
 NODE_SECRET=<same-shared-secret>
 PEER_URLS=https://seed1.spncoin-testnet.org
 ```
 
-وقتی node بالا می‌آید:
-1. به seed وصل می‌شود
-2. لیست بلاک‌ها را sync می‌کند
-3. خودش هم به یک peer قابل اتصال تبدیل می‌شود
+When the node comes up:
+1. It connects to the seed
+2. It syncs the list of blocks
+3. It itself becomes a connectable peer
 
-هرچه نودهای مستقل بیشتر شوند، شبکه غیرمتمرکزتر می‌شود.
+The more independent nodes there are, the more decentralized the network becomes.
 
 ---
 
-## مرحله ۴ — ماینرهای مستقل
+## Step 4 — Independent Miners
 
-تا وقتی فقط تو mine می‌کنی، شبکه واقعاً غیرمتمرکز نیست.
-باید افراد دیگر هم با سخت‌افزار خودشان mine کنند:
+As long as only you mine, the network is not truly decentralized. Other people must also mine with their own hardware:
 
 ```bash
-# اتصال ماینر به یک node
-# از صفحه /miner.html راهنمای کامل را ببین
+# connecting a miner to a node
+# see the full guide at the /miner.html page
 ws://NODE_ADDRESS/stratum
 ```
 
 ---
 
-## مرحله ۴.۵ — راه‌اندازی Faucet (شیر آب testnet)
+## Step 4.5 — Setting Up a Faucet (testnet tap)
 
-برای اینکه افراد بتوانند SPN Coin را تست کنند، به سکه testnet نیاز دارند.
-«Faucet» یک سرویس است که به‌صورت رایگان و محدود، سکه testnet می‌دهد.
-ابزارش از قبل آماده است (`testnet/faucet.js` + `testnet/faucet.html`).
+For people to be able to test SPN Coin, they need testnet coins. A "faucet" is a service that hands out testnet coins for free and in limited amounts. The tool is already available (`testnet/faucet.js` + `testnet/faucet.html`).
 
-### اجرا:
+### Run:
 ```bash
-# یک حساب با مجوز transact:send روی نود بساز (از پنل admin)
+# create an account with the transact:send permission on the node (from the admin panel)
 NODE_URL=http://localhost:3000 \
 FAUCET_USER=faucet-account \
 FAUCET_PASS=its-password \
@@ -117,64 +106,57 @@ FAUCET_AMOUNT=10 \
 node testnet/faucet.js
 ```
 
-سپس faucet روی `http://localhost:3010` بالا می‌آید. هر کاربر می‌تواند
-آدرس testnet خود را وارد کند و ۱۰ SPN تست بگیرد (با cooldown ۲۴ ساعته
-برای هر آدرس و IP — ضد سوءاستفاده).
+The faucet then comes up at `http://localhost:3010`. Each user can enter their testnet address and receive 10 test SPN (with a 24-hour cooldown per address and IP — anti-abuse).
 
-> 💡 faucet کلید خصوصی را خودش نگه نمی‌دارد. فقط از طریق API نود از
-> کیف پول funded نود درخواست ارسال می‌کند — معماری امن.
+> 💡 The faucet does not hold the private key itself. It only requests a send from the node's funded wallet through the node's API — a secure architecture.
 
-### نکته مهم
-صفحه faucet به‌صراحت می‌گوید: «سکه‌های testnet ارزش مالی ندارند».
-این صداقت را همیشه حفظ کن.
+### Important Note
+The faucet page explicitly states: "Testnet coins have no financial value." Always keep this honesty.
 
 ---
 
-## مرحله ۵ — معیارهای آمادگی برای mainnet
+## Step 5 — Readiness Criteria for Mainnet
 
-به mainnet نرو مگر اینکه:
+Do not go to mainnet unless:
 
-- [ ] حداقل ۱۰–۲۰ node مستقل (نه روی سرورهای تو) فعال باشند
-- [ ] چند ماینر مستقل با hashrate واقعی mine کنند
-- [ ] testnet چندین ماه بدون مشکل امنیتی کار کرده باشد
-- [ ] یک جامعه واقعی (GitHub، Discord) فعال باشد
-- [ ] کد توسط افراد مستقل بازبینی شده باشد
+- [ ] At least 10–20 independent nodes (not on your servers) are active
+- [ ] Several independent miners are mining with real hashrate
+- [ ] The testnet has run for several months without a security incident
+- [ ] A real community (GitHub, Discord) is active
+- [ ] The code has been reviewed by independent people
 
 ---
 
-## مرحله ۶ — Mainnet (فقط بعد از همه موارد بالا)
+## Step 6 — Mainnet (only after all of the above)
 
 ```bash
-CHAIN_ID=1   # mainnet — PoW سخت واقعی
+CHAIN_ID=1   # mainnet — real, hard PoW
 ```
 
-در mainnet، difficulty واقعی است و امنیت از hashrate جمعی می‌آید.
+On mainnet, the difficulty is real and security comes from collective hashrate.
 
 ---
 
-## هشدارهای حقوقی مهم
+## Important Legal Warnings
 
-- در ایران و اکثر کشورها، **فروش یا عرضه توکن با وعده سود = اوراق بهادار
-  غیرمجاز = جرم**. هرگز SPN را با وعده افزایش قیمت نفروش.
-- این پروژه را همیشه به عنوان **آزمایشی و آموزشی** معرفی کن.
-- هیچ pre-mine مخفی نداشته باش — شفافیت کامل.
-- قبل از هر اقدام تجاری با یک وکیل مشورت کن.
+- In Iran and most countries, **selling or offering a token with a promise of profit = unlicensed securities = a crime**. Never sell SPN with a promise of price appreciation.
+- Always present this project as **experimental and educational**.
+- Have no hidden pre-mine — full transparency.
+- Consult a lawyer before any commercial action.
 
 ---
 
-## واقعیت
+## Reality
 
-### ابزارهای آماده در این پروژه
+### Tools Ready in This Project
 
-| ابزار | فایل | کاربرد |
+| Tool | File | Purpose |
 |---|---|---|
-| راه‌انداز ۳ نود | `testnet/launch.js` | تست محلی شبکه چندنودی |
-| Faucet (شیر آب) | `testnet/faucet.js` | توزیع سکه testnet |
-| رابط Faucet | `testnet/faucet.html` | صفحه وب درخواست سکه |
-| اسکریپت پیوستن | `join-testnet.sh` | راه‌اندازی یک‌دستوری نود |
+| 3-node launcher | `testnet/launch.js` | Local multi-node network testing |
+| Faucet (tap) | `testnet/faucet.js` | Distributing testnet coins |
+| Faucet interface | `testnet/faucet.html` | Web page for requesting coins |
+| Join script | `join-testnet.sh` | One-command node setup |
 
 ---
 
-ارزش یک رمزارز از **شبکه و جامعه** می‌آید، نه از کد. کد (که داری) فقط
-۵٪ کار است. ۹۵٪ بقیه ساختن جامعه، اعتماد، و شبکه واقعی است که سال‌ها
-زمان می‌برد و هیچ تضمینی ندارد.
+The value of a cryptocurrency comes from its **network and community**, not its code. The code (which you have) is only 5% of the work. The other 95% is building the community, trust, and a real network, which takes years and has no guarantee.

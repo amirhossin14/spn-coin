@@ -1,12 +1,12 @@
-# به‌روزرسانی به نسخه ۶.۰.۰
+# Upgrade to Version 6.0.0
 
-## شماره نسخه
+## Version Number
 - `package.json`: 4.0.0 → **6.0.0**
 - `config.js` (COIN.VERSION): 4.0.0 → **6.0.0**
-- `/api/health` و بنر راه‌اندازی و README همگی → **v6.0.0**
+- `/api/health`, the startup banner, and the README all → **v6.0.0**
 
-## وابستگی‌ها (آخرین نسخه npm)
-| پکیج | قبل | بعد |
+## Dependencies (latest npm versions)
+| Package | Before | After |
 |---|---|---|
 | express | ^4.18.2 | **^5.2.1** (major) |
 | elliptic | ^6.5.4 | ^6.6.1 |
@@ -16,173 +16,173 @@
 | jest (dev) | ^29.0.0 | **^30.4.2** (major) |
 | eslint (dev) | ^8.0.0 | **^10.4.1** (major) |
 
-## اصلاحات کد برای سازگاری با نسخه‌های جدید
-- **Express 5**: مسیر catch-all از `'/api/*'` به `'/api/*splat'` تغییر کرد
-  (در path-to-regexp v8 الگوی wildcard باید نام‌دار باشد، وگرنه سرور هنگام
-  راه‌اندازی crash می‌کرد).
-- **ESLint 9/10**: افزودن فایل کانفیگ flat جدید `eslint.config.js`
-  (نسخه‌های جدید دیگر `.eslintrc` را نمی‌خوانند و بدون آن اجرا نمی‌شدند).
-- **engines.node**: حداقل به `>=20.0.0` رسید (نیاز ESLint 10).
-- اسکریپت `test` با `--passWithNoTests` اجرا می‌شود تا در نبود تست‌ها خطا ندهد.
+## Code Changes for Compatibility with the New Versions
+- **Express 5**: the catch-all route changed from `'/api/*'` to `'/api/*splat'`
+  (in path-to-regexp v8 the wildcard pattern must be named, otherwise the server would crash
+  on startup).
+- **ESLint 9/10**: added the new flat config file `eslint.config.js`
+  (the new versions no longer read `.eslintrc` and would not run without it).
+- **engines.node**: minimum raised to `>=20.0.0` (required by ESLint 10).
+- the `test` script runs with `--passWithNoTests` so it does not error when there are no tests.
 
-## راستی‌آزمایی
-- ✅ سرور با Express 5 بدون خطا بالا می‌آید (تست دود انجام شد)
+## Verification
+- ✅ the server comes up with Express 5 without errors (smoke test done)
 - ✅ `/api/health` → version 6.0.0
-- ✅ مسیر 404 ناشناخته‌ی API درست کار می‌کند
-- ✅ بررسی نحوی همه‌ی فایل‌های JS موفق
-- ✅ `npm run lint` بدون خطا
-- ✅ `npm test` سبز
+- ✅ the unknown-API 404 route works correctly
+- ✅ syntax check of all JS files succeeds
+- ✅ `npm run lint` with no errors
+- ✅ `npm test` green
 
 ---
 
-## محافظت از کد (Code Obfuscation) — افزوده شد
+## Code Obfuscation — added
 
-از آن‌جا که Denuvo مخصوص باینری‌های بازی است و به این پروژهٔ Node.js نمی‌خورد،
-یک مرحلهٔ build مبهم‌سازی سمت سرور اضافه شد:
+Since Denuvo is specific to game binaries and does not fit this Node.js project,
+a server-side obfuscation build step was added:
 
-- وابستگی dev: `javascript-obfuscator@^5.4.3`
-- اسکریپت جدید: `build/obfuscate.js`
-- اسکریپت‌های npm:
-  - `npm run build`     → کل سورس را در `./dist` مبهم‌سازی می‌کند (سورس اصلی دست‌نخورده می‌ماند)
-  - `npm run start:dist`→ اجرای نسخهٔ محافظت‌شده از `./dist`
-- `dist/` به `.gitignore` اضافه شد.
+- dev dependency: `javascript-obfuscator@^5.4.3`
+- new script: `build/obfuscate.js`
+- npm scripts:
+  - `npm run build`     → obfuscates the entire source into `./dist` (the original source stays untouched)
+  - `npm run start:dist`→ runs the protected version from `./dist`
+- `dist/` was added to `.gitignore`.
 
-تنظیمات obfuscation به‌صورت «متعادل و امن برای Node» انتخاب شد:
-`renameGlobals` و `selfDefending` و `transformObjectKeys` خاموش‌اند تا
-`require()`، `module.exports` و ارجاع‌های بین‌فایلی نشکنند؛ ولی stringArray
-(با base64)، splitStrings، controlFlowFlattening و numbersToExpressions روشن‌اند.
+The obfuscation settings were chosen to be "balanced and safe for Node":
+`renameGlobals`, `selfDefending`, and `transformObjectKeys` are off so that
+`require()`, `module.exports`, and cross-file references do not break; but stringArray
+(with base64), splitStrings, controlFlowFlattening, and numbersToExpressions are on.
 
-### راستی‌آزمایی
-- ✅ `npm run build` → ۲۰ فایل JS مبهم شد، ۲۱ asset کپی شد
-- ✅ `npm run start:dist` بدون خطا بالا آمد
-- ✅ `/api/health` و `/api/coin-info` نسخهٔ 6.0.0 برگرداندند
-- ✅ مسیر ۴۰۴ درست کار کرد
+### Verification
+- ✅ `npm run build` → 20 JS files obfuscated, 21 assets copied
+- ✅ `npm run start:dist` came up without errors
+- ✅ `/api/health` and `/api/coin-info` returned version 6.0.0
+- ✅ the 404 route worked correctly
 
-### استقرار نسخهٔ محافظت‌شده
+### Deploying the Protected Version
 ```bash
 npm run build
 cd dist
-npm install --omit=dev   # نصب وابستگی‌های production
+npm install --omit=dev   # install production dependencies
 npm start
 ```
 
 ---
 
-## افزوده‌ها: مسیر لانچ (توکن L2 + testnet عمومی + مستندات)
+## Additions: Launch Path (L2 token + public testnet + documentation)
 
-### مسیر الف — قرارداد هوشمند توکن (`contracts/`)
-- قرارداد `SpnCoinToken.sol`: ERC-20 عرضهٔ ثابت بر پایهٔ OpenZeppelin v5
-  (ERC20 + Burnable + Permit)، **بدون mint/owner/blacklist/tax**.
-- ✅ با solc 0.8.24 بدون خطا کامپایل شد؛ تأیید شد `mint()` وجود ندارد.
-- پروژهٔ Hardhat کامل: `hardhat.config.js` (Sepolia/Base/Arbitrum testnet)،
-  `scripts/deploy.js`، `test/token.test.js` (شامل تست permit و عدم‌وجود mint)،
-  `.env.example`، `.gitignore`، `README.md`.
+### Path A — Token Smart Contract (`contracts/`)
+- `SpnCoinToken.sol` contract: a fixed-supply ERC-20 based on OpenZeppelin v5
+  (ERC20 + Burnable + Permit), **without mint/owner/blacklist/tax**.
+- ✅ compiled without errors with solc 0.8.24; confirmed `mint()` does not exist.
+- complete Hardhat project: `hardhat.config.js` (Sepolia/Base/Arbitrum testnet),
+  `scripts/deploy.js`, `test/token.test.js` (including permit and no-mint tests),
+  `.env.example`, `.gitignore`, `README.md`.
 
-### testnet عمومی (`testnet/`, `docs/`)
-- `testnet/faucet.js`: سرویس faucet با محدودیت نرخ (cooldown بر اساس آدرس و IP)
-  که از طریق API نود سکهٔ تستی می‌فرستد. اسکریپت `npm run faucet` اضافه شد.
-- `testnet/faucet.html`: رابط وب سادهٔ faucet.
-- `docs/TESTNET_GUIDE.md`: راه‌اندازی seed nodeها، explorer، faucet، systemd، پایش.
+### Public Testnet (`testnet/`, `docs/`)
+- `testnet/faucet.js`: a rate-limited faucet service (cooldown based on address and IP)
+  that sends test coins through the node's API. The `npm run faucet` script was added.
+- `testnet/faucet.html`: a simple web interface for the faucet.
+- `docs/TESTNET_GUIDE.md`: setting up seed nodes, explorer, faucet, systemd, monitoring.
 
-### مستندات لانچ (`docs/`)
-- `docs/PATH_A_ROADMAP.md`: نقشهٔ راه گام‌به‌گام توکن روی L2/اتریوم.
-- `docs/PRELAUNCH_CHECKLIST.md`: چک‌لیست فنی + امنیتی + حقوقی (با تمرکز بر مقررات بریتانیا).
+### Launch Documentation (`docs/`)
+- `docs/PATH_A_ROADMAP.md`: a step-by-step roadmap for the token on L2/Ethereum.
+- `docs/PRELAUNCH_CHECKLIST.md`: a technical + security + legal checklist (focused on UK regulations).
 
-### پاک‌سازی
-- `contracts/**` به ignore لینتر اضافه شد (زیرپروژهٔ Hardhat با ابزار جدا).
-- ✅ `npm run lint` روی کل پروژه تمیز.
-
----
-
-## آدرس اختصاصی قابل‌تنظیم (هر ۴ حالت)
-
-- بلوک جدید `ADDRESS` در `config.js`: کنترل پیشوند برند، بایت نسخه، فرمت، و HRP.
-- `crypto.js` بازنویسی شد تا هویت آدرس را از config بخواند (به‌جای ثابت hardcode).
-- **سبک bech32** (BIP173) اضافه شد: ماژول جدید `blockchain/bech32.js` و دیسپچ
-  فرمت در `publicKeyToAddress`/`validateAddress`/`parseAddress`.
-- **ابزار vanity**: `tools/vanity.js` + اسکریپت `npm run vanity` (با سقف تلاش و
-  هشدار محدودیت کاراکتر اولِ base58check).
-- راهنما: `docs/ADDRESS_GUIDE.md`.
-
-### راستی‌آزمایی
-- ✅ base58check بدون تغییر کار می‌کند؛ آدرس‌ها valid و parse درست.
-- ✅ bech32 از تست مرجع BIP173 (`A12UEL5L`) عبور کرد؛ آدرس `myc1...`/`tmyc1...`
-  ساخته و اعتبارسنجی شد؛ آدرس دستکاری‌شده رد شد.
-- ✅ ابزار vanity آدرس دلخواه (`SPN1BA...`) را پیدا کرد.
-- ✅ سرور بوت شد، Wallet آدرس valid ساخت، lint کل پروژه تمیز.
-- ⚠️ یادآوری: تغییر فرمت آدرس شکنندهٔ اجماع است — `./data` را ریست کن.
+### Cleanup
+- `contracts/**` added to the linter's ignore (a Hardhat subproject with separate tooling).
+- ✅ `npm run lint` clean across the whole project.
 
 ---
 
-## ارتقای پروتکل: نزدیک‌تر به بیت‌کوین/لایت‌کوین
+## Configurable Dedicated Address (all 4 modes)
 
-- **الگوریتم PoW قابل‌انتخاب** (`config.js` → `BLOCKCHAIN.POW_ALGORITHM`):
-  `sha256d` (بیت‌کوین) یا `scrypt` (لایت‌کوین، N=1024 r=1 p=1).
-  - `blockchain/crypto.js`: توابع `scryptHash` و `powHash` (دیسپچ بر اساس config).
-  - `Block.powHash()` جدا از `Block.computeHash()` (هویت = sha256d، PoW = الگوریتم config).
-  - `Block.validate` و `mineBlock` و هر دو فایل Stratum به `powHash` مسیریابی شدند
-    (txid/merkle همچنان sha256d می‌ماند).
-- **انتخاب زنجیره بر اساس کار انباشته (chainwork)** به‌جای طول زنجیره:
-  `Block.work()` و `Blockchain.chainWork()` اضافه شد؛ `replaceChain` بازنویسی شد.
-  این قانون درست ناکاموتو است و یک ضعف امنیتی واقعی را رفع می‌کند.
-- سند: `docs/BITCOIN_LITECOIN_COMPARISON.md` (مقایسهٔ صادقانه + ساده‌سازی‌های باقی‌مانده).
+- a new `ADDRESS` block in `config.js`: control of the brand prefix, version byte, format, and HRP.
+- `crypto.js` was rewritten to read the address identity from config (instead of a hardcoded constant).
+- **bech32 style** (BIP173) was added: a new `blockchain/bech32.js` module and format dispatch
+  in `publicKeyToAddress`/`validateAddress`/`parseAddress`.
+- **vanity tool**: `tools/vanity.js` + the `npm run vanity` script (with an attempt cap and
+  a warning about the first-character restriction of base58check).
+- guide: `docs/ADDRESS_GUIDE.md`.
 
-### راستی‌آزمایی
-- ✅ حالت sha256d: استخراج ۳ بلاک واقعی، `validateChain` سبز، chainwork محاسبه شد.
-- ✅ حالت scrypt: استخراج ۳ بلاک واقعی (۴۲ms)، `validateChain` سبز.
-- ✅ `powHash` در حالت scrypt با sha256d متفاوت و قطعی است.
-- ✅ سرور بوت شد، lint کل پروژه بدون خطا.
-- ⚠️ تغییر الگوریتم PoW شکنندهٔ اجماع است — `./data` را ریست کن.
+### Verification
+- ✅ base58check works unchanged; addresses valid and parse correctly.
+- ✅ bech32 passed the BIP173 reference test (`A12UEL5L`); `myc1...`/`tmyc1...` addresses
+  were built and validated; a tampered address was rejected.
+- ✅ the vanity tool found the desired address (`SPN1BA...`).
+- ✅ the server booted, Wallet produced a valid address, lint clean across the whole project.
+- ⚠️ reminder: changing the address format is consensus-breaking — reset `./data`.
 
 ---
 
-## ارتقای پروتکل ۲: هدف ۲۵۶ بیتی + زبان Script
+## Protocol Upgrade: Closer to Bitcoin/Litecoin
 
-### سختی هدف ۲۵۶ بیتی (دانه‌بندی ظریف)
-- `blockchain/crypto.js`: ریاضیات هدف کامل — `POW_LIMIT`, `hashMeetsTarget`,
+- **Selectable PoW algorithm** (`config.js` → `BLOCKCHAIN.POW_ALGORITHM`):
+  `sha256d` (Bitcoin) or `scrypt` (Litecoin, N=1024 r=1 p=1).
+  - `blockchain/crypto.js`: `scryptHash` and `powHash` functions (dispatch based on config).
+  - `Block.powHash()` separate from `Block.computeHash()` (identity = sha256d, PoW = config algorithm).
+  - `Block.validate`, `mineBlock`, and both Stratum files were routed to `powHash`
+    (txid/merkle still remain sha256d).
+- **Chain selection by accumulated work (chainwork)** instead of chain length:
+  `Block.work()` and `Blockchain.chainWork()` were added; `replaceChain` was rewritten.
+  This is the correct Nakamoto rule and fixes a real security weakness.
+- document: `docs/BITCOIN_LITECOIN_COMPARISON.md` (an honest comparison + remaining simplifications).
+
+### Verification
+- ✅ sha256d mode: mined 3 real blocks, `validateChain` green, chainwork computed.
+- ✅ scrypt mode: mined 3 real blocks (42ms), `validateChain` green.
+- ✅ `powHash` in scrypt mode differs from sha256d and is deterministic.
+- ✅ the server booted, lint across the whole project with no errors.
+- ⚠️ changing the PoW algorithm is consensus-breaking — reset `./data`.
+
+---
+
+## Protocol Upgrade 2: 256-bit Target + Script Language
+
+### 256-bit Difficulty Target (fine-grained)
+- `blockchain/crypto.js`: full target math — `POW_LIMIT`, `hashMeetsTarget`,
   `difficultyForTarget`, `targetForDifficulty`, `workForTarget`,
-  `targetToBits`/`bitsToTarget` (کدگذاری فشردهٔ nBits سبک بیت‌کوین).
-- `Block`: `bits` مرجع PoW شد؛ متد `target()`؛ `difficulty` حالا عددِ مشتق (float).
-  اعتبارسنجی PoW با `hashMeetsTarget(powHash, target)`.
-- `getNextTarget()`: تنظیم سختی بر پایهٔ هدف با clamp 4× (و `getNextDifficulty`
-  حالا float مشتق برمی‌گرداند برای سازگاری). `mineBlock` و chainwork هم target-محور شدند.
-- Stratum به هدف واقعی شبکه (`blockchain.currentTarget()`) و `tip.bits` وصل شد.
+  `targetToBits`/`bitsToTarget` (Bitcoin-style compact nBits encoding).
+- `Block`: `bits` became the PoW reference; `target()` method; `difficulty` is now a derived
+  number (float). PoW validation via `hashMeetsTarget(powHash, target)`.
+- `getNextTarget()`: difficulty adjustment based on the target with a 4× clamp (and `getNextDifficulty`
+  now returns a derived float for compatibility). `mineBlock` and chainwork also became target-based.
+- Stratum was wired to the real network target (`blockchain.currentTarget()`) and `tip.bits`.
 
-### زبان Script (multisig / timelock)
-- ماژول جدید `blockchain/script.js`: ماشین مجازی پشته‌ای + سازنده‌های
-  `p2pkh` / `multisig` / `timelock` و opcodeهای CHECKSIG/CHECKMULTISIG/CLTV و …
-- یکپارچه‌سازی افزایشی در `utxo/utxo.js`: UTXOهای دارای `script` از موتور عبور
-  می‌کنند؛ تراکنش‌های ساده بدون تغییر.
-- راهنما: `docs/SCRIPT_GUIDE.md`.
+### Script Language (multisig / timelock)
+- a new `blockchain/script.js` module: a stack-based virtual machine + builders for
+  `p2pkh` / `multisig` / `timelock` and the CHECKSIG/CHECKMULTISIG/CLTV and other opcodes.
+- incremental integration in `utxo/utxo.js`: UTXOs that have a `script` go through the engine;
+  simple transactions are unchanged.
+- guide: `docs/SCRIPT_GUIDE.md`.
 
-### راستی‌آزمایی
-- ✅ استخراج با هدف ۲۵۶ بیتی (sha256d)؛ اعتبارسنجی و chainwork درست.
-- ✅ تنظیم سختی واقعی فعال شد (۱.۰→۴.۰، bits `200fffff`→`2003ffff`).
-- ✅ Script: P2PKH، multisig ۲از۳، و CLTV — همه با تست واقعی سبز.
-- ✅ یکپارچگی: خرج multisig از `Transaction.validate` عبور/رد می‌شود؛ مسیر ساده سالم.
-- ✅ سرور بوت شد؛ lint کل پروژه بدون خطا.
-- ⚠️ هر دو تغییر شکنندهٔ اجماع‌اند — `./data` را ریست کن.
+### Verification
+- ✅ mining with the 256-bit target (sha256d); validation and chainwork correct.
+- ✅ real difficulty adjustment activated (1.0→4.0, bits `200fffff`→`2003ffff`).
+- ✅ Script: P2PKH, 2-of-3 multisig, and CLTV — all green with real tests.
+- ✅ integration: a multisig spend passes/is rejected by `Transaction.validate`; the simple path is healthy.
+- ✅ the server booted; lint across the whole project with no errors.
+- ⚠️ both changes are consensus-breaking — reset `./data`.
 
 ---
 
-## رفع باگ‌ها (Bug Fixes)
+## Bug Fixes
 
-سه باگ واقعی که با تست پیدا و رفع شدند:
+Three real bugs that were found and fixed with tests:
 
-1. **استخراج سریع کل زنجیره را می‌شکست (median-time-past).** وقتی چند بلاک در یک
-   میلی‌ثانیه ماین می‌شدند، قانون BIP-113 بلاک را رد می‌کرد (`timestamp <= MTP`).
-   اصلاح: ماینر حالا زمان بلاک را به `max(now, MTP+1, tip+1)` می‌گذارد
-   (در `blockchain/blockchain.js` و مسیر ثبت بلاک `mining-pool/stratum.js`).
+1. **Fast mining broke the whole chain (median-time-past).** When several blocks were mined within
+   one millisecond, the BIP-113 rule rejected the block (`timestamp <= MTP`).
+   Fix: the miner now sets the block time to `max(now, MTP+1, tip+1)`
+   (in `blockchain/blockchain.js` and the block-submission path in `mining-pool/stratum.js`).
 
-2. **کوین‌بیس از طریق mempool هرگز قابل‌خرج نبود.** `mempool.add` بلوغ کوین‌بیس را
-   با ارتفاع hardcodeشدهٔ `0` می‌سنجید، پس هر پاداش استخراج «نابالغ» رد می‌شد.
-   اصلاح: پارامتر `blockHeight` اضافه شد و همهٔ فراخوان‌ها ارتفاع بلاک بعدی
-   (`blockchain.height + 1`) را پاس می‌دهند (`mempool/mempool.js`, `server.js`, `p2p/p2p.js`).
+2. **Coinbase was never spendable through the mempool.** `mempool.add` checked coinbase maturity
+   with a hardcoded height of `0`, so every mining reward was rejected as "immature".
+   Fix: a `blockHeight` parameter was added and all callers pass the next block's height
+   (`blockchain.height + 1`) (`mempool/mempool.js`, `server.js`, `p2p/p2p.js`).
 
-3. **تایمرِ mempool فرایند را زنده نگه می‌داشت.** `setInterval` پاک‌سازی، `unref`
-   نشده بود و باعث می‌شد تست‌رانر/CLI خارج نشوند. اصلاح: `.unref()` اضافه شد.
+3. **The mempool timer kept the process alive.** The cleanup `setInterval` was not `unref`'d,
+   which prevented the test runner/CLI from exiting. Fix: `.unref()` was added.
 
-### راستی‌آزمایی
-- ✅ تست‌های رگرسیون برای باگ ۱ و ۲ اضافه شد؛ کل مجموعه: **۲۰/۲۰ پاس**.
-- ✅ استخراج ۱۰۳ بلاک پشت‌سرهم + خرج کوین‌بیس بالغ کار می‌کند.
-- ✅ lint بدون خطا؛ سرور و نسخهٔ obfuscate‌شده سالم بوت می‌شوند.
+### Verification
+- ✅ regression tests for bugs 1 and 2 were added; the whole suite: **20/20 pass**.
+- ✅ mining 103 consecutive blocks + spending a mature coinbase works.
+- ✅ lint with no errors; the server and the obfuscated version boot healthy.

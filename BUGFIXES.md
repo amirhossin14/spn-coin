@@ -1,48 +1,50 @@
-# رفع باگ‌ها
+# Bug Fixes
 
-## ۱) باگ عملکردی واقعی: نادیده‌گرفته‌شدن نرخ کارمزد (feeRate)
-- **مشکل:** در `wallet/wallet.js` تابع `createTransaction` آرگومان `feeRate` را
-  می‌گرفت (و در مستندات هم بود)، ولی هرگز استفاده نمی‌شد؛ `utxoSet.selectCoins`
-  بدون آن صدا زده می‌شد و کارمزد همیشه از ثابت `FEE_PER_BYTE` می‌آمد. یعنی
-  نرخ کارمزدِ انتخابیِ کاربر هیچ اثری نداشت.
-- **رفع:** `feeRate` از `wallet → selectCoins → _estimateFee` عبور داده شد
-  (`utxo/utxo.js`). حالا کارمزد = بایت‌های تخمینی × نرخ، با پیش‌فرض سازگارِ قبلی.
-- **تأیید:** نرخ ۱۰ → کارمزد ۲۲۶۰؛ نرخ ۱۰۰ → ۲۲۶۰۰ (۱۰ برابر)؛ حالتِ بدون نرخ
-  همان مقدار قبلی. جریان کامل خرج همچنان درست کار می‌کند.
+## 1) A Real Functional Bug: Fee Rate (feeRate) Was Ignored
+- **Problem:** in `wallet/wallet.js`, the `createTransaction` function accepted a `feeRate`
+  argument (and it was documented too), but it was never used; `utxoSet.selectCoins` was
+  called without it, and the fee always came from the constant `FEE_PER_BYTE`. In other
+  words, the user's chosen fee rate had no effect.
+- **Fix:** `feeRate` is now passed through `wallet → selectCoins → _estimateFee`
+  (`utxo/utxo.js`). Now fee = estimated bytes × rate, with a backward-compatible default.
+- **Verification:** rate 10 → fee 2260; rate 100 → 22600 (10×); the no-rate case gives
+  the same value as before. The full spend flow still works correctly.
 
-## ۲) پاک‌سازی کد مرده (۴۱ هشدار lint → ۰)
-حذف ایمپورت‌ها/ثابت‌های بلااستفاده و علامت‌گذاری آرگومان‌های بلااستفاده در:
+## 2) Dead Code Cleanup (41 lint warnings → 0)
+Removed unused imports/constants and marked unused arguments in:
 `blockchain/blockchain.js, cli/wallet-cli.js, db/state.js, mempool/mempool.js,
 middleware/security.js, mining-pool/stratum.js, mining-pool/stratum-ws.js,
 p2p/p2p.js, p2p/p2p-http.js, server.js, utxo/utxo.js, wallet/wallet.js`.
-شامل تبدیل `catch (e)` بلااستفاده به `catch {`، حذف importهای مرده، و حذف
-کلیدهای destructure استفاده‌نشده. هیچ تغییری در رفتار ایجاد نشد.
+This included converting unused `catch (e)` to `catch {`, removing dead imports, and
+removing unused destructured keys. No behavior changes were introduced.
 
-## راستی‌آزمایی نهایی
-- ✅ `npm run lint` → صفر خطا و صفر هشدار.
-- ✅ `npm test` → هر ۱۸ تست پاس.
-- ✅ سرور بوت می‌شود، `/api/health` سالم.
-- ✅ جریان کامل: استخراج، خرج امضاشده با کارمزد صحیح، reorg بر اساس chainwork،
-  Script (multisig/timelock)، و هر دو فرمت آدرس (base58/bech32) و الگوریتم PoW
-  (sha256d/scrypt) — همه سالم.
+## Final Verification
+- ✅ `npm run lint` → zero errors and zero warnings.
+- ✅ `npm test` → all 18 tests pass.
+- ✅ The server boots, `/api/health` is healthy.
+- ✅ Full flow: mining, signed spend with correct fee, reorg based on chainwork,
+  Script (multisig/timelock), both address formats (base58/bech32), and both PoW
+  algorithms (sha256d/scrypt) — all healthy.
 
-## ۴) اعتبارسنجی ورودی‌ها پیش از ایجاد حساب (createUser)
-- **مشکل:** تابع ساخت حساب به‌جای **رد کردن** ورودی نامعتبر، آن را **بی‌صدا دستکاری**
-  می‌کرد: کاراکترهای نامعتبرِ نام کاربری حذف و نام به ۳۲ کاراکتر بریده می‌شد — پس
-  ممکن بود حسابی با نامی متفاوت از خواستهٔ کاربر ساخته شود بدون هیچ هشداری. همچنین
-  بررسی تکراری‌بودن حساس به حروف بزرگ/کوچک بود (امکان جعلِ «Admin» در برابر «admin»)،
-  نقشِ نامعتبر بی‌صدا به `viewer` تبدیل می‌شد، و رمزِ برابر با نام کاربری رد نمی‌شد.
-- **رفع (اعتبارسنجی واقعی، رد شفاف به‌جای دستکاری):**
-  - نام کاربری: ۳ تا ۳۲ کاراکتر، فقط حروف/رقم/`_`/`-` — در صورت نامعتبر بودن **رد**
-    می‌شود (نه حذفِ خاموشِ کاراکترها یا بریدن طول).
-  - رمز عبور: ۸ تا ۱۲۸ کاراکتر و **نباید برابر نام کاربری** باشد.
-  - نقش (role): در صورت حذف → `viewer`؛ در صورت نامعتبر بودن → **رد** با پیام روشن
-    (نه تبدیل خاموش).
-  - بررسی تکراری‌بودن نام کاربری **حساس به حروف بزرگ/کوچک نیست** (ضدِ جعل هویت).
-  - ولیدیتور `V.username` در endpoint با این قواعد هماهنگ شد (اجازهٔ `-`).
-- **تأیید:** همهٔ حالت‌ها تست شد — ورودی‌های معتبر ساخته می‌شوند و هر ورودی نامعتبر
-  (نام کوتاه/بلند/کاراکتر بد، رمز کوتاه، رمز=نام، نقش نامعتبر، تکراری بدون‌توجه به
-  حروف) با پیام مناسب **رد** می‌شود.
+## 4) Input Validation Before Account Creation (createUser)
+- **Problem:** instead of **rejecting** invalid input, the account creation function
+  **silently mangled** it: invalid username characters were stripped and the name was
+  truncated to 32 characters — so an account could be created with a name different from
+  what the user requested, without any warning. In addition, the duplicate check was
+  case-sensitive (allowing "Admin" to be spoofed against "admin"), an invalid role was
+  silently converted to `viewer`, and a password equal to the username was not rejected.
+- **Fix (real validation, clear rejection instead of mangling):**
+  - Username: 3 to 32 characters, only letters/digits/`_`/`-` — if invalid it is
+    **rejected** (not a silent stripping of characters or truncation of length).
+  - Password: 8 to 128 characters and **must not equal the username**.
+  - Role: if omitted → `viewer`; if invalid → **rejected** with a clear message
+    (not a silent conversion).
+  - The username duplicate check is **case-insensitive** (anti-impersonation).
+  - The `V.username` validator in the endpoint was aligned with these rules (allowing `-`).
+- **Verification:** all cases were tested — valid inputs are created, and every invalid
+  input (name too short/long/bad character, short password, password=name, invalid role,
+  duplicate regardless of case) is **rejected** with an appropriate message.
 
-> نکته: فایل `access.lock` یک رازِ runtime (در `.gitignore`) است و در اولین اجرا
-> خودکار با کاربران پیش‌فرضِ تصادفی ساخته می‌شود؛ از بسته حذف شد و نباید commit شود.
+> Note: the `access.lock` file is a runtime secret (in `.gitignore`) and is created
+> automatically on first run with random default users; it was removed from the package
+> and must not be committed.
