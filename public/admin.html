@@ -1450,28 +1450,63 @@ async function doBlockIp() {
 function exportLogsPDF() {
   const ls = _lastLogs || [];
   if (!ls.length) { toast('No logs to export', 'e'); return; }
+  const actCls = (a) => {
+    a = a || '';
+    if (a.includes('login') && !a.includes('fail')) return 'a-ok';
+    if (a.includes('fail') || a.includes('lock')) return 'a-err';
+    if (a.includes('logout')) return 'a-mut';
+    return 'a-def';
+  };
   const rows = ls.map(l => {
     const t   = fmtLogTs(l.ts || l.timestamp || l.time || 0);
     const geo = fmtGeo(l.geo);
-    return '<tr><td>' + escH(t) + '</td><td>' + escH(l.action || '') + '</td><td>' +
-           escH(l.username || l.user || '') + '</td><td>' + escH(l.src || '') + '</td><td>' +
-           escH(l.path || '') + '</td><td>' + escH(geo) + '</td><td>' + escH(l.ip || '') +
-           '</td><td>' + escH(l.ua || '') + '</td></tr>';
+    const a   = l.action || '';
+    return '<tr>' +
+      '<td class="mono">' + escH(t) + '</td>' +
+      '<td><span class="pill ' + actCls(a) + '">' + escH(a) + '</span></td>' +
+      '<td>' + escH(l.username || l.user || '') + '</td>' +
+      '<td>' + escH(l.src || '') + '</td>' +
+      '<td class="mono dim">' + escH(l.path || '') + '</td>' +
+      '<td>' + escH(geo) + '</td>' +
+      '<td class="mono">' + escH(l.ip || '') + '</td>' +
+      '<td class="dev">' + escH(l.ua || '') + '</td></tr>';
   }).join('');
   const when = escH(new Date().toLocaleString('en-US', { hour12: false }));
-  const html = '<!doctype html><html><head><meta charset="utf-8"><title>SPN Coin — Audit Logs</title>' +
-    '<style>body{font-family:Arial,Helvetica,sans-serif;color:#111;padding:24px}' +
-    'h1{font-size:18px;margin:0 0 4px}.meta{color:#555;font-size:12px;margin-bottom:14px}' +
-    'table{width:100%;border-collapse:collapse;font-size:11px}' +
-    'th,td{border:1px solid #ccc;padding:5px 7px;text-align:left;vertical-align:top;word-break:break-word}' +
-    'th{background:#f0f0f0}td:nth-child(8){max-width:220px;font-size:9px;color:#555}' +
-    '.b{margin-bottom:14px;padding:7px 12px;font-size:13px;cursor:pointer}' +
-    '@media print{.noprint{display:none}}</style></head><body>' +
-    '<h1>SPN Coin — Audit Logs</h1>' +
-    '<div class="meta">Exported ' + when + ' · ' + ls.length + ' entries · CONFIDENTIAL — handle securely</div>' +
-    '<button class="b noprint" onclick="window.print()">🖨️ Print / Save as PDF</button>' +
+  const css =
+    '*{box-sizing:border-box}' +
+    "body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;color:#1c2128;margin:0;padding:28px 30px;background:#fff}" +
+    '.hd{display:flex;align-items:center;gap:12px;border-bottom:3px solid #f5b301;padding-bottom:14px}' +
+    '.logo{width:40px;height:40px;border-radius:9px;background:#f5b301;color:#1c1300;font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center;flex:none}' +
+    '.ht{font-size:20px;font-weight:800;line-height:1.1}' +
+    '.hs{font-size:12px;color:#57606a;font-weight:600;letter-spacing:.4px}' +
+    '.meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:11.5px;color:#57606a;margin:12px 0 16px}' +
+    '.conf{background:#fff0f0;color:#cf222e;border:1px solid #ffd0d0;border-radius:20px;padding:2px 10px;font-weight:700;font-size:10.5px;letter-spacing:.4px}' +
+    'table{width:100%;border-collapse:collapse;font-size:10.5px}' +
+    'thead{display:table-header-group}' +
+    'th{background:#0c1120;color:#fff;text-align:left;padding:7px 8px;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}' +
+    'td{padding:6px 8px;border-bottom:1px solid #e4e8ec;vertical-align:top;word-break:break-word}' +
+    'tr{break-inside:avoid}' +
+    'tbody tr:nth-child(even){background:#f6f8fa}' +
+    ".mono{font-family:'Consolas','Courier New',monospace}" +
+    '.dim{color:#6a737d}' +
+    '.dev{max-width:230px;font-size:8.5px;color:#6a737d;line-height:1.35}' +
+    '.pill{display:inline-block;padding:2px 8px;border-radius:20px;font-weight:700;font-size:9.5px;white-space:nowrap}' +
+    '.a-ok{background:#e6f4ea;color:#1a7f37;border:1px solid #abe0ba}' +
+    '.a-err{background:#fde8e8;color:#cf222e;border:1px solid #f5c2c2}' +
+    '.a-mut{background:#eef1f4;color:#57606a;border:1px solid #d7dde3}' +
+    '.a-def{background:#fff4e0;color:#b36b00;border:1px solid #f3dcae}' +
+    '.ft{margin-top:16px;padding-top:10px;border-top:1px solid #e4e8ec;font-size:9.5px;color:#8a949e;display:flex;justify-content:space-between}' +
+    '.btn{margin:14px 0 16px;padding:9px 16px;font-size:13px;font-weight:700;color:#1c1300;background:#f5b301;border:none;border-radius:8px;cursor:pointer}' +
+    '@page{margin:14mm}' +
+    '@media print{.noprint{display:none}body{padding:0}th{-webkit-print-color-adjust:exact;print-color-adjust:exact}.pill,.conf,tbody tr:nth-child(even){-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
+  const html = '<!doctype html><html><head><meta charset="utf-8"><title>SPN Coin — Audit Logs</title><style>' + css + '</style></head><body>' +
+    '<div class="hd"><div class="logo">S</div><div><div class="ht">SPN Coin</div><div class="hs">AUDIT LOGS REPORT</div></div></div>' +
+    '<div class="meta"><span>Exported: ' + when + ' UTC</span><span>' + ls.length + ' entries</span><span class="conf">CONFIDENTIAL — handle securely</span></div>' +
+    '<button class="btn noprint" onclick="window.print()">🖨 Print / Save as PDF</button>' +
     '<table><thead><tr><th>Time</th><th>Action</th><th>User</th><th>Source</th><th>Path</th><th>Location</th><th>IP</th><th>Device (User-Agent)</th></tr></thead><tbody>' +
-    rows + '</tbody></table></body></html>';
+    rows + '</tbody></table>' +
+    '<div class="ft"><span>SPN Coin — Blockchain Management Console</span><span>spnchain.com/admin</span></div>' +
+    '</body></html>';
   const w = window.open('', '_blank');
   if (!w) { toast('Allow pop-ups to export', 'e'); return; }
   w.document.write(html); w.document.close();
