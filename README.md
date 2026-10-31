@@ -1,16 +1,20 @@
 <div align="center">
 
-# 🪙 SPN Coin
+<img src="assets/logo.png" alt="SPN Coin" width="120" height="120">
 
-**A Bitcoin-inspired blockchain built from scratch in Node.js**
+# SPN Coin
+
+**A Bitcoin-faithful proof-of-work blockchain built from scratch in Node.js**
 
 Fair launch · Zero premine · UTXO model · Real 256-bit Proof-of-Work · Stratum mining pool · secp256k1
 
 [![Node](https://img.shields.io/badge/node-%3E%3D20-green)](https://nodejs.org)
-[![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](#testing)
+[![Tests](https://img.shields.io/badge/tests-224%20passing-brightgreen)](#testing)
 [![License](https://img.shields.io/badge/license-source--available-orange)](./LICENSE)
-[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
-[![CodeQL](https://github.com/OWNER/REPO/actions/workflows/codeql.yml/badge.svg)](../../actions/workflows/codeql.yml)
+[![CI](https://github.com/amirhossin14/spn-coin/actions/workflows/ci.yml/badge.svg)](https://github.com/amirhossin14/spn-coin/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/amirhossin14/spn-coin/actions/workflows/codeql.yml/badge.svg)](https://github.com/amirhossin14/spn-coin/actions/workflows/codeql.yml)
+
+**[🌐 Website](https://spnchain.com)** · **[🔍 Explorer](https://spnchain.com/explorer)** · **[📊 Network status](https://spnchain.com/status)** · **[🖥️ Run a node](https://spnchain.com/run-node)**
 
 </div>
 
