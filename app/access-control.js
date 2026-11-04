@@ -769,6 +769,11 @@ class AccessControl {
         }
 
         if (updates.password) {
+            // Enforce the same strength bounds as createUser / change-password.
+            if (typeof updates.password !== 'string' || updates.password.length < 8)
+                return { ok: false, error: 'Password must be at least 8 characters' };
+            if (updates.password.length > 128)
+                return { ok: false, error: 'Password must be at most 128 characters' };
             user.passwordHash = hashPassword(updates.password);
             writeLog({ action: 'password:changed', username: editorUsername, target: user.username });
         }

@@ -515,6 +515,12 @@ class Blockchain {
             genesis.prevHash !== GENESIS_HASH ||
             genesis.chainId !== CHAIN_ID ||
             genesis.merkleRoot !== expectedGenesis.merkleRoot ||
+            // Genesis is the one block never run through block.validate(), so its
+            // difficulty is not otherwise checked. chainWork() derives a block's
+            // work straight from `bits`; without pinning the genesis bits here an
+            // attacker could declare a trivially-easy genesis target, claim near-
+            // infinite cumulative work, and win fork choice with a 1-block chain.
+            String(genesis.bits) !== String(expectedGenesis.bits) ||
             genesis.transactions.length !== expectedGenesis.transactions.length) {
             errors.push('Invalid genesis block');
             return { valid: false, errors, blocksChecked: 0 };

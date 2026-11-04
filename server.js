@@ -261,12 +261,46 @@ app.use(logger.httpMiddleware());
 // and defeat the admin IP allowlist, rate limits and IP bans. Trust exactly the
 // number of reverse proxies in front of this node (TRUST_PROXY_HOPS, default 1;
 // set 0 if the node is exposed directly with no proxy).
+// SECURITY: this default (1) assumes exactly one trusted proxy (e.g. Caddy) in
+// front. If this node is ever exposed to the internet DIRECTLY, a client can
+// forge X-Forwarded-For to spoof req.ip and bypass IP-based controls (admin IP
+// allowlist, /metrics internal-only, DDoS whitelist). In that case set
+// TRUST_PROXY_HOPS=0. Keep it matched to the real number of proxies.
 const TRUST_PROXY_HOPS = Number.isFinite(+process.env.TRUST_PROXY_HOPS) ? +process.env.TRUST_PROXY_HOPS : 1;
 app.set('trust proxy', TRUST_PROXY_HOPS);
 // Single source of truth: is there a trusted reverse proxy in front of us?
 // Used consistently for XFF/XFP-dependent middleware (DDoS guard, HTTPS enforce).
 const TRUST_PROXY = TRUST_PROXY_HOPS > 0;
 app.disable('x-powered-by');
+
+// ── Cloudflare real client IP ─────────────────────────────────
+// When the site is proxied through Cloudflare, every request reaches us
+// from a Cloudflare edge IP, so req.ip would collapse all visitors onto a
+// handful of addresses — which would break per-IP rate limiting, the DDoS
+// guard, IP bans and the admin allowlist, and hide the real IP from logs.
+// Cloudflare puts the genuine visitor IP in the `CF-Connecting-IP` header.
+// We adopt it for the WHOLE app (so every downstream req.ip read is correct)
+// but ONLY when a trusted proxy sits in front (TRUST_PROXY) — otherwise a
+// directly-exposed node would let a client forge the header. Toggle with
+// BEHIND_CLOUDFLARE: '1' force on, '0' force off, unset = auto (on when
+// trusted AND the header is present and well-formed).
+const _CFIP_RE = /^[0-9a-fA-F:.]{3,45}$/;
+const _CF_MODE = process.env.BEHIND_CLOUDFLARE;
+if (_CF_MODE !== '0') {
+    app.use((req, _res, next) => {
+        try {
+            const cf = String(req.headers['cf-connecting-ip'] || '').trim();
+            const allow = _CF_MODE === '1' ? true : TRUST_PROXY;
+            if (allow && cf && _CFIP_RE.test(cf)) {
+                const real = cf.replace('::ffff:', '');
+                // req.ip is a getter; redefine it per-request so the entire
+                // middleware stack below sees the real visitor IP.
+                Object.defineProperty(req, 'ip', { configurable: true, value: real });
+            }
+        } catch { /* fail-open: keep original req.ip */ }
+        next();
+    });
+}
 
 // ── IPS: reject already-banned IPs before anything else ──
 app.use(idsIps.blockGate());

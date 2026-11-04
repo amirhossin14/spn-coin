@@ -24,7 +24,7 @@
 'use strict';
 
 const crypto = require('crypto');
-const { sha256, sign, verify } = require('../blockchain/crypto');
+const { sha256, sign, verify, publicKeyToAddress } = require('../blockchain/crypto');
 const { CHAIN_ID } = require('../config');
 
 function canon(b) { return JSON.stringify(b, Object.keys(b).sort()); }
@@ -85,14 +85,36 @@ function installVestingStaking(tokens) {
     tokens._stakes = new Map();        // stakeId -> stake
     tokens._rewardPool = new Map();    // tokenId -> { pool, rewardPerBlock, lockBlocks }
 
+    // Which op field carries the pubkey, and which address that key must
+    // own, for each op type. Binding the signing key to the acting address
+    // is what stops anyone from signing funds out of someone else's account
+    // (identical model to tokens.js _verify).
+    const BIND = {
+        'vesting-create':  { pubKey: 'funderPubKey',      addr: 'funder' },
+        'vesting-release': { pubKey: 'beneficiaryPubKey', addr: 'beneficiary' },
+        'stake-fund':      { pubKey: 'issuerPubKey',      addr: 'issuer' },
+        'stake':           { pubKey: 'stakerPubKey',      addr: 'staker' },
+        'unstake':         { pubKey: 'stakerPubKey',      addr: 'staker' },
+    };
+
     const verifyOp = (op) => {
         if (!op || !op.sig || !op.type) return 'malformed op';
         if (Number(op.chainId) !== Number(CHAIN_ID)) return 'wrong chain id';
-        const pub = op.funderPubKey || op.beneficiaryPubKey || op.issuerPubKey || op.stakerPubKey;
+        const b = BIND[op.type];
+        if (!b) return 'unknown vesting/staking op';
+        const pub = op[b.pubKey];
+        const claimed = op[b.addr];
         if (!pub) return 'missing pubkey';
+        if (!claimed) return 'missing address';
         let ok = false;
         try { ok = verify(pub, opHash(op), op.sig); } catch { ok = false; }
-        return ok ? null : 'bad signature';
+        if (!ok) return 'bad signature';
+        // The supplied key must hash to the claimed address (either network).
+        let derived;
+        try { derived = [publicKeyToAddress(pub, false), publicKeyToAddress(pub, true)]; }
+        catch { return 'bad pubkey'; }
+        if (!derived.includes(claimed)) return 'signer is not the owner of this address';
+        return null;
     };
     const height = (ctx) => Number(ctx?.blockHeight ?? ctx?.height ?? tokens.currentHeight ?? 0);
     const bal = (t, a) => t.balances.get(a) || 0n;

@@ -16,7 +16,7 @@ const COIN = {
     DECIMALS:       8,                 // 8 decimal places (like Bitcoin)
     ADDRESS_PREFIX: 'SPN',
     WEBSITE:        'https://spncoin.example.com',
-    VERSION:        '6.6.1',
+    VERSION:        '6.6.2',
 };
 
 // ═══════════════════════════════════════════════════════════════

@@ -1142,8 +1142,8 @@ async function ldUsers() {
     const us = d.users || d || [];
     g('uTbl').innerHTML = us.map(u => `
       <tr>
-        <td style="font-weight:700">${u.username}</td>
-        <td><span class="rb rb-${u.role}">${u.role}</span></td>
+        <td style="font-weight:700">${escH(u.username)}</td>
+        <td><span class="rb rb-${escH(String(u.role||'').toLowerCase())}">${escH(u.role||'—')}</span></td>
         <td><span class="rb ${u.active !== false ? 'rb-on' : 'rb-off'}">${u.active !== false ? 'Active' : 'Inactive'}</span></td>
         <td>${u.totpEnabled ? '<span style="color:var(--grn)">✅ On</span>' : '<span style="color:var(--txt3)">Off</span>'}</td>
         <td style="color:var(--txt3);font-size:11px">${u.lastLogin ? ago(u.lastLogin) : 'Never'}</td>

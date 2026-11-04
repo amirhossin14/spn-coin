@@ -1,6 +1,6 @@
 {
   "name": "spncoin-node",
-  "version": "6.6.1",
+  "version": "6.6.2",
   "description": "SPN Coin Full Node — Proprietary blockchain software. All rights reserved.",
   "main": "server.js",
   "scripts": {

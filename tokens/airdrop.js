@@ -22,7 +22,7 @@
 'use strict';
 
 const crypto = require('crypto');
-const { sha256, sign, verify } = require('../blockchain/crypto');
+const { sha256, sign, verify, publicKeyToAddress } = require('../blockchain/crypto');
 const { CHAIN_ID } = require('../config');
 
 function canon(body) { return JSON.stringify(body, Object.keys(body).sort()); }
@@ -109,14 +109,34 @@ function installAirdrops(tokens) {
     tokens.__airdrops = true;
     tokens._airdrops = new Map(); // airdropId -> { tokenId, root, total, claimed:Set, remaining }
 
+    // Which op field carries the pubkey, and which address that key must
+    // own, for each op type. Binding the signing key to the acting address
+    // is what stops anyone from signing a balance move out of someone else's
+    // account (identical model to tokens.js _verify).
+    const BIND = {
+        'airdrop-batch':  { pubKey: 'fromPubKey',     addr: 'from' },
+        'airdrop-create': { pubKey: 'issuerPubKey',   addr: 'issuer' },
+        'airdrop-claim':  { pubKey: 'claimantPubKey', addr: 'claimant' },
+    };
+
     const verifyOp = (op) => {
         if (!op || !op.sig || !op.type) return 'malformed op';
         if (Number(op.chainId) !== Number(CHAIN_ID)) return 'wrong chain id';
-        const pub = op.fromPubKey || op.issuerPubKey || op.claimantPubKey;
+        const b = BIND[op.type];
+        if (!b) return 'unknown airdrop op';
+        const pub = op[b.pubKey];
+        const claimed = op[b.addr];
         if (!pub) return 'missing pubkey';
+        if (!claimed) return 'missing address';
         let ok = false;
         try { ok = verify(pub, opHash(op), op.sig); } catch { ok = false; }
-        return ok ? null : 'bad signature';
+        if (!ok) return 'bad signature';
+        // The supplied key must hash to the claimed address (either network).
+        let derived;
+        try { derived = [publicKeyToAddress(pub, false), publicKeyToAddress(pub, true)]; }
+        catch { return 'bad pubkey'; }
+        if (!derived.includes(claimed)) return 'signer is not the owner of this address';
+        return null;
     };
 
     const prev = tokens.applyOp.bind(tokens);
