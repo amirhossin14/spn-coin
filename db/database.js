@@ -8,7 +8,7 @@
  */
 // ════════════════════════════════════════════════════════════
 //  🗄️ PostgreSQL Database + KYC Module
-//  Features: Connection Pool، Migrations، KYC Verification
+//  Features: Connection Pool, Migrations, KYC Verification
 // ════════════════════════════════════════════════════════════
 const { Pool } = require('pg');
 const crypto   = require('crypto');
@@ -67,7 +67,7 @@ async function getClient() {
 }
 
 // ════════════════════════════════════════════════════════════
-//  MIGRATIONS — ساختار جداول
+//  MIGRATIONS — table structure
 // ════════════════════════════════════════════════════════════
 async function migrate() {
     console.log('🔄 [DB] Running migrations...');
@@ -187,7 +187,7 @@ async function migrate() {
         ON CONFLICT (level) DO NOTHING
     `);
 
-    // ── Blockchain در DB ────────────────────────────────────
+    // ── Blockchain in DB ────────────────────────────────────
     await query(`
         CREATE TABLE IF NOT EXISTS blocks (
             height      BIGINT PRIMARY KEY,

@@ -9,16 +9,16 @@
  */
 /**
  * ══════════════════════════════════════════════════════════════
- *  💻 Wallet CLI — ابزار خط فرمان برای مدیریت کیف‌پول
+ *  💻 Wallet CLI — command-line tool for wallet management
  *
- *  دستورات:
- *   wallet new                      — ساخت کیف‌پول جدید
- *   wallet import <privkey>         — Import کلید
- *   wallet balance <address>        — مشاهده balance
+ *  Commands:
+ *   wallet new                      — create a new wallet
+ *   wallet import <privkey>         — import a key
+ *   wallet balance <address>        — view balance
  *   wallet send <to> <amount>       — send transaction
- *   wallet history <address>        — تاریخچه
- *   wallet utxos <address>          — لیست UTXOها
- *   wallet info                     — اطلاعات network
+ *   wallet history <address>        — transaction history
+ *   wallet utxos <address>          — list UTXOs
+ *   wallet info                     — network info
  * ══════════════════════════════════════════════════════════════
  */
 const readline = require('readline');
@@ -28,7 +28,7 @@ const https    = require('http');
 const NODE_URL = process.env.NODE_URL || 'http://localhost:3000';
 const API_KEY  = process.env.API_KEY  || '';
 
-// ── رنگ‌ها ──────────────────────────────────────────────────
+// ── colors ──────────────────────────────────────────────────
 const C = {
     reset: '\x1b[0m', bold: '\x1b[1m',
     red:   '\x1b[31m', green: '\x1b[32m', yellow: '\x1b[33m',
@@ -109,7 +109,7 @@ function formatDate(ts) {
 }
 
 // ════════════════════════════════════════════════════════════
-//  دستورات
+//  commands
 // ════════════════════════════════════════════════════════════
 
 async function cmdNew() {
@@ -247,7 +247,7 @@ async function cmdSend(token) {
         const { UTXOSet } = require('../utxo/utxo');
         const utxoData    = await apiCall('GET', `/api/utxos/${wallet.address}`, null, token);
 
-        // ساخت UTXOSet محلی
+        // build a local UTXOSet
         const localUTXO = new UTXOSet();
         for (const u of utxoData) {
             localUTXO.add(u.txid, u.vout, { address: u.address, amount: u.amount, pubkey: wallet.publicKey });
@@ -304,7 +304,7 @@ async function cmdInfo() {
 }
 
 // ════════════════════════════════════════════════════════════
-//  اجرا
+//  run
 // ════════════════════════════════════════════════════════════
 async function main() {
     const args    = process.argv.slice(2);

@@ -1,0 +1,9 @@
+# SPN Coin — https://spnchain.com
+User-agent: *
+Allow: /
+# Keep private / internal areas out of the index
+Disallow: /admin
+Disallow: /monitor
+Disallow: /api/
+
+Sitemap: https://spnchain.com/sitemap.xml

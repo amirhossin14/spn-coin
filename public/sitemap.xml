@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://spnchain.com/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://spnchain.com/dashboard</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/explorer</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/about</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/contact</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/roadmap</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/run-node</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/token-factory</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/token</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/token-manage</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/wallet</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/mywallet</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/send</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/airdrop</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/claim</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/network</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/radar</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/analytics</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/status</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/terms</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/block</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/tx</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/miner</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/server-setup</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://spnchain.com/SPN_Coin_Whitepaper.pdf</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+</urlset>

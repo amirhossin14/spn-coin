@@ -44,8 +44,8 @@ function resolveEncKey() {
     }
 }
 const ENC_KEY     = resolveEncKey();
-const TOKEN_TTL   = 8 * 60 * 60 * 1000;   // 8 ساعت
-const MAX_FAILS   = 5;                      // حداکثر تلاش ناSuccess
+const TOKEN_TTL   = 8 * 60 * 60 * 1000;   // 8 hours
+const MAX_FAILS   = 5;                      // maximum failed attempts
 const LOCK_TIME   = 15 * 60 * 1000;        // Lock for 15 minutes
 
 // ─── Roles and permissions ──────────────────────────────────────────
@@ -220,7 +220,7 @@ function verifyPassword(plaintext, storedHash) {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  JWT ساده (بدون کتابخانه)
+//  Simple JWT (no library)
 // ══════════════════════════════════════════════════════════════
 function signToken(payload) {
     const header  = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
@@ -244,7 +244,7 @@ function verifyToken(token) {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  فایل access.lock
+//  access.lock file
 // ══════════════════════════════════════════════════════════════
 function loadLock() {
     try {
@@ -263,7 +263,7 @@ function saveLock(data) {
 function initLock() {
     // Build defaults NOW (reads env vars at init time, not at module load)
     const defaults = buildDefaultUsers();
-    // hash رمزها برای ذخیره امن
+    // hash passwords for secure storage
     const users = defaults.map(u => ({
         ...u,
         passwordHash: hashPassword(u.password),
@@ -294,7 +294,7 @@ function initLock() {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  لاگ‌گذاری — Persistent, tamper-evident (hash-chained) audit log
+//  Logging — Persistent, tamper-evident (hash-chained) audit log
 // ══════════════════════════════════════════════════════════════
 let _auditPrevHash = null;
 function _loadLastHash() {
@@ -349,7 +349,7 @@ function getLogs(limit = 200) {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  اکشن‌های نام‌گذاری شده برای لاگ
+//  Named actions for the log
 // ══════════════════════════════════════════════════════════════
 const ACTION_LABELS = {
     'login':              'Login',
@@ -378,7 +378,7 @@ const ACTION_LABELS = {
 };
 
 // ══════════════════════════════════════════════════════════════
-//  کلاس اصلی AccessControl
+//  Main AccessControl class
 // ══════════════════════════════════════════════════════════════
 class AccessControl {
 
@@ -395,14 +395,14 @@ class AccessControl {
             return { ok: false, error: 'User' };
         }
 
-        // Check قفل بودن
+        // Check whether the account is locked
         if (user.lockedUntil && Date.now() < user.lockedUntil) {
             const rem = Math.ceil((user.lockedUntil - Date.now()) / 60000);
             writeLog({ action: 'login:locked', username, ip });
             return { ok: false, error: 'Account is locked. Try again in ' + rem };
         }
 
-        // Check رمز
+        // Check password
         if (!verifyPassword(password, user.passwordHash)) {
             user.failCount = (user.failCount || 0) + 1;
             if (user.failCount >= MAX_FAILS) {
@@ -457,7 +457,7 @@ class AccessControl {
         };
         const token = signToken(payload);
 
-        // ذخیره session
+        // Save session
         this.data.sessions = (this.data.sessions || []).filter(s => s.userId !== user.id);
         this.data.sessions.push({ token, userId: user.id, ip, loginAt: Date.now() });
 
@@ -508,15 +508,15 @@ class AccessControl {
         };
     }
 
-    // ── Check مجوز ──────────────────────────────────────────────
+    // ── Check permission ──────────────────────────────────────────────
     can(user, permission) {
         return user?.permissions?.includes(permission) || false;
     }
 
-    // ── Middleware برای Express ──────────────────────────────────
+    // ── Middleware for Express ──────────────────────────────────
     middleware(permission = null) {
         return (req, res, next) => {
-            // Check API Key در header
+            // Check API Key in header
             const apiKey = req.headers['x-api-key'];
             if (apiKey) {
                 const user = this.authenticateApiKey(apiKey);
@@ -565,7 +565,7 @@ class AccessControl {
         });
     }
 
-    // ── مدیریت Userان ──────────────────────────────────────────
+    // ── User management ──────────────────────────────────────────
     getUsers() {
         return this.data.users.map(u => ({
             id:          u.id,
@@ -793,12 +793,12 @@ class AccessControl {
         return { ok: true };
     }
 
-    // ── مدیریت API Key ───────────────────────────────────────────
+    // ── API Key management ───────────────────────────────────────────
     getApiKeys() {
         return (this.data.apiKeys || []).map(k => ({
             id:        k.id,
             name:      k.name,
-            key:       k.key.substring(0, 8) + '...',  // نمایش جزئی
+            key:       k.key.substring(0, 8) + '...',  // partial display
             active:    k.active,
             created:   k.created,
             lastUsed:  k.lastUsed,
@@ -821,7 +821,7 @@ class AccessControl {
         this.data.apiKeys.push(entry);
         saveLock(this.data);
         writeLog({ action: 'apikey:created', username: creatorUsername, keyName: name });
-        return { ok: true, key };  // کلید کامل فقط یک‌بار نمایش داده می‌شود
+        return { ok: true, key };  // the full key is shown only once
     }
 
     revokeApiKey(id, revokerUsername) {
@@ -833,7 +833,7 @@ class AccessControl {
         return { ok: true };
     }
 
-    // ── لاگ‌ها ──────────────────────────────────────────────────
+    // ── Logs ──────────────────────────────────────────────────
     getLogs(limit = 200, filter = {}) {
         let logs = getLogs(limit * 2);
         if (filter.username) logs = logs.filter(l => l.username === filter.username);
@@ -842,7 +842,7 @@ class AccessControl {
         return logs.slice(0, limit);
     }
 
-    // ── اطلاعات role‌ها ───────────────────────────────────────────
+    // ── Role information ───────────────────────────────────────────
     getRoles() { return ROLES; }
 }
 
@@ -850,7 +850,7 @@ class AccessControl {
 const ac = new AccessControl();
 module.exports = { ac, ROLES, ACTION_LABELS, verifyAuditLog };
 
-// ── Methodهای اضافه برای سازگاری با server.js ──────────────────
+// ── Additional methods for compatibility with server.js ──────────────────
 AccessControl.prototype.getUserById = function(id) {
     const u = (this.data.users || []).find(u => u.id === id);
     if (!u) return null;

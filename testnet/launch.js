@@ -9,19 +9,19 @@
  */
 /**
  * ══════════════════════════════════════════════════════════════
- *  🧪 Testnet — startup network آزمایشی ۳ نودی
+ *  🧪 Testnet — startup of a 3-node experimental network
  *
- *  اجرا:
+ *  Run:
  *   node testnet/launch.js
  *
- *  ۳ نود روی پورت‌های مختلف با هم sync می‌کنند
+ *  3 nodes on different ports sync with each other
  * ══════════════════════════════════════════════════════════════
  */
 const { fork } = require('child_process');
 const path     = require('path');
 const http     = require('http');
 
-// ── تنظیمات ۳ نود ────────────────────────────────────────────
+// ── 3-node settings ────────────────────────────────────────────
 const NODES = [
     { id: 'node1', http: 3100, stratum: 3133, p2p: 8433, peers: ['127.0.0.1:8434', '127.0.0.1:8435'] },
     { id: 'node2', http: 3200, stratum: 3233, p2p: 8434, peers: ['127.0.0.1:8433', '127.0.0.1:8435'] },
@@ -35,7 +35,7 @@ function log(prefix, color, msg) {
     console.log(`${C.bold}[${ts}]${C.reset} ${color}[${prefix}]${C.reset} ${msg}`);
 }
 
-// ── startup نودها ─────────────────────────────────────────
+// ── startup of nodes ─────────────────────────────────────────
 const processes = [];
 
 async function launchNode(cfg) {
@@ -48,13 +48,13 @@ async function launchNode(cfg) {
         P2P_PORT:       String(cfg.p2p),
         NODE_ID:        cfg.id,
         PEERS:          cfg.peers.join(','),
-        BLOCK_TIME:     '5000',        // 5 ثانیه برای testnet
-        DIFF_WINDOW:    '10',          // پنجره کوچک‌تر برای testnet
+        BLOCK_TIME:     '5000',        // 5 seconds for testnet
+        DIFF_WINDOW:    '10',          // smaller window for testnet
         MIN_DIFFICULTY: '1',
         INITIAL_REWARD: '5000000000',
         HALVING_INTERVAL:'100',
         MEMPOOL_MAX_TXS:'1000',
-        DB_HOST:        'localhost',   // یا از SQLite در testnet
+        DB_HOST:        'localhost',   // or use SQLite in testnet
         DATA_DIR:       `./testnet/data/${cfg.id}`,
         LOG_LEVEL:      'info',
     };
@@ -92,7 +92,7 @@ function checkHealth(port) {
     });
 }
 
-// ── مانیتورینگ testnet ────────────────────────────────────────
+// ── testnet monitoring ────────────────────────────────────────
 async function monitorTestnet() {
     console.log('\n' + '═'.repeat(60));
     for (const node of NODES) {
@@ -111,23 +111,23 @@ async function monitorTestnet() {
 async function main() {
     console.log(`\n${C.bold}${C.cyan}🧪 SPN Coin Testnet —  نودی${C.reset}\n`);
 
-    // ساخت پوشه‌های داده
+    // create data folders
     const fs = require('fs');
     for (const n of NODES) {
         fs.mkdirSync(`./testnet/data/${n.id}`, { recursive: true });
     }
 
-    // startup نودها
+    // start the nodes
     for (const cfg of NODES) {
         await launchNode(cfg);
-        await new Promise(r => setTimeout(r, 2000)); // فاصله بین startup
+        await new Promise(r => setTimeout(r, 2000)); // gap between startups
     }
 
-    // منتظر بمانید تا نودها آماده شوند
+    // wait for the nodes to become ready
     log('testnet', C.yellow, '...');
     await new Promise(r => setTimeout(r, 8000));
 
-    // مانیتورینگ هر ۱۵ ثانیه
+    // monitor every 15 seconds
     await monitorTestnet();
     setInterval(monitorTestnet, 15_000);
 

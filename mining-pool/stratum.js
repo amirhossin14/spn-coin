@@ -14,23 +14,23 @@ const { Block }    = require('../blockchain/blockchain');
 const { Transaction } = require('../utxo/utxo');
 const { buildTemplate, buildCandidate } = require('./blocktemplate');
 
-// ── تنظیمات ────────────────────────────────────────────────
+// ── Settings ────────────────────────────────────────────────
 const CFG = {
     POOL_FEE:          parseFloat(process.env.POOL_FEE)        || 0.01, // 1%
     POOL_ADDRESS:      process.env.POOL_ADDRESS                || 'POOL_WALLET_ADDRESS',
     VARDIFF_MIN:       parseInt(process.env.VARDIFF_MIN)       || 1,
     VARDIFF_MAX:       parseInt(process.env.VARDIFF_MAX)       || 32,
-    VARDIFF_TARGET_MS: parseInt(process.env.VARDIFF_TARGET_MS) || 15_000, // هدف: هر 15 ثانیه یک share
-    VARDIFF_WINDOW:    parseInt(process.env.VARDIFF_WINDOW)    || 10,    // count share برای محاسبه
-    JOB_EXPIRY_MS:     parseInt(process.env.JOB_EXPIRY_MS)    || 300_000,// 5 دقیقه
+    VARDIFF_TARGET_MS: parseInt(process.env.VARDIFF_TARGET_MS) || 15_000, // target: one share every 15 seconds
+    VARDIFF_WINDOW:    parseInt(process.env.VARDIFF_WINDOW)    || 10,    // number of shares used for the calculation
+    JOB_EXPIRY_MS:     parseInt(process.env.JOB_EXPIRY_MS)    || 300_000,// 5 minutes
     MAX_SHARES_PER_SEC:parseInt(process.env.MAX_SHARES_SEC)   || 20,
-    BAN_INVALID_SHARES:parseInt(process.env.BAN_INVALID)      || 10,   // بعد از X share Invalid
-    BAN_DURATION_MS:   parseInt(process.env.BAN_DURATION)     || 600_000,// 10 دقیقه
-    TIMEOUT_MS:        parseInt(process.env.MINER_TIMEOUT_MS) || 300_000,// 5 دقیقه بدون activity
+    BAN_INVALID_SHARES:parseInt(process.env.BAN_INVALID)      || 10,   // after X invalid shares
+    BAN_DURATION_MS:   parseInt(process.env.BAN_DURATION)     || 600_000,// 10 minutes
+    TIMEOUT_MS:        parseInt(process.env.MINER_TIMEOUT_MS) || 300_000,// 5 minutes without activity
     MAX_CONNECTIONS:   parseInt(process.env.MAX_MINERS)        || 1000,
     EXTRANONCE1_SIZE:  4,
     EXTRANONCE2_SIZE:  4,
-    PPLNS_WINDOW:      parseInt(process.env.PPLNS_WINDOW)     || 100_000,// آخرین N share
+    PPLNS_WINDOW:      parseInt(process.env.PPLNS_WINDOW)     || 100_000,// last N shares
 };
 
 // ── Share Database ───────────────────────────────────────────
@@ -49,7 +49,7 @@ class ShareDB {
         if (this.shares.length > this.maxShares) this.shares.shift();
     }
 
-    // محاسبه PPLNS — سهم هر User در آخرین N share
+    // calculate PPLNS — each user's share over the last N shares
     calcPPLNS(reward) {
         const window    = this.shares.slice(-CFG.PPLNS_WINDOW).filter(s => s.valid);
         if (!window.length) return {};
@@ -135,11 +135,11 @@ class MinerConnection {
         this.address     = null;
         this.authorized  = false;
         this.difficulty  = CFG.VARDIFF_MIN;
-        this.shareTimes  = [];     // برای Vardiff
+        this.shareTimes  = [];     // for Vardiff
         this.seenShares  = new Set(); // Duplicate protection
         this.invalidCount= 0;
         this.shareCount  = 0;      // Rate limiting
-        this.shareWindow = [];     // timestamp share های اخیر
+        this.shareWindow = [];     // timestamps of recent shares
         this.subscribed  = false;
         this.lastActivity= Date.now();
         this._buf        = '';
@@ -155,7 +155,7 @@ class MinerConnection {
             }
         }, 60_000);
 
-        // Vardiff adjustment هر 30 ثانیه
+        // Vardiff adjustment every 30 seconds
         this._vardiffTimer = setInterval(() => this._adjustDiff(), 30_000);
     }
 
@@ -215,7 +215,7 @@ class StratumServer extends EventEmitter {
         this.server      = null;
 
         this._extraNonce1Counter = 0;
-        this._extraNonceMap = new Map(); // ip → extraNonce1 (برای reuse در reconnect)
+        this._extraNonceMap = new Map(); // ip → extraNonce1 (for reuse on reconnect)
     }
 
     start(port = 3333) {
@@ -223,24 +223,24 @@ class StratumServer extends EventEmitter {
         this.server.on('error', err => console.error(`[Stratum] ❌ ${err.message}`));
         this.server.listen(port, () => console.log(`⛏️  [Stratum]  ${port} آماده`));
 
-        // تولید job اولیه
+        // generate the initial job
         setTimeout(() => this._buildJob(true), 2000);
     }
 
-    // ── connection جدید ───────────────────────────────────────────
+    // ── new connection ───────────────────────────────────────────
     _onConnect(socket) {
         const ip = socket.remoteAddress?.replace('::ffff:', '') || 'unknown';
 
-        // بررسی Ban
+        // check Ban
         if (this.banList.has(ip)) {
             if (Date.now() < this.banList.get(ip)) { socket.destroy(); return; }
             this.banList.delete(ip);
         }
 
-        // بررسی ظرفیت
+        // check capacity
         if (this.miners.size >= CFG.MAX_CONNECTIONS) { socket.destroy(); return; }
 
-        // اختصاص ExtraNonce1
+        // assign ExtraNonce1
         const extraNonce1 = this._extraNonceMap.get(ip)
             || (++this._extraNonce1Counter).toString(16).padStart(CFG.EXTRANONCE1_SIZE * 2, '0');
         this._extraNonceMap.set(ip, extraNonce1);
@@ -276,7 +276,7 @@ class StratumServer extends EventEmitter {
         console.log(`🔌 [Stratum] connection : ${ip} (${this.miners.size} active)`);
     }
 
-    // ── پردازش پیام Stratum ───────────────────────────────────
+    // ── process Stratum message ───────────────────────────────────
     _handleMessage(msg, miner) {
         const { id, method, params } = msg;
 
@@ -379,13 +379,13 @@ class StratumServer extends EventEmitter {
         }
     }
 
-    // ── احراز هویت ──────────────────────────────────────────
+    // ── authentication ──────────────────────────────────────────
     _authorize(workerName, _password, _ip) {
         if (!workerName || typeof workerName !== 'string') {
             return { ok: false, reason: 'Invalid username' };
         }
 
-        // فرمت: ADDRESS.WORKERNAME
+        // format: ADDRESS.WORKERNAME
         const parts   = workerName.split('.');
         const address = parts[0];
 
@@ -393,7 +393,7 @@ class StratumServer extends EventEmitter {
             return { ok: false, reason: 'address Invalid' };
         }
 
-        // بررسی block‌لیست
+        // check blocklist
         if (process.env.WORKER_BLACKLIST?.split(',').includes(address)) {
             return { ok: false, reason: 'address' };
         }
@@ -504,7 +504,7 @@ class StratumServer extends EventEmitter {
         }
     }
 
-    // ── ساخت Job ─────────────────────────────────────────────
+    // ── build Job ─────────────────────────────────────────────
     // One shared template per job; each miner gets its own candidate header
     // (its own coinbase → its own merkle root), so no two miners share a block.
     _buildJob(cleanJobs = false) {

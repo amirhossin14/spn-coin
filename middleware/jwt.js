@@ -8,11 +8,11 @@
  */
 // ════════════════════════════════════════════════════════════
 //  🔑 JWT Authentication Middleware
-//  ویژگی‌ها: Access Token + Refresh Token + Blacklist
+//  Features: Access Token + Refresh Token + Blacklist
 // ════════════════════════════════════════════════════════════
 const crypto = require('crypto');
 
-// ── تنظیمات ────────────────────────────────────────────────
+// ── Settings ───────────────────────────────────────────────
 // ── JWT secrets — MUST be set via environment variables ───────
 // If not set: warn loudly and use a per-process random secret
 // (all sessions invalidated on restart — NOT suitable for production)
@@ -31,8 +31,8 @@ if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
 }
 const JWT_SECRET         = process.env.JWT_SECRET         || crypto.randomBytes(64).toString('hex');
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || crypto.randomBytes(64).toString('hex');
-const ACCESS_TTL        = parseInt(process.env.JWT_ACCESS_TTL)  || 15 * 60;        // 15 دقیقه
-const REFRESH_TTL       = parseInt(process.env.JWT_REFRESH_TTL) || 7 * 24 * 3600;  // 7 روز
+const ACCESS_TTL        = parseInt(process.env.JWT_ACCESS_TTL)  || 15 * 60;        // 15 minutes
+const REFRESH_TTL       = parseInt(process.env.JWT_REFRESH_TTL) || 7 * 24 * 3600;  // 7 days
 
 // ── Token blacklist (revoked tokens) ────────────────────────
 // Revoked tokens must survive process restarts, otherwise a token revoked for
@@ -80,7 +80,7 @@ async function _isBlacklisted(token) {
 }
 
 setInterval(() => {
-    // پاکسازی خودکار توکن‌های منقضی از کش محلی
+    // automatically purge expired tokens from the local cache
     const now = Math.floor(Date.now() / 1000);
     for (const t of blacklist) {
         try {
@@ -123,7 +123,7 @@ function _decode(token) {
 }
 
 // ════════════════════════════════════════════════════════════
-//  توابع اصلی
+//  Main functions
 // ════════════════════════════════════════════════════════════
 function createTokens(user, opts = {}) {
     const now = Math.floor(Date.now() / 1000);
@@ -140,7 +140,7 @@ function createTokens(user, opts = {}) {
     if (opts.pending2fa) accessPayload.pending2fa = true;
     const refreshPayload = {
         sub:  user.id,
-        jti:  crypto.randomBytes(16).toString('hex'),  // یکتا برای هر refresh
+        jti:  crypto.randomBytes(16).toString('hex'),  // unique per refresh
         iat:  now,
         exp:  now + REFRESH_TTL,
         type: 'refresh'

@@ -8,11 +8,11 @@
  */
 // ════════════════════════════════════════════════════════════
 //  📊 Prometheus Metrics Exporter
-//  ویژگی‌ها: HTTP Metrics، Blockchain Metrics، System Metrics
+//  Features: HTTP Metrics, Blockchain Metrics, System Metrics
 // ════════════════════════════════════════════════════════════
 const os = require('os');
 
-// ── Counter & Gauge helpers (بدون dependency خارجی) ─────────
+// ── Counter & Gauge helpers (no external dependency) ─────────
 class Counter {
     constructor(name, help, labels = []) {
         this.name   = name;
@@ -92,7 +92,7 @@ class Histogram {
 }
 
 // ════════════════════════════════════════════════════════════
-//  تعریف متریک‌ها
+//  Metric definitions
 // ════════════════════════════════════════════════════════════
 const metrics = {
     // HTTP

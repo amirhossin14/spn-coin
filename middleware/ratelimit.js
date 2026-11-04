@@ -8,7 +8,7 @@
  */
 // ════════════════════════════════════════════════════════════
 //  🛡️ Rate Limiter + DDoS Protection
-//  ویژگی‌ها: Sliding Window، IP Blocking، Slowdown، Honeypot
+//  Features: Sliding Window, IP Blocking, Slowdown, Honeypot
 // ════════════════════════════════════════════════════════════
 
 // ── Sliding Window Rate Limiter ─────────────────────────────
@@ -18,7 +18,7 @@ class SlidingWindowLimiter {
         this.max       = max;
         this.message   = message || 'Too many requests';
         this.keyPrefix = keyPrefix;
-        this.store     = new Map(); // در production از Redis استفاده کنید
+        this.store     = new Map(); // in production, use Redis
     }
 
     _getKey(req) {
@@ -76,19 +76,19 @@ class SlidingWindowLimiter {
 // ── DDoS Protection ─────────────────────────────────────────
 class DDoSProtection {
     constructor() {
-        this.ipStore    = new Map();  // آمار هر IP
-        this.blocklist  = new Map();  // IP های block شده: ip → unblockAt
+        this.ipStore    = new Map();  // stats per IP
+        this.blocklist  = new Map();  // blocked IPs: ip → unblockAt
         this.whitelist  = new Set((process.env.IP_WHITELIST || '127.0.0.1,::1').split(','));
 
-        // تنظیمات DDoS
+        // DDoS settings
         this.cfg = {
             reqPerSec:      parseInt(process.env.DDOS_REQ_PER_SEC)     || 50,
             blockThreshold: parseInt(process.env.DDOS_BLOCK_THRESHOLD)  || 200,
-            blockDuration:  parseInt(process.env.DDOS_BLOCK_DURATION)   || 15 * 60_000,  // 15 دقیقه
-            windowMs:       1000,   // پنجره 1 ثانیه
+            blockDuration:  parseInt(process.env.DDOS_BLOCK_DURATION)   || 15 * 60_000,  // 15 minutes
+            windowMs:       1000,   // 1-second window
         };
 
-        // پاکسازی خودکار
+        // automatic cleanup
         setInterval(() => this._cleanup(), 30_000).unref();
     }
 
@@ -127,7 +127,7 @@ class DDoSProtection {
         if (req.method === 'GET' && /\.(?:js|css|png|jpe?g|gif|svg|ico|webp|woff2?|ttf|eot|map|txt|json)$/i.test(req.path || ''))
             return { allowed: true };
 
-        // بررسی block بودن
+        // check if blocked
         if (this.blocklist.has(ip)) {
             const until = this.blocklist.get(ip);
             if (Date.now() < until) {
@@ -140,7 +140,7 @@ class DDoSProtection {
         const now     = Date.now();
         record.lastSeen = now;
 
-        // ریست پنجره
+        // reset window
         if (now - record.windowStart > this.cfg.windowMs) {
             record.hits        = 0;
             record.windowStart = now;
@@ -207,7 +207,7 @@ class DDoSProtection {
     }
 }
 
-// ── Honeypot middleware (تله برای بات‌ها) ──────────────────
+// ── Honeypot middleware (trap for bots) ──────────────────
 function honeypot() {
     const traps  = ['/admin.php', '/wp-admin', '/.env', '/phpinfo.php', '/login.php'];
     const caught = new Map();
@@ -218,7 +218,7 @@ function honeypot() {
             const ip = (req.ip || '').trim();
             caught.set(ip, (caught.get(ip) || 0) + 1);
             console.warn(`🍯 [Honeypot] ${ip} → ${req.path}`);
-            // پاسخ تأخیردار برای مصرف منابع بات
+            // delayed response to consume the bot's resources
             setTimeout(() => res.status(404).json({ error: 'Not Found' }), 2000);
             return;
         }
@@ -226,7 +226,7 @@ function honeypot() {
     };
 }
 
-// ── نمونه‌های آماده ─────────────────────────────────────────
+// ── Ready-made instances ────────────────────────────────────
 const ddos = new DDoSProtection();
 
 const limiters = {

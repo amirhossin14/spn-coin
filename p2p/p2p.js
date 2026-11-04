@@ -129,11 +129,11 @@ class P2PNode extends EventEmitter {
         this.peers      = new Map();   // id → Peer
         this.knownPeers = new Set();   // "ip:port"
         this.server     = null;
-        this.seenInvs   = new LRUSet(10_000);  // برای جلوگیری از flood
+        this.seenInvs   = new LRUSet(10_000);  // to prevent flooding
         this.reputation = new PeerReputation({ maxPeers: MAX_PEERS });
     }
 
-    // ── راه‌اندازی ────────────────────────────────────────────
+    // ── Startup ────────────────────────────────────────────
     start(port = P2P_PORT) {
         this.port   = port;
         this.server = net.createServer(socket => {
@@ -171,13 +171,13 @@ class P2PNode extends EventEmitter {
         }
     }
 
-    // ── Send block به همه ────────────────────────────────────
+    // ── Send block to all peers ────────────────────────────────────
     broadcastBlock(block) {
         const inv = [{ type: INV_TYPE.BLOCK, hash: block.hash }];
         this._broadcast(MSG.INV, { inv }, null);
     }
 
-    // ── Send transaction به همه ──────────────────────────────────
+    // ── Send transaction to all peers ──────────────────────────────────
     broadcastTx(tx) {
         const key = `tx:${tx.id}`;
         if (this.seenInvs.has(key)) return;
@@ -185,7 +185,7 @@ class P2PNode extends EventEmitter {
         this._broadcast(MSG.INV, { inv: [{ type: INV_TYPE.TX, hash: tx.id }] }, null);
     }
 
-    // ── sync با peer ─────────────────────────────────────────
+    // ── sync with peer ─────────────────────────────────────────
     syncWith(peer) {
         const locator = this._buildBlockLocator();
         peer.send(MSG.GETBLOCKS, { version: PROTOCOL_VERSION, locator, hashStop: '0'.repeat(64) });
@@ -234,7 +234,7 @@ class P2PNode extends EventEmitter {
                     peer.startPing();
                     console.log(`✅ [P2P] Handshake : ${peer.ip} (height=${peer.bestHeight})`);
                     this.emit('peer:ready', peer);
-                    // اگر peer بلاک بیشتری دارد sync کن
+                    // if the peer has more blocks, sync with it
                     if (peer.bestHeight > this.blockchain.height) this.syncWith(peer);
                 }
                 break;
