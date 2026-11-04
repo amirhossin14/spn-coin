@@ -453,6 +453,12 @@ app.use(['/admin.html', '/dashboard.html', '/admin', '/dashboard'], (req, res, n
     next();
 });
 
+// Google Search Console verification — must serve the exact .html URL with a
+// 200 (Google fetches it directly and does NOT follow the clean-URL redirect).
+// Placed BEFORE the .html→clean-URL redirect below so it is never rewritten.
+app.get('/googleb7eb6d13391a9589.html', (req, res) =>
+    res.sendFile(path.join(__dirname, 'public', 'googleb7eb6d13391a9589.html')));
+
 // ── Clean URLs: canonicalise /page.html → /page (301), keep query string ──
 // Placed BEFORE express.static so the .html form never serves a 200 directly.
 app.get(/\.html$/i, (req, res, next) => {
